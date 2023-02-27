@@ -1,0 +1,232 @@
+from os.path import exists #check if file exists
+import numpy as np
+import matplotlib.pyplot as plt
+import math, sys, os, json, subprocess
+from libCalib1 import TIsotope as TIso
+from libCalib1 import TMeasurement as Tmeas
+from libPlotEliade import PlotJsondom as PlotDomain
+from libPlotEliade import PlotJsonclover as PlotClover
+from pathlib import Path
+
+path='{}{}'.format(Path.home(),'/EliadeSorting/EliadeTools/RecalEnergy')
+print('Path to RecalEnergy {}'.format(path))
+save_results_to = 'figures/'
+
+blPlot = True
+
+lutfile = 'LUT_ELIADE_S9_run20_raluca.json'
+
+j_results = {}
+
+list_results = []
+
+blFirstElement = False
+
+
+j_sources = None
+debug = True
+
+class TPeak:
+    def __init__(self, domain, line):
+        self.domain  = domain
+        self.area = float(line[3])
+        self.Etable = float(line[7])
+        self.pos_ch = float(line [4])
+        self.fwhm = float(line[5])
+        # self.eff = line[3]
+
+    def __repr__(self):
+        print('==============')
+        print('dom {}, Etab {}, Area {}, Ch {}, fwhm {}'.format(self.domain, self.Etable, self.area, self.pos_ch, self.fwhm))
+        print('==============')
+
+# class TDetProperties:
+#     def __init__(self, p2t):
+
+def file_exists(myfile):
+    if not exists(myfile):
+        print('file_exists: File {} does not exist'.format(myfile))
+        return False
+    print('file_exists: File found {}'.format(myfile))
+    return True
+def MakeDir(path):
+    isExist = os.path.exists(path)
+    if not isExist:
+        os.makedirs(path)
+        print("The new directory {} is created!".format(path))
+
+
+def ProcessFitDataStr(dom, lines, j_src, j_lut ):
+    print('ProcessFitDataStr: now  split lines')
+
+    # print(lines)
+    words = [s for s in lines.split('#2') if s]
+    # del words[0]
+    words.pop(0)
+
+    PeakList = []
+    cal = []
+
+    for word in words:
+        if 'Cal' in word:
+            cal = []
+            temp = [t for t in word.split('[ ') if t]
+            temp1 = [t1 for t1 in temp[1].split(' ') if t1]
+            del temp1[len(temp1) - 1]
+            for s in temp1:
+                cal.append(s)
+            print('Calibration for domain {} {}'.format(dom, cal))
+            for item in j_lut:
+                if item['domain'] == dom:
+                    # print('Old calibration {}'.format(item['pol_list']))
+                    item['pol_list'] = cal
+                    # print('New calibration {}'.format(item['pol_list']))
+
+        for gamma in j_src['60Co']['gammas']:
+            if gamma in word:
+                print('Found ',gamma,' ', word)
+                numbers = [s for s in word.split(' ') if s]
+                peak = TPeak(dom, numbers)
+                PeakList.append(peak)
+                # peak.__str__()
+
+    FillResults2json(dom, PeakList, cal)
+    # print('Print PeakList {} elements'.format(len(PeakList)))
+    for p in PeakList:
+        p.__str__()
+
+def FillResults2json(dom, list, cal):
+    jsondata = {}
+    content = {}
+    source = {}
+    jsondata['domain'] = dom
+
+
+    for item in j_lut:
+        if item['domain'] == dom:
+            jsondata['serial'] = item['serial']
+            jsondata['detType'] = item['detType']
+
+    peaksum = 0
+    for peak in list:
+        content = {}
+        content['eff'] = peak.area/n_decays_sum*100
+        content['res'] = peak.fwhm/peak.pos_ch*peak.Etable
+        # jsondata[peak.Etable] = content
+        source[peak.Etable] = content
+        peaksum = peaksum + peak.area
+        # print('Dump to json peak: {} {} {}'.format(peak.Etable, peak.pos_ch, peak.fwhm))
+        # print(source)
+        # print(source[peak.Etable])
+        # print('Dump to json peak: {} {} {}'.format(source[peak.Etable].Etable, source[peak.Etable].pos_ch, source[peak.Etable].fwhm))
+
+    print('source {}'.format(source))
+
+
+    jsondata['PT'] = peaksum/total
+    jsondata['pol_list'] = cal
+
+    jsondata[my_source.name] = source
+
+    list_results.append(jsondata)
+    print(list_results)
+    return True
+
+def load_json(file):
+    fname = '{}'.format(file)
+    if not file_exists(fname):
+        sys.exit()
+    with open(fname,'r') as myfile:
+        return json.load(myfile)
+
+def SumAsci(file):
+    sum = 0
+    with open('{}'.format(file),'r') as ifile:
+        for line in ifile:
+            try:
+                num = int(line)
+                sum+=num
+            except ValueError:
+                print('{} is not a number'.format(line.rstrip()))
+                return 0
+    if debug:
+        print('Total sum: {}'.format(sum))
+    return sum
+
+def main():
+
+    run = 1
+    server = 6
+
+    if not file_exists('{}'.format(path)):
+        print('RecalEnergy cannot be found. Ciao.')
+        sys.exit()
+
+    j_sources = load_json('gamma_sources.json')
+    j_data = load_json('run_table.json')
+    global j_lut
+    j_lut = load_json('{}'.format(lutfile))
+
+    # print('Printing source table')
+    # print(j_sources)
+
+
+
+    my_run = Tmeas(None,None,None,None,None,None)
+    my_run.setup_run_from_json(j_data, run, server)
+    print(my_run.__str__())
+
+    global my_source
+    my_source = TIso(None, None, None, None)
+    my_source.setup_source_from_json(j_sources, my_run.source)
+    global n_decays_sum
+    n_decays_sum= my_source.GetNdecaysIntegral(my_run.tstart, my_run.tstop)
+    global n_decays_int
+    n_decays_int = my_source.GetNdecays(my_run.tstart, my_run.tstop)
+    print(my_source.__str__())
+    # print('sum {}; int {}'.format(n_decays_sum, n_decays_int))
+
+    # print('Gammas ', j_sources['Co60']['gammas'])
+
+    for domain in range (109,120):
+        if (domain != 109) and (domain != 119):
+            continue
+        if debug:
+            print('I am trying to do fit for domain {}'.format(domain))
+        current_file = 'data/mDelila_raw_py_{}.spe'.format(domain)
+        if file_exists(current_file):
+            command_line = '{} -spe {} -{} -lim 800 1200 -fmt A 16384 -dwa 4 100 -poly2 -v 2'.format(path, current_file, my_source.name)
+            if debug:
+                print('I am ready to do fit for domain {} : '.format(domain))
+                print('{}'.format(command_line))
+            result_scr = subprocess.run(['{}'.format(command_line)], shell=True, capture_output=True)
+            # print(result_scr)
+            fitdata = result_scr.stdout.decode()
+            # print(fitdata)
+            global total
+            total = SumAsci(current_file)
+            ProcessFitDataStr(domain, fitdata, j_sources, j_lut)
+
+
+    with open('new_{}'.format(lutfile), 'w') as ofile:
+        js_tab = json.dump(j_lut, ofile, indent=3, default=str)
+
+    # with open('calib_res_{}.json'.format(my_run.run), 'w') as ofile:
+    #     ofile.write(j_results)
+
+    with open('calib_res_{}.json'.format(my_run.run), 'w') as ofile:
+        js_tab = json.dump(list_results, ofile, indent=3, default=str)
+
+
+    with open('calib_res_{}.json'.format(my_run.run), 'r') as ifile:
+        js_tab = json.load(ifile)
+        if blPlot == True:
+            PlotDomain(js_tab, my_source.name)
+            PlotClover(js_tab, my_source.name)
+
+    global j_res
+    with open('calib_res_{}.json'.format(my_run.run), 'r') as ifile:
+        j_res = json.load(ifile)
+
+if __name__ == "__main__":
+   main()
