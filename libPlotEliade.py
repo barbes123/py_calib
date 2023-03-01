@@ -63,7 +63,7 @@ def PlotJsondom(data, source):
             eff = i[source][key]["eff"]
             plt.scatter(x=float(key), y=eff)
         plt.xlim([1000,1400])
-        plt.ylim([0.0001,0.00015])
+        #plt.ylim([0.0001,0.00015])
         plt.title(f'Efficiency for domain {dom}')
         plt.xlabel('Energy (keV)')
         plt.ylabel('Efficiency (%)')
@@ -123,7 +123,7 @@ def PlotJsonclover(data, source):
             elif float(key)==1332.513:
                 plt.scatter(x=dom, y=eff, color='b', label=f"{key}")
         FindXlim(clover)
-        plt.ylim([0.0001,0.00015])
+        plt.ylim([0.00001,0.000013])
         title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
         plt.title(f'Efficiency for clover {title_clover}')
         plt.xlabel('Domain')
@@ -134,6 +134,26 @@ def PlotJsonclover(data, source):
     file_name2 = 'eliade_{}_efficiency.png'.format(title_clover)
     plt.savefig(save_results_to + file_name2)
     plt.close()   
+
+    for i in data:
+        pt=i["PT"]
+        clover=i["serial"]
+        dom = i["domain"]
+
+        plt.scatter(dom, pt, color='b')
+        FindXlim(clover)
+        plt.ylim([0.1,0.15])
+        title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
+        plt.title(f'Peak to Total ratio for clover {title_clover}')
+        plt.xlabel('Domain')
+        plt.ylabel('Peak-to-total ratio')
+        plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
+        
+        
+    file_name3 = 'eliade_{}_peaktotal.png'.format(title_clover)
+    plt.savefig(save_results_to + file_name3)
+    plt.close()   
+
     return  True
 
 with open('calib_res_1.json', 'r') as js_file:
