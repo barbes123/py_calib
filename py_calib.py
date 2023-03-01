@@ -7,6 +7,7 @@ from libCalib1 import TMeasurement as Tmeas
 from libPlotEliade import PlotJsondom as PlotDomain
 from libPlotEliade import PlotJsonclover as PlotClover
 from pathlib import Path
+from libSettings import run22Co60source
 
 path='{}{}'.format(Path.home(),'/EliadeSorting/EliadeTools/RecalEnergy')
 print('Path to RecalEnergy {}'.format(path))
@@ -161,9 +162,7 @@ def SumAsci(file):
     return sum
 
 def SetUpRecallEner(dom):
-    if dom == 11111:
-        myCurrentSetting.limDown = 100
-    pass
+    run22Co60source(dom)
 
 def main():
 
