@@ -26,6 +26,13 @@ blFirstElement = False
 j_sources = None
 debug = True
 
+class TRecallEner:
+    def __init__(self, limDown, limUp, ampl, fwhm):
+        self.limDown = limDown
+        self.limUp = limUp
+        self.ampl = ampl
+        self.fwhm = fwhm
+
 class TPeak:
     def __init__(self, domain, line):
         self.domain  = domain
@@ -153,6 +160,11 @@ def SumAsci(file):
         print('Total sum: {}'.format(sum))
     return sum
 
+def SetUpRecallEner(dom):
+    if dom == 11111:
+        myCurrentSetting.limDown = 100
+    pass
+
 def main():
 
     run = 1
@@ -188,14 +200,21 @@ def main():
 
     # print('Gammas ', j_sources['Co60']['gammas'])
 
+    limDown = 800
+    limUp = 1200
+
+    global myCurrentSetting
+    myCurrentSetting = TRecallEner(800,1200,100,4)
+
     for domain in range (109,120):
         if (domain != 109) and (domain != 119):
             continue
+        SetUpRecallEner(domain)
         if debug:
             print('I am trying to do fit for domain {}'.format(domain))
         current_file = 'data/mDelila_raw_py_{}.spe'.format(domain)
         if file_exists(current_file):
-            command_line = '{} -spe {} -{} -lim 800 1200 -fmt A 16384 -dwa 4 100 -poly2 -v 2'.format(path, current_file, my_source.name)
+            command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly2 -v 2'.format(path, current_file, my_source.name, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
             if debug:
                 print('I am ready to do fit for domain {} : '.format(domain))
                 print('{}'.format(command_line))
