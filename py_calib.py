@@ -18,7 +18,8 @@ save_results_to = 'figures/'
 blPlot = True
 debug = False
 
-lutfile = 'LUT_ELIADE_S9_run20_raluca.json'
+lutfile = 'LUT_ELIADE.json'
+# lutfile = 'LUT_ELIADE_S9_run20_raluca.json'
 
 j_results = {}
 
