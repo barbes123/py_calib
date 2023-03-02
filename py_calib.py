@@ -1,3 +1,5 @@
+#! /usr/bin/python3
+
 from os.path import exists #check if file exists
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,6 +16,7 @@ print('Path to RecalEnergy {}'.format(path))
 save_results_to = 'figures/'
 
 blPlot = True
+debug = False
 
 lutfile = 'LUT_ELIADE_S9_run20_raluca.json'
 
@@ -25,7 +28,9 @@ blFirstElement = False
 
 
 j_sources = None
-debug = True
+
+global my_params
+
 
 class TRecallEner:
     def __init__(self, limDown, limUp, ampl, fwhm):
@@ -33,6 +38,18 @@ class TRecallEner:
         self.limUp = limUp
         self.ampl = ampl
         self.fwhm = fwhm
+
+class TStartParams:
+    def __init__(self, server, runnbr, dom1, dom2):
+        self.server = int(server)
+        self.runnbr = int(runnbr)
+        self.dom1 = int(dom1)
+        self.dom2 = int(dom2)
+
+    def __repr__(self):
+        print('=========================================')
+        print('Server {}, Run {}, domFrom {}, domTo {}'.format(self.server, self.runnbr, self.dom1, self.dom2))
+        print('=========================================')
 
 class TPeak:
     def __init__(self, domain, line):
@@ -128,7 +145,8 @@ def FillResults2json(dom, list, cal):
         # print(source[peak.Etable])
         # print('Dump to json peak: {} {} {}'.format(source[peak.Etable].Etable, source[peak.Etable].pos_ch, source[peak.Etable].fwhm))
 
-    print('source {}'.format(source))
+    if debug == True:
+        print('source {}'.format(source))
 
 
     jsondata['PT'] = peaksum/total
@@ -137,7 +155,8 @@ def FillResults2json(dom, list, cal):
     jsondata[my_source.name] = source
 
     list_results.append(jsondata)
-    print(list_results)
+    if debug == True:
+        print(list_results)
     return True
 
 def load_json(file):
@@ -162,12 +181,13 @@ def SumAsci(file):
     return sum
 
 def SetUpRecallEner(dom):
-    run22Co60source(dom)
+    pass
+    # run22Co60source(dom)
 
 def main():
 
-    run = 1
-    server = 6
+    # run = 1
+    # server = 6
 
     if not file_exists('{}'.format(path)):
         print('RecalEnergy cannot be found. Ciao.')
@@ -179,12 +199,10 @@ def main():
     j_lut = load_json('{}'.format(lutfile))
 
     # print('Printing source table')
-    # print(j_sources)
-
-
+    print('my_params.run', my_params.runnbr)
 
     my_run = Tmeas(None,None,None,None,None,None)
-    my_run.setup_run_from_json(j_data, run, server)
+    my_run.setup_run_from_json(j_data, my_params.runnbr, my_params.server)
     print(my_run.__str__())
 
     global my_source
@@ -205,9 +223,9 @@ def main():
     global myCurrentSetting
     myCurrentSetting = TRecallEner(800,1200,100,4)
 
-    for domain in range (109,120):
-        if (domain != 109) and (domain != 119):
-            continue
+    for domain in range (my_params.dom1, my_params.dom2):
+        # if (domain != 109) and (domain != 119):
+        #     continue
         SetUpRecallEner(domain)
         if debug:
             print('I am trying to do fit for domain {}'.format(domain))
@@ -247,4 +265,24 @@ def main():
         j_res = json.load(ifile)
 
 if __name__ == "__main__":
+   print('Input Parameters: server, run, domDown, domUp')
+   n = len(sys.argv)
+   print('Number of arguments {}'.format(n))
+   if n == 1: #no arguments
+       print('Default input values')
+       my_params = TStartParams(6, 1, 109, 119)
+       # print('Start Params ', my_params.__str__())
+   elif n == 5: #2 arguments
+       print('Settings input values from arguments')
+       dom1 = int(sys.argv[3])
+       dom2 = int(sys.argv[4])
+       if dom1 >= dom2:
+           my_params = TStartParams(sys.argv[1], sys.argv[2], dom2, dom1)
+       else:
+           my_params = TStartParams(sys.argv[1], sys.argv[2], dom1, dom2)
+   else:
+       print('Wrong number of parameters, ciao')
+       sys.exit()
+
+   print('Start Params are set', my_params.__str__())
    main()
