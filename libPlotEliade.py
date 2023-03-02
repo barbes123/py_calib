@@ -45,7 +45,7 @@ def PlotJsondom(data, source):
         plt.figure(1)
         for key in i[source].keys():
             res=i[source][key]["res"]
-            plt.scatter(x=float(key), y=res)
+            plt.scatter(x=float(key), y=res, color='b')
         plt.xlim([1000.,1400.])
         plt.ylim([1,5])
         plt.title(f'Resolution for domain {dom}')
@@ -61,7 +61,7 @@ def PlotJsondom(data, source):
         plt.figure(2)
         for key in i[source].keys():
             eff = i[source][key]["eff"]
-            plt.scatter(x=float(key), y=eff)
+            plt.scatter(x=float(key), y=eff, color='b')
         plt.xlim([1000,1400])
         #plt.ylim([0.0001,0.00015])
         plt.title(f'Efficiency for domain {dom}')
