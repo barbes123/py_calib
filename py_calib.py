@@ -4,11 +4,14 @@ from os.path import exists #check if file exists
 import numpy as np
 import matplotlib.pyplot as plt
 import math, sys, os, json, subprocess
+from pathlib import Path
+
+sys.path.insert(1, 'lib')
+
 from libCalib1 import TIsotope as TIso
 from libCalib1 import TMeasurement as Tmeas
 from libPlotEliade import PlotJsondom as PlotDomain
 from libPlotEliade import PlotJsonclover as PlotClover
-from pathlib import Path
 from TRecallEner import TRecallEner
 from libSettings import *
 
@@ -186,8 +189,8 @@ def main():
         print('RecalEnergy cannot be found. Ciao.')
         sys.exit()
 
-    j_sources = load_json('gamma_sources.json')
-    j_data = load_json('run_table.json')
+    j_sources = load_json('json/gamma_sources.json')
+    j_data = load_json('json/run_table.json')
     global j_lut
     j_lut = load_json('{}'.format(lutfile))
 
