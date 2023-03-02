@@ -33,12 +33,12 @@ j_sources = None
 global my_params
 
 
-# class TRecallEner:
-#     def __init__(self, limDown, limUp, ampl, fwhm):
-#         self.limDown = limDown
-#         self.limUp = limUp
-#         self.ampl = ampl
-#         self.fwhm = fwhm
+class TRecallEner:
+    def __init__(self, limDown, limUp, ampl, fwhm):
+        self.limDown = limDown
+        self.limUp = limUp
+        self.ampl = ampl
+        self.fwhm = fwhm
 
 class TStartParams:
     def __init__(self, server, runnbr, dom1, dom2):
@@ -182,12 +182,8 @@ def SumAsci(file):
     return sum
 
 def SetUpRecallEner(dom):
-<<<<<<< HEAD
-    run20Co60source(dom)
-=======
     pass
     # run22Co60source(dom)
->>>>>>> a292c9eb46989c5f9f87e3a1ba90f4a8cc8900b5
 
 def main():
 
@@ -222,22 +218,16 @@ def main():
 
     # print('Gammas ', j_sources['Co60']['gammas'])
 
-    # limDown = 800
-    # limUp = 1200
+    limDown = 800
+    limUp = 1200
 
     global myCurrentSetting
+    myCurrentSetting = TRecallEner(800,1200,100,4)
 
-<<<<<<< HEAD
-    for domain in range (109,120):
-        if (domain != 109) and (domain != 119):
-            continue
-        myCurrentSetting = run20Co60source(domain)
-=======
     for domain in range (my_params.dom1, my_params.dom2):
         # if (domain != 109) and (domain != 119):
         #     continue
         SetUpRecallEner(domain)
->>>>>>> a292c9eb46989c5f9f87e3a1ba90f4a8cc8900b5
         if debug:
             print('I am trying to do fit for domain {}'.format(domain))
         current_file = 'data/mDelila_raw_py_{}.spe'.format(domain)
