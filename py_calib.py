@@ -9,7 +9,8 @@ from libCalib1 import TMeasurement as Tmeas
 from libPlotEliade import PlotJsondom as PlotDomain
 from libPlotEliade import PlotJsonclover as PlotClover
 from pathlib import Path
-from libSettings import run20Co60source
+from TRecallEner import TRecallEner
+from libSettings import *
 
 path='{}{}'.format(Path.home(),'/EliadeSorting/EliadeTools/RecalEnergy')
 print('Path to RecalEnergy {}'.format(path))
@@ -31,14 +32,6 @@ blFirstElement = False
 j_sources = None
 
 global my_params
-
-
-class TRecallEner:
-    def __init__(self, limDown, limUp, ampl, fwhm):
-        self.limDown = limDown
-        self.limUp = limUp
-        self.ampl = ampl
-        self.fwhm = fwhm
 
 class TStartParams:
     def __init__(self, server, runnbr, dom1, dom2):
@@ -181,9 +174,8 @@ def SumAsci(file):
         print('Total sum: {}'.format(sum))
     return sum
 
-def SetUpRecallEner(dom):
-    pass
-    # run22Co60source(dom)
+def SetUpRecallEner(js, dom):
+    return run20Co60source(js, dom)
 
 def main():
 
@@ -227,7 +219,7 @@ def main():
     for domain in range (my_params.dom1, my_params.dom2):
         # if (domain != 109) and (domain != 119):
         #     continue
-        SetUpRecallEner(domain)
+        myCurrentSetting = SetUpRecallEner(j_lut, domain)
         if debug:
             print('I am trying to do fit for domain {}'.format(domain))
         current_file = 'data/mDelila_raw_py_{}.spe'.format(domain)
