@@ -13,7 +13,7 @@ from libCalib1 import TMeasurement as Tmeas
 from libPlotEliade import PlotJsondom as PlotDomain
 from libPlotEliade import PlotJsonclover as PlotClover
 from TRecallEner import TRecallEner
-from libSettings import *
+from libSettings import SetUpRecallEner
 
 path='{}{}'.format(Path.home(),'/EliadeSorting/EliadeTools/RecalEnergy')
 print('Path to RecalEnergy {}'.format(path))
@@ -177,9 +177,6 @@ def SumAsci(file):
         print('Total sum: {}'.format(sum))
     return sum
 
-def SetUpRecallEner(js, dom):
-    return run20Co60source(js, dom)
-
 def main():
 
     # run = 1
@@ -219,7 +216,7 @@ def main():
     global myCurrentSetting
     myCurrentSetting = TRecallEner(800,1200,100,4)
 
-    for domain in range (my_params.dom1, my_params.dom2):
+    for domain in range (my_params.dom1, my_params.dom2+1):
         # if (domain != 109) and (domain != 119):
         #     continue
         myCurrentSetting = SetUpRecallEner(j_lut, domain)

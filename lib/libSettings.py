@@ -1,7 +1,16 @@
 import json
 from TRecallEner import TRecallEner
 
+# *******************************
+def SetUpRecallEner(js, dom):
+    return run20Co60source(js, dom)
+# *******************************
 def run20Co60source(js, dom): #file is LUT file
+    temp_params = TRecallEner(800,1200,100,4)
+    return temp_params
+    pass
+
+def run25Eu1252source(js, dom): #file is LUT file
     temp_params = TRecallEner(800,1200,100,4)
     return temp_params
     pass
