@@ -106,12 +106,12 @@ def PlotJsonclover(data, source):
         plt.ylabel('Resolution (keV)')
         plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
         legend_without_duplicate_labels(plt)
-        
-        
+
     file_name1 = 'eliade_{}_resolution.png'.format(title_clover)
     plt.savefig(save_results_to + file_name1)
     plt.close()
-
+   
+        
     for i in data:
         clover=i["serial"]
         dom = i["domain"]
@@ -123,7 +123,7 @@ def PlotJsonclover(data, source):
             elif float(key)==1332.513:
                 plt.scatter(x=dom, y=eff, color='b', label=f"{key}")
         FindXlim(clover)
-        plt.ylim([0.00001,0.000013])
+        #plt.ylim([0.00001,0.000013])
         title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
         plt.title(f'Efficiency for clover {title_clover}')
         plt.xlabel('Domain')
@@ -142,19 +142,99 @@ def PlotJsonclover(data, source):
 
         plt.scatter(dom, pt, color='b')
         FindXlim(clover)
-        plt.ylim([0.1,0.15])
+        #plt.ylim([0.1,0.15])
         title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
         plt.title(f'Peak to Total ratio for clover {title_clover}')
         plt.xlabel('Domain')
         plt.ylabel('Peak-to-total ratio')
         plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
         
-        
+
     file_name3 = 'eliade_{}_peaktotal.png'.format(title_clover)
     plt.savefig(save_results_to + file_name3)
     plt.close()   
 
+    for i in data:
+        clover=i["serial"]
+        dom = i["domain"]
+        if((dom%10!=9) and (dom%10!=0)):
+            for key in i[source].keys():
+                eff = i[source][key]["eff"]
+                if float(key)==1173.238:
+                    plt.scatter(x=dom, y=eff, color='r', label=f"{key}")
+                elif float(key)==1332.513:
+                    plt.scatter(x=dom, y=eff, color='b', label=f"{key}")
+        FindXlim(clover)
+        plt.ylim([0,0.01])
+        title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
+        plt.title(f'Efficiency for clover {title_clover} - segments')
+        plt.xlabel('Domain')
+        plt.ylabel('Efficiency (%)')
+        plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
+        legend_without_duplicate_labels(plt)
+        
+    file_name4 = 'eliade_{}_efficiency_segments.png'.format(title_clover)
+    plt.savefig(save_results_to + file_name4)
+    plt.close() 
+
+    return True
+
+def PlotJsoncore(data, source):
+    MakeDir(save_results_to)
+    for i in data:
+        #clover=i["serial"]
+        dom = i["domain"]
+        if(dom%10==9):
+            for key in i[source].keys():
+                eff = i[source][key]["eff"]
+                if float(key)==1173.238:
+                    plt.scatter(x=dom, y=eff, color='r', label=f"{key}")
+                elif float(key)==1332.513:
+                    plt.scatter(x=dom, y=eff, color='b', label=f"{key}")
+        #FindXlim(clover)
+        #plt.ylim([0.00001,0.000013])
+        #title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
+        plt.title('Efficiency for core 1 ')
+        plt.xlabel('Domain')
+        plt.ylabel('Efficiency (%)')
+        plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
+        legend_without_duplicate_labels(plt)
+        
+        
+    file_name5 = 'eliade_efficiency_core1.png'
+    plt.savefig(save_results_to + file_name5)
+    plt.close()   
+
+    for i in data:
+        
+        clover=i["serial"]
+        dom = i["domain"]
+        
+        if(dom%10==9):
+            for key in i[source].keys():
+                res=i[source][key]["res"]
+                if float(key)==1173.238:
+                    plt.scatter(x=dom, y=res, color='r', label=f"{key}")
+                elif float(key)==1332.513:
+                    plt.scatter(x=dom, y=res, color='b', label=f"{key}")
+            
+        #FindXlim(clover)
+        plt.ylim([1,5])
+        #title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
+        plt.title(f'Resolution for core 1')
+        plt.xlabel('Domain')
+        plt.ylabel('Resolution (keV)')
+        plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
+        legend_without_duplicate_labels(plt)
+        
+        
+    file_name6 = 'eliade_resolution_core1.png'
+    plt.savefig(save_results_to + file_name6)
+    plt.close()
+
     return  True
+
+  
 
 with open('calib_res_1.json', 'r') as js_file:
     data=json.load(js_file)

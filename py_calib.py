@@ -12,6 +12,7 @@ from libCalib1 import TIsotope as TIso
 from libCalib1 import TMeasurement as Tmeas
 from libPlotEliade import PlotJsondom as PlotDomain
 from libPlotEliade import PlotJsonclover as PlotClover
+from libPlotEliade import PlotJsoncore as PlotCore
 from TRecallEner import TRecallEner
 from libSettings import SetUpRecallEner
 
@@ -132,7 +133,8 @@ def FillResults2json(dom, list, cal):
     peaksum = 0
     for peak in list:
         content = {}
-        content['eff'] = peak.area/n_decays_sum*100
+        content['eff'] = peak.area/n_decays_int*100
+        #print(n_decays_sum, 'this is sum of decays')
         content['res'] = peak.fwhm/peak.pos_ch*peak.Etable
         # jsondata[peak.Etable] = content
         source[peak.Etable] = content
@@ -168,7 +170,8 @@ def SumAsci(file):
     with open('{}'.format(file),'r') as ifile:
         for line in ifile:
             try:
-                num = int(line)
+                #num = int(line)
+                num = float(line)
                 sum+=num
             except ValueError:
                 print('{} is not a number'.format(line.rstrip()))
@@ -206,7 +209,7 @@ def main():
     global n_decays_int
     n_decays_int = my_source.GetNdecays(my_run.tstart, my_run.tstop)
     print(my_source.__str__())
-    # print('sum {}; int {}'.format(n_decays_sum, n_decays_int))
+    print('sum {}; int {}'.format(n_decays_sum, n_decays_int))
 
     # print('Gammas ', j_sources['Co60']['gammas'])
 
@@ -252,6 +255,8 @@ def main():
         if blPlot == True:
             PlotDomain(js_tab, my_source.name)
             PlotClover(js_tab, my_source.name)
+            PlotCore(js_tab, my_source.name)
+            
 
     global j_res
     with open('calib_res_{}.json'.format(my_run.run), 'r') as ifile:
