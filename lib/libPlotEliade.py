@@ -7,6 +7,9 @@ global save_results_to
 # save_results_to = '/home/rmiron/Desktop/dir/python_exercises/calibrations/figures/'
 save_results_to = 'figures/'
 title_clover = ''
+list_of_clovers = {"CL29", "CL30", "CL31", "CL32", "CL33", "CL35", "CL36"}
+list_of_sources = {"60Co", "152Eu","137Cs", "133Ba"}
+
 #res and eff vs ener for each domain
 
 
@@ -84,19 +87,31 @@ def legend_without_duplicate_labels(figure):
     figure.legend(by_label.values(), by_label.keys(), loc='lower right')
 
 def PlotJsonclover(data, source):
+    print('I am in PlotJsonclover')
     MakeDir(save_results_to)
     for i in data:
         
         clover=i["serial"]
         dom = i["domain"]
+
+        my_det_type = 1
         
-        
-        for key in i[source].keys():
-            res=i[source][key]["res"]
-            if float(key)==1173.238:
-                plt.scatter(x=dom, y=res, color='r', label=f"{key}")
-            elif float(key)==1332.513:
-                plt.scatter(x=dom, y=res, color='b', label=f"{key}")
+        for cloverkey in list_of_clovers:
+            for key in data:
+                # print(key["serial"])
+                print(key["serial"].rstrip(key["serial"][-1]))
+                if key["serial"].rstrip(key["serial"][-1]) == cloverkey:
+                    if key["detType"] == my_det_type:
+                        print('wowo')
+            # for key in data['serial']:
+                # print(key)
+
+            # for key in i[source].keys():
+            #     res=i[source][key]["res"]
+            #     if float(key)==1173.238:
+            #         plt.scatter(x=dom, y=res, color='r', label=f"{key}")
+            #     elif float(key)==1332.513:
+            #         plt.scatter(x=dom, y=res, color='b', label=f"{key}")
             
         FindXlim(clover)
         plt.ylim([1,5])
