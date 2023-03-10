@@ -136,6 +136,7 @@ def FillResults2json(dom, list, cal):
         content['eff'] = peak.area/n_decays_int*100
         #print(n_decays_sum, 'this is sum of decays')
         content['res'] = peak.fwhm/peak.pos_ch*peak.Etable
+        content['pos_ch'] = peak.pos_ch
         # jsondata[peak.Etable] = content
         source[peak.Etable] = content
         peaksum = peaksum + peak.area
