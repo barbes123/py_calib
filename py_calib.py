@@ -78,6 +78,17 @@ def MakeDir(path):
         os.makedirs(path)
         print("The new directory {} is created!".format(path))
 
+def MakeSymLink(file, link):
+    os.chdir('data')
+    if file_exists(link):
+        print('Link {} to file {} exists '.format(link, file))
+        os.chdir('..')
+        return
+    if file_exists(file):
+        print(os.path.abspath(file))
+        os.symlink(os.path.abspath(file), link)
+        print('Link {} to file {} created '.format(link, file))
+    os.chdir('..')
 
 def ProcessFitDataStr(dom, lines, j_src, j_lut ):
     print('ProcessFitDataStr: now  split lines')
@@ -194,6 +205,11 @@ def main():
     j_data = load_json('json/run_table.json')
     global j_lut
     j_lut = load_json('{}'.format(lutfile))
+
+
+    MakeSymLink('HPGe.spe','mDelila_raw_py_1.spe')
+    MakeSymLink('SEG.spe','mDelila_raw_py_2.spe')
+    MakeSymLink('LaBr.spe','mDelila_raw_py_3.spe')
 
     # print('Printing source table')
     print('my_params.run', my_params.runnbr)
