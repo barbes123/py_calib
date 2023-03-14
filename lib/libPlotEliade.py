@@ -1,13 +1,15 @@
 import json
 import matplotlib.pyplot as plt
+from matplotlib.pyplot import cm
 from matplotlib import interactive
+import numpy as np
 import os
 
 global save_results_to
 # save_results_to = '/home/rmiron/Desktop/dir/python_exercises/calibrations/figures/'
 save_results_to = 'figures/'
 title_clover = ''
-list_of_clovers = {"CL29", "CL30", "CL31", "CL32", "CL33", "CL34", "CL35", "CL36", "HPGe"}
+list_of_clovers = {"CL29", "CL30", "CL31", "CL32", "CL33", "CL34", "CL35", "CL36", "HPGe", "SEG", "LaBr"}
 list_of_sources = {"60Co", "152Eu","137Cs", "133Ba"}
 
 #res and eff vs ener for each domain
@@ -78,7 +80,7 @@ def PlotJsondom(data, source):
         plt.savefig(save_results_to + file_name2)
         interactive(False)
         plt.close()
-        
+    print("Finished domain graphs")
     return  True
 
 def legend_without_duplicate_labels(figure):
@@ -89,44 +91,38 @@ def legend_without_duplicate_labels(figure):
 def PlotJsonclover(data, source):
     print('I am in PlotJsonclover')
     MakeDir(save_results_to)
-    #for i in data:
-        
-        #clover=i["serial"]
-        #dom = i["domain"]
-
+    
     my_det_type = 1
         
-    ### RESOLUTION FOR CLOVERS
+    ### RESOLUTION, EFFICIENCY AND PEAK-TO-TOTAL RATIO FOR CLOVERS
     for cloverkey in list_of_clovers:
         blCloverFound = False
-        for key in data:
-            # print(key["serial"])
-            #print(key["serial"].rstrip(key["serial"][-1]))
-            if key["serial"].rstrip(key["serial"][-1]) == cloverkey:
-                if key["detType"] == my_det_type:
+        for key in data: # Browse through data in output file
+            if key["serial"].rstrip(key["serial"][-1]) == cloverkey: #check if clover is found
+                if key["detType"] == my_det_type: #check if the detector is the type that we want
                     blCloverFound = True
-
-                    plt.figure(0)
+                    plt.figure(0) #peak-to-total plot
                     plot_color = "b"
                     plt.scatter(x=key["domain"], y=key["PT"], color=plot_color)
-                    #print('wowo')
-                    for gammakey in list_of_sources:
-                        if source == gammakey:                                
-                            for element in gammatab[source]["gammas"]:
+                    for gammakey in list_of_sources: # browse through the list of sources
+                        if source == gammakey: #if our source is in the list                                
+                            for element in gammatab[source]["gammas"]: #for each gamma energy of the source
                                 plot_color="k"
                                 with open('json/gamma_set.json', 'r') as jason_file:
                                     gammaset=json.load(jason_file)
-                                    plot_color=gammaset[source]['gammas'][element]
-                                plt.figure(1)
+                                    plot_color=gammaset[source]['gammas'][element] #using different colors for each energy
+                                plt.figure(1) #efficiency plot
                                 plt.scatter(x=key["domain"], y=key[source][element]["eff"], color=plot_color, label=f"{element}")
-                                plt.figure(2)
+                                plt.figure(2) #resolution plot
                                 plt.scatter(x=key["domain"], y=key[source][element]["res"], color=plot_color, label=f"{element}")
         if blCloverFound == True:
 
-            FindXlim(cloverkey)
-            print('I am here 1')
-            plt.figure(1)  # eff
-            plt.ylim([0, 0.1])
+            FindXlim(cloverkey) #each clover has a different x-axis interval
+            plt.figure(1)  # efficiency
+            if my_det_type==1 or my_det_type==10:
+                plt.ylim([0.04, 0.1])
+            elif my_det_type==2: # (segments)
+                plt.ylim([0,0.01])
             plt.title(f'Efficiency for clover {cloverkey}')
             plt.xlabel('Domain')
             plt.ylabel('Efficiency (%)')
@@ -140,19 +136,17 @@ def PlotJsonclover(data, source):
 
             plt.figure(2) #resolution
             plt.ylim([1,5])
-            #title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
             plt.title(f'Resolution for clover {cloverkey}')
             plt.xlabel('Domain')
             plt.ylabel('Resolution (keV)')
             plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
             legend_without_duplicate_labels(plt)
-            print('I am here 3')
 
             file_name1 = 'eliade_{}_resolution.png'.format(cloverkey)
             plt.savefig(save_results_to + file_name1)
             plt.close()
 
-            plt.figure(0)  # PT
+            plt.figure(0)  # Peak to Total
             plt.title(f'Peak to Total ratio for clover {cloverkey}')
             plt.xlabel('Domain')
             plt.ylabel('Peak-to-total ratio')
@@ -163,231 +157,40 @@ def PlotJsonclover(data, source):
             plt.close()
 
             blCloverFound = False
-    print('Finished drawings')
+    print('Finished CLOVER graphs')
 
-        
-       
-        # for key in data['serial']:
-            # print(key)
-        
-
-        # for key in i[source].keys():
-        #     res=i[source][key]["res"]
-        #     if float(key)==1173.238:
-        #         plt.scatter(x=dom, y=res, color='r', label=f"{key}")
-        #     elif float(key)==1332.513:
-        #         plt.scatter(x=dom, y=res, color='b', label=f"{key}")
-        
-
-            
-        # FindXlim(clover)
-        # plt.ylim([1,5])
-        # title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
-        # plt.title(f'Resolution for clover {title_clover}')
-        # plt.xlabel('Domain')
-        # plt.ylabel('Resolution (keV)')
-        # plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
-        # legend_without_duplicate_labels(plt)
-
-    # file_name1 = 'eliade_{}_resolution.png'.format(title_clover)
-    # plt.savefig(save_results_to + file_name1)
-    # plt.close()
-
-    ### EFFICIENCY FOR CLOVERS
-   
-    # for cloverkey in list_of_clovers:
-    #     for key in data:
-    #         # print(key["serial"])
-    #         #print(key["serial"].rstrip(key["serial"][-1]))
-    #         if key["serial"].rstrip(key["serial"][-1]) == cloverkey:
-    #             if key["detType"] == my_det_type:
-    #                 #print('wowo')
-    #                 for gammakey in list_of_sources:
-    #                     if source == gammakey:
-    #                         for element in gammatab[source]["gammas"]:
-    #                             plot_color="k"
-    #                             with open('json/gamma_set.json', 'r') as jason_file:
-    #                                 gammaset=json.load(jason_file)
-    #                                 plot_color=gammaset[source]['gammas'][element]
-    #                             plt.scatter(x=key["domain"], y=key[source][element]["eff"], color =  plot_color,label=f"{element}")
-    #     FindXlim(cloverkey)
-    #     plt.ylim([1,5])
-    #     plt.title(f'Efficiency for clover {cloverkey}')
-    #     plt.xlabel('Domain')
-    #     plt.ylabel('Efficiency (%)')
-    #     plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
-    #     legend_without_duplicate_labels(plt)
-    #
-    #
-    #     file_name2 = 'eliade_{}_efficiency.png'.format(cloverkey)
-    #     plt.savefig(save_results_to + file_name2)
-    #     plt.close()
-    
-    ### PEAK TO TOTAL
-    # for cloverkey in list_of_clovers:
-    #     for key in data:
-    #         # print(key["serial"])
-    #         #print(key["serial"].rstrip(key["serial"][-1]))
-    #         if key["serial"].rstrip(key["serial"][-1]) == cloverkey:
-    #             if key["detType"] == my_det_type:
-    #                 #print('wowo')
-    #                 for gammakey in list_of_sources:
-    #                     if source == gammakey:
-    #                         for element in gammatab[source]["gammas"]:
-    #                             plot_color="b"
-    #                             plt.scatter(x=key["domain"], y=key["PT"], color =  plot_color)
-    #     FindXlim(cloverkey)
-    #     #plt.ylim([1,5])
-    #     plt.title(f'Peak to Total ratio for clover {cloverkey}')
-    #     plt.xlabel('Domain')
-    #     plt.ylabel('Peak-to-total ratio')
-    #     plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
-    #
-    #
-    #     file_name3 = 'eliade_{}_peaktotal.png'.format(cloverkey)
-    #     plt.savefig(save_results_to + file_name3)
-    #     plt.close()
-
-    ### EFFICIENCY FOR SEGMENTS
-
-    # my_det_type=2
-
-    # for cloverkey in list_of_clovers:
-    #     for key in data:
-    #         # print(key["serial"])
-    #         #print(key["serial"].rstrip(key["serial"][-1]))
-    #         if key["serial"].rstrip(key["serial"][-1]) == cloverkey:
-    #             if key["detType"] == my_det_type:
-    #                 #print('wowo')
-    #                     for gammakey in list_of_sources:
-    #                         if source == gammakey:                                
-    #                             for element in gammatab[source]["gammas"]:
-    #                                 plot_color="k"
-    #                                 with open('json/gamma_set.json', 'r') as jason_file:
-    #                                     gammaset=json.load(jason_file)
-    #                                     plot_color=gammaset[source]['gammas'][element]
-    #                                 #if((key["domain"]%10!=9) and (key["domain"]%10!=0)):
-    #                                 print("segment")
-    #                                 plt.scatter(x=key["domain"], y=key[source][element]["eff"], color =  plot_color,label=f"{element}")
-    #     FindXlim(cloverkey)
-    #     plt.ylim([0.0001, 0.00015])
-    #     plt.title(f'Efficiency for clover {cloverkey} - segments')
-    #     plt.xlabel('Domain')
-    #     plt.ylabel('Efficiency (%)')
-    #     plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
-    #     legend_without_duplicate_labels(plt)       
-
-
-    #     file_name4 = 'eliade_{}_efficiency_segments.png'.format(cloverkey)
-    #     plt.savefig(save_results_to + file_name4)
-    #     plt.close()  
-    '''    
-    for i in data:
-        clover=i["serial"]
-        dom = i["domain"]
-
-        for key in i[source].keys():
-            eff = i[source][key]["eff"]
-            if float(key)==1173.238:
-                plt.scatter(x=dom, y=eff, color='r', label=f"{key}")
-            elif float(key)==1332.513:
-                plt.scatter(x=dom, y=eff, color='b', label=f"{key}")
-        FindXlim(clover)
-        #plt.ylim([0.00001,0.000013])
-        title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
-        plt.title(f'Efficiency for clover {title_clover}')
-        plt.xlabel('Domain')
-        plt.ylabel('Efficiency (%)')
-        plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
-        legend_without_duplicate_labels(plt)
-        
-    file_name2 = 'eliade_{}_efficiency.png'.format(title_clover)
-    plt.savefig(save_results_to + file_name2)
-    plt.close()   
-
-    for i in data:
-        pt=i["PT"]
-        clover=i["serial"]
-        dom = i["domain"]
-
-        plt.scatter(dom, pt, color='b')
-        FindXlim(clover)
-        #plt.ylim([0.1,0.15])
-        title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
-        plt.title(f'Peak to Total ratio for clover {title_clover}')
-        plt.xlabel('Domain')
-        plt.ylabel('Peak-to-total ratio')
-        plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
-        
-
-    file_name3 = 'eliade_{}_peaktotal.png'.format(title_clover)
-    plt.savefig(save_results_to + file_name3)
-    plt.close()   
-
-    for i in data:
-        clover=i["serial"]
-        dom = i["domain"]
-        if((dom%10!=9) and (dom%10!=0)):
-            for key in i[source].keys():
-                eff = i[source][key]["eff"]
-                if float(key)==1173.238:
-                    plt.scatter(x=dom, y=eff, color='r', label=f"{key}")
-                elif float(key)==1332.513:
-                    plt.scatter(x=dom, y=eff, color='b', label=f"{key}")
-        FindXlim(clover)
-        plt.ylim([0,0.01])
-        title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
-        plt.title(f'Efficiency for clover {title_clover} - segments')
-        plt.xlabel('Domain')
-        plt.ylabel('Efficiency (%)')
-        plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
-        legend_without_duplicate_labels(plt)
-        
-    file_name4 = 'eliade_{}_efficiency_segments.png'.format(title_clover)
-    plt.savefig(save_results_to + file_name4)
-    plt.close() 
-    '''
     return True
 
    
 def PlotJsoncore(data, source):
+
     MakeDir(save_results_to)
-    for i in data:
+    #my_det_type=1
+    for key in data:
         #clover=i["serial"]
-        dom = i["domain"]
-        if(dom%10==9):
-            for key in i[source].keys():
-                eff = i[source][key]["eff"]
-                if float(key)==1173.238:
-                    plt.scatter(x=dom, y=eff, color='r', label=f"{key}")
-                elif float(key)==1332.513:
-                    plt.scatter(x=dom, y=eff, color='b', label=f"{key}")
+        if key["detType"] == 1:
+            for gammakey in list_of_sources:
+                if source == gammakey:
+                    for element in gammatab[source]["gammas"]:
+                        plot_color="k"
+                        with open('json/gamma_set.json', 'r') as jason_file:
+                                    gammaset=json.load(jason_file)
+                                    plot_color=gammaset[source]['gammas'][element] #using different colors for each energy
+                        plt.figure(1) #efficiency plot
+                        plt.scatter(x=key["domain"], y=key[source][element]["eff"], color=plot_color, label=f"{element}")
+                        plt.figure(2) #resolution plot
+                        plt.scatter(x=key["domain"], y=key[source][element]["res"], color=plot_color, label=f"{element}")
         #FindXlim(clover)
-        #plt.ylim([0.00001,0.000013])
+        plt.figure(1)
+        plt.ylim([0.04,0.1])
         #title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
         plt.title('Efficiency for core 1 ')
         plt.xlabel('Domain')
         plt.ylabel('Efficiency (%)')
         plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
         legend_without_duplicate_labels(plt)
-        
-        
-    file_name5 = 'eliade_efficiency_core1.png'
-    plt.savefig(save_results_to + file_name5)
-    plt.close()   
 
-    for i in data:
-        
-        dom = i["domain"]
-        
-        if(dom%10==9):
-            for key in i[source].keys():
-                res=i[source][key]["res"]
-                if float(key)==1173.238:
-                    plt.scatter(x=dom, y=res, color='r', label=f"{key}")
-                elif float(key)==1332.513:
-                    plt.scatter(x=dom, y=res, color='b', label=f"{key}")
-            
+        plt.figure(2)
         #FindXlim(clover)
         plt.ylim([1,5])
         #title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
@@ -396,15 +199,101 @@ def PlotJsoncore(data, source):
         plt.ylabel('Resolution (keV)')
         plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
         legend_without_duplicate_labels(plt)
+
         
-        
+    plt.figure(1)    
+    file_name5 = 'eliade_efficiency_core1.png'
+    plt.savefig(save_results_to + file_name5)
+    plt.close()   
+
+    plt.figure(2)
     file_name6 = 'eliade_resolution_core1.png'
     plt.savefig(save_results_to + file_name6)
     plt.close()
 
+    print("Finished graphs for all core1")
     return  True
 
-  
+def PlotCalibration(data,source):
+    MakeDir(save_results_to)
+
+    #variable n below should be number of curves to plot
+
+    #version 1:
+
+    # color = cm.rainbow(np.linspace(0, 1, n))
+    # for i, c in zip(range(n), color):
+    #     plt.plot(x, y, c=c)
+
+    #or version 2:
+    #n=40
+    #color = cm.rainbow(np.linspace(0, 1, n))
+    # for i in range(n):
+    #     c = next(color)
+    #     plt.plot(x, y, c=c)    
+
+    xmin=0
+    xmax=1200
+    steps=150
+    step=(xmax-xmin)/steps
+    dataplotx=[]
+    dataploty=[]
+
+    '''
+    from cycler import cycler
+
+    # 1000 distinct colors:
+    colors = [hsv_to_rgb([(i * 0.618033988749895) % 1.0, 1, 1])
+            for i in range(1000)]
+    plt.rc('axes', prop_cycle=(cycler('color', colors)))
+
+    for i in range(20):
+        plt.plot([1, 0], [i, i])
+
+    plt.show()
+    '''
+
+    for cloverkey in list_of_clovers:
+        blCloverFound = False
+        i=0
+        for key in data: # Browse through data in output file
+            dom=key["domain"]
+            i=i+1
+            for s in range(steps):
+                    xgrid=xmin+step*s
+                    dataplotx.append(xgrid)
+                    dataploty.append(float(key["pol_list"][0])+float(key["pol_list"][1])*xgrid)
+            #print(key["pol_list"][0], key["pol_list"][1])
+            #print(i)
+            c=(0, i / 10.0, 0, 1)
+            plt.plot(dataplotx, dataploty, color = c, label= f"{dom}") 
+            if key["serial"].rstrip(key["serial"][-1]) == cloverkey: #check if clover is found
+                
+
+                #if key["detType"] == my_det_type: #check if the detector is the type that we want
+                blCloverFound = True
+                for gammakey in list_of_sources: # browse through the list of sources
+                    if source == gammakey: #if our source is in the list                                
+                        for element in gammatab[source]["gammas"]: #for each gamma energy of the source
+                            # for i, c in zip(range(n), color):                                                
+                                plt.scatter(x=key[source][element]["pos_ch"], y=float(element), color= c)
+                 
+        if blCloverFound == True:
+                #print("calib")
+                plt.xlim([0,1200])
+                plt.ylim([0,1500])
+                plt.xlabel('Channel')
+                plt.ylabel('Energy (keV)')
+                plt.title(f'Calibration for clover {cloverkey}')
+                legend_without_duplicate_labels(plt)
+                #plt.legend()
+                plt.show()
+                file_name='eliade_{}_calibration.png'.format(cloverkey)
+                plt.savefig(save_results_to + file_name)
+                plt.close()  
+                blCloverFound=False
+                                
+    return True
 
 with open('calib_res_1.json', 'r') as js_file:
     data=json.load(js_file)
@@ -412,9 +301,4 @@ with open('calib_res_1.json', 'r') as js_file:
 with open('json/gamma_sources.json', 'r') as jas_file:
     gammatab=json.load(jas_file)
 
-# with open('json/gamma_set.json', 'r') as jason_file:
-#     gammaset=json.load(jason_file)
-
-# PlotJsondom(data, "60Co")
-# PlotJsonclover(data, "60Co")
 

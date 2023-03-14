@@ -5,6 +5,10 @@ from TRecallEner import TRecallEner
 def SetUpRecallEner(js, dom):
     if dom == 1:
         return TRecallEner(200, 400, 1000, 4)
+    elif dom == 2:
+        return TRecallEner(200, 400, 100, 7)
+    elif dom == 3:
+        return TRecallEner(200, 400, 1000, 15)
     return run20Co60source(js, dom)
 # *******************************
 def run20Co60source(js, dom): #file is LUT file

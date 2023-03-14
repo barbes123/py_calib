@@ -13,6 +13,7 @@ from libCalib1 import TMeasurement as Tmeas
 from libPlotEliade import PlotJsondom as PlotDomain
 from libPlotEliade import PlotJsonclover as PlotClover
 from libPlotEliade import PlotJsoncore as PlotCore
+from libPlotEliade import PlotCalibration
 from TRecallEner import TRecallEner
 from libSettings import SetUpRecallEner
 
@@ -273,6 +274,7 @@ def main():
             PlotDomain(js_tab, my_source.name)
             PlotClover(js_tab, my_source.name)
             PlotCore(js_tab, my_source.name)
+            PlotCalibration(js_tab, my_source.name)
             
 
     global j_res

@@ -5308,5 +5308,41 @@
          "1"
       ],
       "on": 1
+   },
+   {
+      "channel": 0,
+      "domain": 2,
+      "detType": 2,
+      "serial": "SEG",
+      "TimeOffset": 0,
+      "theta": 0,
+      "phi": 0,
+      "threshold": 0,
+      "cs_dom": 1,
+      "enable": 1,
+      "pol_order": 2,
+      "pol_list": [
+         "0",
+         "1"
+      ],
+      "on": 1
+   },
+   {
+      "channel": 0,
+      "domain": 3,
+      "detType": 3,
+      "serial": "LaBr",
+      "TimeOffset": 0,
+      "theta": 0,
+      "phi": 0,
+      "threshold": 0,
+      "cs_dom": 1,
+      "enable": 1,
+      "pol_order": 2,
+      "pol_list": [
+         "0",
+         "1"
+      ],
+      "on": 1
    }
 ]
