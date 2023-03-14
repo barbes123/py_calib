@@ -3,6 +3,8 @@ from TRecallEner import TRecallEner
 #def __init__(self, limDown, limUp, ampl, fwhm):
 # *******************************
 def SetUpRecallEner(js, dom):
+    if dom == 1:
+        return TRecallEner(200, 400, 1000, 4)
     return run20Co60source(js, dom)
 # *******************************
 def run20Co60source(js, dom): #file is LUT file
