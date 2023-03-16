@@ -4,6 +4,8 @@ from matplotlib.pyplot import cm
 from matplotlib import interactive
 import numpy as np
 import os
+import matplotlib.colors as mcolors
+from random import choice
 
 global save_results_to
 # save_results_to = '/home/rmiron/Desktop/dir/python_exercises/calibrations/figures/'
@@ -232,12 +234,13 @@ def PlotCalibration(data,source):
     #     c = next(color)
     #     plt.plot(x, y, c=c)    
 
-    xmin=0
-    xmax=1200
-    steps=150
-    step=(xmax-xmin)/steps
-    dataplotx=[]
-    dataploty=[]
+    
+
+    # # 1000 distinct colors:
+    # colors = [hsv_to_rgb([(i * 0.618033988749895) % 1.0, 1, 1])
+    #         for i in range(1000)]
+    # plt.rc('axes', prop_cycle=(cycler('color', colors)))
+
 
     '''
     from cycler import cycler
@@ -253,30 +256,82 @@ def PlotCalibration(data,source):
     plt.show()
     '''
 
+    '''
+    import matplotlib.pyplot as plt
+import numpy as np
+
+num_plots = 20
+
+# Have a look at the colormaps here and decide which one you'd like:
+# http://matplotlib.org/1.2.1/examples/pylab_examples/show_colormaps.html
+colormap = plt.cm.gist_ncar
+plt.gca().set_prop_cycle(plt.cycler('color', plt.cm.jet(np.linspace(0, 1, num_plots))))
+
+# Plot several different functions...
+x = np.arange(10)
+labels = []
+for i in range(1, num_plots + 1):
+    plt.plot(x, i * x + 5 * i)
+    labels.append(r'$y = %ix + %i$' % (i, 5*i))
+
+# I'm basically just demonstrating several different legend options here...
+plt.legend(labels, ncol=4, loc='upper center', 
+           bbox_to_anchor=[0.5, 1.1], 
+           columnspacing=1.0, labelspacing=0.0,
+           handletextpad=0.0, handlelength=1.5,
+           fancybox=True, shadow=True)
+
+plt.show()
+
+colors = hsv_to_rgb([(i * 0.618033988749895) % 1, 1, 1])
+            default_cycler=(cycler('color', colors)+cycler(linestyle=['-', '--', '-.']))
+            plt.rc('lines', linewidth=4)
+            plt.rc('axes', prop_cycle=default_cycler)
+
+    '''
+    xmin=0
+    xmax=1200
+    steps=150
+    step=(xmax-xmin)/steps
+    dataplotx=[]
+    dataploty=[]
+
+    colours = mcolors._colors_full_map # This is a dictionary of all named colours
+    # Turn the dictionary into a list
+    color_lst = list(colours.values()) 
+
+    #color_dict = {}
+
+  
+
+
+
     for cloverkey in list_of_clovers:
         blCloverFound = False
-        i=0
+        #i=1
         for key in data: # Browse through data in output file
-            dom=key["domain"]
-            i=i+1
-            for s in range(steps):
+            
+            if key["serial"].rstrip(key["serial"][-1]) == cloverkey: #check if clover is found
+                #if key["detType"] == my_det_type: #check if the detector is the type that we want
+                blCloverFound = True
+                dom=key["domain"]
+            
+                #i=i+1
+                for s in range(steps):
                     xgrid=xmin+step*s
                     dataplotx.append(xgrid)
                     dataploty.append(float(key["pol_list"][0])+float(key["pol_list"][1])*xgrid)
-            #print(key["pol_list"][0], key["pol_list"][1])
-            #print(i)
-            c=(0, i / 10.0, 0, 1)
-            plt.plot(dataplotx, dataploty, color = c, label= f"{dom}") 
-            if key["serial"].rstrip(key["serial"][-1]) == cloverkey: #check if clover is found
-                
+                #c=(0, i / 20.0, 0, 1)
+                c=choice(color_lst)                
+                            
 
-                #if key["detType"] == my_det_type: #check if the detector is the type that we want
-                blCloverFound = True
                 for gammakey in list_of_sources: # browse through the list of sources
                     if source == gammakey: #if our source is in the list                                
                         for element in gammatab[source]["gammas"]: #for each gamma energy of the source
-                            # for i, c in zip(range(n), color):                                                
-                                plt.scatter(x=key[source][element]["pos_ch"], y=float(element), color= c)
+                            # for i, c in zip(range(n), color):      
+                                
+                                plt.plot(dataplotx, dataploty, color=c, label= f"{dom}")                                         
+                                plt.scatter(x=key[source][element]["pos_ch"], y=float(element), color=c)
                  
         if blCloverFound == True:
                 #print("calib")
@@ -287,7 +342,7 @@ def PlotCalibration(data,source):
                 plt.title(f'Calibration for clover {cloverkey}')
                 legend_without_duplicate_labels(plt)
                 #plt.legend()
-                plt.show()
+                #plt.show()
                 file_name='eliade_{}_calibration.png'.format(cloverkey)
                 plt.savefig(save_results_to + file_name)
                 plt.close()  
