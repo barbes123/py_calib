@@ -41,7 +41,7 @@ def FindXlim(name):
 
 
 
-def PlotJsondom(data, source):
+def PlotJsondom(data, gammatab, source):
 
     MakeDir(save_results_to)
 
@@ -90,12 +90,11 @@ def legend_without_duplicate_labels(figure):
     by_label = dict(zip(labels, handles))
     figure.legend(by_label.values(), by_label.keys(), loc='lower right')
 
-def PlotJsonclover(data, source):
+def PlotJsonclover(data, gammatab, source):
     print('I am in PlotJsonclover')
     MakeDir(save_results_to)
     
     my_det_type = 1
-        
     ### RESOLUTION, EFFICIENCY AND PEAK-TO-TOTAL RATIO FOR CLOVERS
     for cloverkey in list_of_clovers:
         blCloverFound = False
@@ -164,7 +163,7 @@ def PlotJsonclover(data, source):
     return True
 
    
-def PlotJsoncore(data, source):
+def PlotJsoncore(data, gammatab, source):
 
     MakeDir(save_results_to)
     #my_det_type=1
@@ -216,144 +215,45 @@ def PlotJsoncore(data, source):
     print("Finished graphs for all core1")
     return  True
 
-def PlotCalibration(data,source):
+def PlotCalibration(data, gammatab, source):
     MakeDir(save_results_to)
-
-    #variable n below should be number of curves to plot
-
-    #version 1:
-
-    # color = cm.rainbow(np.linspace(0, 1, n))
-    # for i, c in zip(range(n), color):
-    #     plt.plot(x, y, c=c)
-
-    #or version 2:
-    #n=40
-    #color = cm.rainbow(np.linspace(0, 1, n))
-    # for i in range(n):
-    #     c = next(color)
-    #     plt.plot(x, y, c=c)    
-
-    
-
-    # # 1000 distinct colors:
-    # colors = [hsv_to_rgb([(i * 0.618033988749895) % 1.0, 1, 1])
-    #         for i in range(1000)]
-    # plt.rc('axes', prop_cycle=(cycler('color', colors)))
-
-
-    '''
-    from cycler import cycler
-
-    # 1000 distinct colors:
-    colors = [hsv_to_rgb([(i * 0.618033988749895) % 1.0, 1, 1])
-            for i in range(1000)]
-    plt.rc('axes', prop_cycle=(cycler('color', colors)))
-
-    for i in range(20):
-        plt.plot([1, 0], [i, i])
-
-    plt.show()
-    '''
-
-    '''
-    import matplotlib.pyplot as plt
-import numpy as np
-
-num_plots = 20
-
-# Have a look at the colormaps here and decide which one you'd like:
-# http://matplotlib.org/1.2.1/examples/pylab_examples/show_colormaps.html
-colormap = plt.cm.gist_ncar
-plt.gca().set_prop_cycle(plt.cycler('color', plt.cm.jet(np.linspace(0, 1, num_plots))))
-
-# Plot several different functions...
-x = np.arange(10)
-labels = []
-for i in range(1, num_plots + 1):
-    plt.plot(x, i * x + 5 * i)
-    labels.append(r'$y = %ix + %i$' % (i, 5*i))
-
-# I'm basically just demonstrating several different legend options here...
-plt.legend(labels, ncol=4, loc='upper center', 
-           bbox_to_anchor=[0.5, 1.1], 
-           columnspacing=1.0, labelspacing=0.0,
-           handletextpad=0.0, handlelength=1.5,
-           fancybox=True, shadow=True)
-
-plt.show()
-
-colors = hsv_to_rgb([(i * 0.618033988749895) % 1, 1, 1])
-            default_cycler=(cycler('color', colors)+cycler(linestyle=['-', '--', '-.']))
-            plt.rc('lines', linewidth=4)
-            plt.rc('axes', prop_cycle=default_cycler)
-
-    '''
-    xmin=0
-    xmax=1200
-    steps=150
-    step=(xmax-xmin)/steps
-    dataplotx=[]
-    dataploty=[]
-
-    colours = mcolors._colors_full_map # This is a dictionary of all named colours
-    # Turn the dictionary into a list
-    color_lst = list(colours.values()) 
-
-    #color_dict = {}
-
-  
-
-
+    number_of_our_colors = 33
+    our_color_plate = iter(cm.rainbow(np.linspace(0, 1, number_of_our_colors)))
+    # niter = 0
 
     for cloverkey in list_of_clovers:
         blCloverFound = False
-        #i=1
         for key in data: # Browse through data in output file
-            
             if key["serial"].rstrip(key["serial"][-1]) == cloverkey: #check if clover is found
                 #if key["detType"] == my_det_type: #check if the detector is the type that we want
                 blCloverFound = True
                 dom=key["domain"]
-            
-                #i=i+1
-                for s in range(steps):
-                    xgrid=xmin+step*s
-                    dataplotx.append(xgrid)
-                    dataploty.append(float(key["pol_list"][0])+float(key["pol_list"][1])*xgrid)
-                #c=(0, i / 20.0, 0, 1)
-                c=choice(color_lst)                
-                            
+
+                try:
+                    current_color = next(our_color_plate)
+                except:
+                    current_color = 'red'
+
+                plt.plot([1, 2000], [float(key["pol_list"][0])+float(key["pol_list"][1])*1,  float(key["pol_list"][0])+float(key["pol_list"][1])*2000], color = current_color, label=f"{dom}")
 
                 for gammakey in list_of_sources: # browse through the list of sources
                     if source == gammakey: #if our source is in the list                                
                         for element in gammatab[source]["gammas"]: #for each gamma energy of the source
-                            # for i, c in zip(range(n), color):      
-                                
-                                plt.plot(dataplotx, dataploty, color=c, label= f"{dom}")                                         
-                                plt.scatter(x=key[source][element]["pos_ch"], y=float(element), color=c)
+                                plt.scatter(x=key[source][element]["pos_ch"], y=float(element), color=current_color)
                  
         if blCloverFound == True:
                 #print("calib")
                 plt.xlim([0,1200])
-                plt.ylim([0,1500])
+                plt.ylim([0,1500])#maximum energy from source + delta: [0; max+delta]
                 plt.xlabel('Channel')
                 plt.ylabel('Energy (keV)')
                 plt.title(f'Calibration for clover {cloverkey}')
                 legend_without_duplicate_labels(plt)
                 #plt.legend()
-                #plt.show()
+                # plt.show()
                 file_name='eliade_{}_calibration.png'.format(cloverkey)
                 plt.savefig(save_results_to + file_name)
                 plt.close()  
                 blCloverFound=False
-                                
     return True
-
-with open('calib_res_1.json', 'r') as js_file:
-    data=json.load(js_file)
-
-with open('json/gamma_sources.json', 'r') as jas_file:
-    gammatab=json.load(jas_file)
-
 

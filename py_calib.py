@@ -271,10 +271,10 @@ def main():
     with open('calib_res_{}.json'.format(my_run.run), 'r') as ifile:
         js_tab = json.load(ifile)
         if blPlot == True:
-            PlotDomain(js_tab, my_source.name)
-            PlotClover(js_tab, my_source.name)
-            PlotCore(js_tab, my_source.name)
-            PlotCalibration(js_tab, my_source.name)
+            PlotDomain(js_tab, j_sources, my_source.name)
+            PlotClover(js_tab, j_sources, my_source.name)
+            PlotCore(js_tab, j_sources, my_source.name)
+            PlotCalibration(js_tab, j_sources, my_source.name)
             
 
     global j_res
