@@ -192,6 +192,28 @@ def SumAsci(file):
         print('Total sum: {}'.format(sum))
     return sum
 
+def SumAsciLimits(file, lim1, lim2):
+    sum = 0
+    nnline = 0
+    # lim1=400
+    # lim2=3000
+    with open('{}'.format(file),'r') as ifile:
+        for line in ifile:
+            if ((nnline*2) not in range(lim1,lim2)):
+                nnline += 1
+                continue
+            try:
+                num = float(line)
+                sum+=num
+            except ValueError:
+                print('{} is not a number'.format(line.rstrip()))
+                # return 0
+            nnline+=1
+    if debug:
+        print('Total sum: {}'.format(sum))
+    return sum
+
+
 def main():
 
     # run = 1
