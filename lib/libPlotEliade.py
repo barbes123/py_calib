@@ -38,6 +38,8 @@ def FindXlim(name):
         plt.xlim([600.,641.])
     elif name == "CL33":
         plt.xlim([700.,741.])
+    elif name == "CL31":
+        plt.xlim([800.,841.])
 
 
 
@@ -113,15 +115,21 @@ def PlotJsonclover(data, gammatab, source):
                                     gammaset=json.load(jason_file)
                                     plot_color=gammaset[source]['gammas'][element] #using different colors for each energy
                                 plt.figure(1) #efficiency plot
-                                plt.scatter(x=key["domain"], y=key[source][element]["eff"], color=plot_color, label=f"{element}")
+                                try:
+                                    plt.scatter(x=key["domain"], y=key[source][element]["eff"], color=plot_color, label=f"{element}")
+                                except:
+                                    continue #print("Energy {} missing from domain {}".format(key[source][element], key["domain"]))
                                 plt.figure(2) #resolution plot
-                                plt.scatter(x=key["domain"], y=key[source][element]["res"], color=plot_color, label=f"{element}")
+                                try:
+                                    plt.scatter(x=key["domain"], y=key[source][element]["res"], color=plot_color, label=f"{element}")
+                                except:
+                                    continue #print("Energy {} missing from domain {}".format(key[source][element], key["domain"]))
         if blCloverFound == True:
 
             FindXlim(cloverkey) #each clover has a different x-axis interval
             plt.figure(1)  # efficiency
             if my_det_type==1 or my_det_type==10:
-                plt.ylim([0.04, 0.1])
+                plt.ylim([0, 0.1])
             elif my_det_type==2: # (segments)
                 plt.ylim([0,0.01])
             plt.title(f'Efficiency for clover {cloverkey}')
@@ -178,12 +186,19 @@ def PlotJsoncore(data, gammatab, source):
                                     gammaset=json.load(jason_file)
                                     plot_color=gammaset[source]['gammas'][element] #using different colors for each energy
                         plt.figure(1) #efficiency plot
-                        plt.scatter(x=key["domain"], y=key[source][element]["eff"], color=plot_color, label=f"{element}")
+                        try:
+                            plt.scatter(x=key["domain"], y=key[source][element]["eff"], color=plot_color, label=f"{element}")
+                        except:
+                            continue
                         plt.figure(2) #resolution plot
-                        plt.scatter(x=key["domain"], y=key[source][element]["res"], color=plot_color, label=f"{element}")
+                        try:
+                            plt.scatter(x=key["domain"], y=key[source][element]["res"], color=plot_color, label=f"{element}")
+                        except:
+                            continue
         #FindXlim(clover)
         plt.figure(1)
-        plt.ylim([0.04,0.1])
+        #plt.xlim(100,841)
+        plt.ylim([0,0.1])
         #title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
         plt.title('Efficiency for core 1 ')
         plt.xlabel('Domain')
@@ -217,39 +232,46 @@ def PlotJsoncore(data, gammatab, source):
 
 def PlotCalibration(data, gammatab, source):
     MakeDir(save_results_to)
-    number_of_our_colors = 33
+    number_of_our_colors = 30
     our_color_plate = iter(cm.rainbow(np.linspace(0, 1, number_of_our_colors)))
     # niter = 0
 
     for cloverkey in list_of_clovers:
+        my_det_type=1
+        number_of_our_colors = 4
+        our_color_plate = iter(cm.rainbow(np.linspace(0, 1, number_of_our_colors)))
         blCloverFound = False
         for key in data: # Browse through data in output file
             if key["serial"].rstrip(key["serial"][-1]) == cloverkey: #check if clover is found
-                #if key["detType"] == my_det_type: #check if the detector is the type that we want
-                blCloverFound = True
-                dom=key["domain"]
+                if key["pol_list"]:
+                    if key["detType"] == my_det_type: #check if the detector is the type that we want
+                        blCloverFound = True
+                        dom=key["domain"]
 
-                try:
-                    current_color = next(our_color_plate)
-                except:
-                    current_color = 'red'
+                        try:
+                            current_color = next(our_color_plate)
+                        except:
+                            current_color = 'red'
 
-                plt.plot([1, 2000], [float(key["pol_list"][0])+float(key["pol_list"][1])*1,  float(key["pol_list"][0])+float(key["pol_list"][1])*2000], color = current_color, label=f"{dom}")
+                        plt.plot([1, 2000], [float(key["pol_list"][0])+float(key["pol_list"][1])*1,  float(key["pol_list"][0])+float(key["pol_list"][1])*2000], color = current_color, label=f"{dom}", linewidth=1)
 
-                for gammakey in list_of_sources: # browse through the list of sources
-                    if source == gammakey: #if our source is in the list                                
-                        for element in gammatab[source]["gammas"]: #for each gamma energy of the source
-                                plt.scatter(x=key[source][element]["pos_ch"], y=float(element), color=current_color)
+                        for gammakey in list_of_sources: # browse through the list of sources
+                            if source == gammakey: #if our source is in the list                                
+                                for element in gammatab[source]["gammas"]: #for each gamma energy of the source
+                                        plt.scatter(x=key[source][element]["pos_ch"], y=float(element), color=current_color)
+                        max_energy=max([float(i) for i in list(gammatab[source]["gammas"].keys())])
+
                  
         if blCloverFound == True:
+                delta=200
                 #print("calib")
                 plt.xlim([0,1200])
-                plt.ylim([0,1500])#maximum energy from source + delta: [0; max+delta]
+                plt.ylim([0,max_energy+delta])#maximum energy from source + delta: [0; max+delta]
                 plt.xlabel('Channel')
                 plt.ylabel('Energy (keV)')
                 plt.title(f'Calibration for clover {cloverkey}')
-                legend_without_duplicate_labels(plt)
-                #plt.legend()
+                #legend_without_duplicate_labels(plt)
+                plt.legend(ncol=3,loc='lower right',prop={'size': 6})
                 # plt.show()
                 file_name='eliade_{}_calibration.png'.format(cloverkey)
                 plt.savefig(save_results_to + file_name)
