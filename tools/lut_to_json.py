@@ -29,7 +29,7 @@ def GetLUTFromTxt(file_name):
 
                 if bl_found_pol_list:
                     for i in range(index, len(lut_line)):
-                        par_list[par].append(lut_line[i])
+                        par_list[par].append(float(lut_line[i]))
                 elif par == 'serial':
                     par_list[par] = lut_line[index]
                 elif par == 'TimeOffset':
