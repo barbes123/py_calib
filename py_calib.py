@@ -244,11 +244,11 @@ def main():
     my_source = TIso(None, None, None, None)
     my_source.setup_source_from_json(j_sources, my_run.source)
     global n_decays_sum
-    n_decays_sum= my_source.GetNdecaysIntegral(my_run.tstart, my_run.tstop)
+    n_decays_sum, n_decays_err= my_source.GetNdecaysIntegral(my_run.tstart, my_run.tstop)
     global n_decays_int
     n_decays_int = my_source.GetNdecays(my_run.tstart, my_run.tstop)
     print(my_source.__str__())
-    print('sum {}; int {}'.format(n_decays_sum, n_decays_int))
+    print('sum {}; err {}; int {}'.format(n_decays_sum, n_decays_err, n_decays_int))
 
     # print('Gammas ', j_sources['Co60']['gammas'])
 
@@ -275,7 +275,8 @@ def main():
             fitdata = result_scr.stdout.decode()
             # print(fitdata)
             global total
-            total = SumAsci(current_file)
+            #total = SumAsci(current_file)
+            total = SumAsciLimits(current_file, 400, 3000)
             ProcessFitDataStr(domain, fitdata, j_sources, j_lut)
 
 

@@ -58,9 +58,10 @@ class TIsotope:
     def GetNdecaysIntegral(self, start, stop):
         t1 = (start - self.date0).total_seconds()
         t2 = (stop - self.date0).total_seconds()
-        ndecays = lambda a0, decay_constant, t: a0 * np.exp(-1 * decay_constant * t)
-        nn, err = quad(ndecays, t1, t2, args=(self.a0, self.decay_constant(),))
-        return nn
+        ndecays = lambda t, a0, decay_constant: a0 * np.exp(-1 * decay_constant * t)
+        nn, err = quad(ndecays, t1, t2, args=(self.a0, self.decay_constant()))
+        print("Error is {}".format(err))
+        return nn, err
 
 class TMeasurement:
     def __init__(self, server, run, source, tstart, tstop, distance):
