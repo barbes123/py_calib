@@ -72,6 +72,10 @@ def PlotJsondom(data, gammatab, source):
             eff = i[source][key]["eff"]
             plt.scatter(x=float(key), y=eff, color='b')
         plt.xlim([1000,1400])
+        if i["detType"]==1 or i["detType"]==10:
+            plt.ylim([0, 0.1])
+        elif i["detType"]==2:
+            plt.ylim([0,0.01])
         #plt.ylim([0.0001,0.00015])
         plt.title(f'Efficiency for domain {dom}')
         plt.xlabel('Energy (keV)')
@@ -156,6 +160,7 @@ def PlotJsonclover(data, gammatab, source):
             plt.close()
 
             plt.figure(0)  # Peak to Total
+            plt.ylim([0.05,0.1])
             plt.title(f'Peak to Total ratio for clover {cloverkey}')
             plt.xlabel('Domain')
             plt.ylabel('Peak-to-total ratio')
