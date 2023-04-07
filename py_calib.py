@@ -22,7 +22,7 @@ print('Path to RecalEnergy {}'.format(path))
 save_results_to = 'figures/'
 
 blPlot = True
-debug = False
+debug = True
 
 lutfile = 'LUT_ELIADE.json'
 
@@ -56,6 +56,8 @@ class TPeak:
         self.Etable = float(line[7])
         self.pos_ch = float(line [4])
         self.fwhm = float(line[5])
+        self.Intensity = 0
+        self.errIntesity = 0
         # self.eff = line[3]
 
     def __repr__(self):
@@ -121,6 +123,8 @@ def ProcessFitDataStr(dom, lines, j_src, j_lut ):
                 print('Found ',gamma,' ', word)
                 numbers = [s for s in word.split(' ') if s]
                 peak = TPeak(dom, numbers)
+                peak.Intensity = 0.99
+                peak.effIntensity = 0.01 #absolute or relative ?
                 PeakList.append(peak)
                 # peak.__str__()
 
@@ -144,9 +148,11 @@ def FillResults2json(dom, list, cal):
     peaksum = 0
     for peak in list:
         content = {}
-        content['eff'] = peak.area/n_decays_int*100
+        content['eff'] = peak.area/(n_decays_int*peak.Intensity) *100
+        content['err_eff'] = 0
         #print(n_decays_sum, 'this is sum of decays')
         content['res'] = peak.fwhm/peak.pos_ch*peak.Etable
+        content['err_res'] = 0
         content['pos_ch'] = peak.pos_ch
         # jsondata[peak.Etable] = content
         source[peak.Etable] = content
