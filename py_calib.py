@@ -92,7 +92,7 @@ def MakeSymLink(file, link):
         print('Link {} to file {} created '.format(link, file))
     os.chdir('..')
 
-def ProcessFitDataStr(dom, lines, j_src, j_lut ):
+def ProcessFitDataStr(dom, my_source, lines, j_src, j_lut ):
     print('ProcessFitDataStr: now  split lines')
 
     # print(lines)
@@ -110,7 +110,7 @@ def ProcessFitDataStr(dom, lines, j_src, j_lut ):
             temp1 = [t1 for t1 in temp[1].split(' ') if t1]
             del temp1[len(temp1) - 1]
             for s in temp1:
-                cal.append(s)
+                cal.append(float(s))
             print('Calibration for domain {} {}'.format(dom, cal))
             for item in j_lut:
                 if item['domain'] == dom:
@@ -118,13 +118,13 @@ def ProcessFitDataStr(dom, lines, j_src, j_lut ):
                     item['pol_list'] = cal
                     # print('New calibration {}'.format(item['pol_list']))
 
-        for gamma in j_src['60Co']['gammas']:
+        for gamma in j_src[my_source]['gammas']:
             if gamma in word:
                 print('Found ',gamma,' ', word)
                 numbers = [s for s in word.split(' ') if s]
                 peak = TPeak(dom, numbers)
-                peak.Intensity = 0.99
-                peak.effIntensity = 0.01 #absolute or relative ?
+                peak.Intensity = j_src[my_source]['gammas'][gamma][1]
+                peak.errIntensity = j_src[my_source]['gammas'][gamma][2] #absolute or relative ?
                 PeakList.append(peak)
                 # peak.__str__()
 
@@ -149,7 +149,11 @@ def FillResults2json(dom, list, cal):
     for peak in list:
         content = {}
         content['eff'] = peak.area/(n_decays_int*peak.Intensity) *100
-        content['err_eff'] = 0
+        if peak.area and n_decays_int:
+            try:
+                content['err_eff'] = np.sqrt(1/peak.area + 1/n_decays_int + peak.errIntensity/peak.Intensity**2)*peak.area/(n_decays_int*peak.Intensity)*100
+            except: 
+                content['err_eff'] = 0
         #print(n_decays_sum, 'this is sum of decays')
         content['res'] = peak.fwhm/peak.pos_ch*peak.Etable
         content['err_res'] = 0
@@ -167,6 +171,11 @@ def FillResults2json(dom, list, cal):
 
 
     jsondata['PT'] = peaksum/total
+    if peaksum and total:
+        try:
+            jsondata['err_PT'] = np.sqrt(1/peaksum+1/total)*peaksum/total
+        except:
+            jsondata['err_PT'] = 0
     jsondata['pol_list'] = cal
 
     jsondata[my_source.name] = source
@@ -283,7 +292,7 @@ def main():
             global total
             #total = SumAsci(current_file)
             total = SumAsciLimits(current_file, 400, 3000)
-            ProcessFitDataStr(domain, fitdata, j_sources, j_lut)
+            ProcessFitDataStr(domain, my_source.name, fitdata, j_sources, j_lut)
 
 
     with open('new_{}'.format(lutfile), 'w') as ofile:

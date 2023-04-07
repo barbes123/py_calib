@@ -70,7 +70,9 @@ def PlotJsondom(data, gammatab, source):
         plt.figure(2)
         for key in i[source].keys():
             eff = i[source][key]["eff"]
-            plt.scatter(x=float(key), y=eff, color='b')
+            plt.errorbar(x=float(key), y=eff, yerr=i[source][key]["err_eff"], fmt='o', color='b', ecolor='red', capsize=5)
+            #plt.scatter(x=float(key), y=eff, color='b')
+            
         plt.xlim([1000,1400])
         if i["detType"]==1 or i["detType"]==10:
             plt.ylim([0, 0.1])
@@ -100,7 +102,7 @@ def PlotJsonclover(data, gammatab, source):
     print('I am in PlotJsonclover')
     MakeDir(save_results_to)
     
-    my_det_type = 1
+    my_det_type = 2
     ### RESOLUTION, EFFICIENCY AND PEAK-TO-TOTAL RATIO FOR CLOVERS
     for cloverkey in list_of_clovers:
         blCloverFound = False
@@ -111,6 +113,7 @@ def PlotJsonclover(data, gammatab, source):
                     plt.figure(0) #peak-to-total plot
                     plot_color = "b"
                     plt.scatter(x=key["domain"], y=key["PT"], color=plot_color)
+                    plt.errorbar(x=key["domain"], y=key["PT"], yerr=key["err_PT"],fmt='o', color=plot_color, ecolor='red', capsize=5)
                     for gammakey in list_of_sources: # browse through the list of sources
                         if source == gammakey: #if our source is in the list                                
                             for element in gammatab[source]["gammas"]: #for each gamma energy of the source
@@ -121,6 +124,7 @@ def PlotJsonclover(data, gammatab, source):
                                 plt.figure(1) #efficiency plot
                                 try:
                                     plt.scatter(x=key["domain"], y=key[source][element]["eff"], color=plot_color, label=f"{element}")
+                                    plt.errorbar(x=key["domain"], y=key[source][element]["eff"], yerr=key[source][element]["err_eff"], fmt='o', color=plot_color, ecolor='red', capsize=5)
                                 except:
                                     continue #print("Energy {} missing from domain {}".format(key[source][element], key["domain"]))
                                 plt.figure(2) #resolution plot
