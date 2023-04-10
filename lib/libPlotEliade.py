@@ -112,8 +112,11 @@ def PlotJsonclover(data, gammatab, source):
                     blCloverFound = True
                     plt.figure(0) #peak-to-total plot
                     plot_color = "b"
-                    plt.scatter(x=key["domain"], y=key["PT"], color=plot_color)
-                    plt.errorbar(x=key["domain"], y=key["PT"], yerr=key["err_PT"],fmt='o', color=plot_color, ecolor='red', capsize=5)
+                    
+                    try:
+                        plt.errorbar(x=key["domain"], y=key["PT"], yerr=key["err_PT"],fmt='o', color=plot_color, ecolor='red', capsize=5)
+                    except:
+                        plt.scatter(x=key["domain"], y=key["PT"], color=plot_color)
                     for gammakey in list_of_sources: # browse through the list of sources
                         if source == gammakey: #if our source is in the list                                
                             for element in gammatab[source]["gammas"]: #for each gamma energy of the source
@@ -124,18 +127,21 @@ def PlotJsonclover(data, gammatab, source):
                                 plt.figure(1) #efficiency plot
                                 try:
                                     plt.scatter(x=key["domain"], y=key[source][element]["eff"], color=plot_color, label=f"{element}")
-                                    plt.errorbar(x=key["domain"], y=key[source][element]["eff"], yerr=key[source][element]["err_eff"], fmt='o', color=plot_color, ecolor='red', capsize=5)
+                                    plt.errorbar(x=key["domain"], y=key[source][element]["eff"], yerr=key[source][element]["err_eff"], fmt='o', color=plot_color, ecolor=plot_color, capsize=5)
                                 except:
                                     continue #print("Energy {} missing from domain {}".format(key[source][element], key["domain"]))
                                 plt.figure(2) #resolution plot
                                 try:
                                     plt.scatter(x=key["domain"], y=key[source][element]["res"], color=plot_color, label=f"{element}")
+                                    plt.errorbar(x=key["domain"], y=key[source][element]["res"], yerr=key[source][element]["err_res"], fmt='o', color=plot_color, ecolor=plot_color, capsize=5)
                                 except:
                                     continue #print("Energy {} missing from domain {}".format(key[source][element], key["domain"]))
         if blCloverFound == True:
 
             FindXlim(cloverkey) #each clover has a different x-axis interval
-            plt.figure(1)  # efficiency
+
+            plt.figure(1)
+            FindXlim(cloverkey)  # efficiency
             if my_det_type==1 or my_det_type==10:
                 plt.ylim([0, 0.1])
             elif my_det_type==2: # (segments)
@@ -146,12 +152,13 @@ def PlotJsonclover(data, gammatab, source):
             plt.grid(color='black', linestyle='--', linewidth=0.5)
             legend_without_duplicate_labels(plt)
 
-            file_name2 = 'eliade_{}_efficiency.png'.format(cloverkey)
-            plt.savefig(save_results_to + file_name2)
+            file_name1 = 'eliade_{}_efficiency.png'.format(cloverkey)
+            plt.savefig(save_results_to + file_name1)
             plt.close()
 
 
-            plt.figure(2) #resolution
+            plt.figure(2)
+            FindXlim(cloverkey) #resolution
             plt.ylim([1,5])
             plt.title(f'Resolution for clover {cloverkey}')
             plt.xlabel('Domain')
@@ -159,11 +166,12 @@ def PlotJsonclover(data, gammatab, source):
             plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
             legend_without_duplicate_labels(plt)
 
-            file_name1 = 'eliade_{}_resolution.png'.format(cloverkey)
-            plt.savefig(save_results_to + file_name1)
+            file_name2 = 'eliade_{}_resolution.png'.format(cloverkey)
+            plt.savefig(save_results_to + file_name2)
             plt.close()
 
-            plt.figure(0)  # Peak to Total
+            plt.figure(0)
+            FindXlim(cloverkey)  # Peak to Total
             plt.ylim([0.05,0.1])
             plt.title(f'Peak to Total ratio for clover {cloverkey}')
             plt.xlabel('Domain')
@@ -197,11 +205,13 @@ def PlotJsoncore(data, gammatab, source):
                         plt.figure(1) #efficiency plot
                         try:
                             plt.scatter(x=key["domain"], y=key[source][element]["eff"], color=plot_color, label=f"{element}")
+                            plt.errorbar(x=key["domain"], y=key[source][element]["eff"], yerr=key[source][element]["err_eff"], fmt='o', color=plot_color, ecolor=plot_color, capsize=5)
                         except:
                             continue
                         plt.figure(2) #resolution plot
                         try:
                             plt.scatter(x=key["domain"], y=key[source][element]["res"], color=plot_color, label=f"{element}")
+                            plt.errorbar(x=key["domain"], y=key[source][element]["res"], yerr=key[source][element]["err_res"], fmt='o', color=plot_color, ecolor=plot_color, capsize=5)
                         except:
                             continue
         #FindXlim(clover)
@@ -246,8 +256,8 @@ def PlotCalibration(data, gammatab, source):
     # niter = 0
 
     for cloverkey in list_of_clovers:
-        my_det_type=1
-        number_of_our_colors = 4
+        my_det_type=2
+        number_of_our_colors = 40
         our_color_plate = iter(cm.rainbow(np.linspace(0, 1, number_of_our_colors)))
         blCloverFound = False
         for key in data: # Browse through data in output file
