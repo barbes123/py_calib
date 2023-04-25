@@ -60,7 +60,7 @@ class TIsotope:
         t2 = (stop - self.date0).total_seconds()
         ndecays = lambda t, a0, decay_constant: a0 * np.exp(-1 * decay_constant * t)
         nn, err = quad(ndecays, t1, t2, args=(self.a0, self.decay_constant()))
-        print("Error is {}".format(err))
+        print("Error from the quad integral is {}".format(err))
         return nn, err
 
 class TMeasurement:

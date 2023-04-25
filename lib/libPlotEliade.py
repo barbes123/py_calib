@@ -54,7 +54,8 @@ def PlotJsondom(data, gammatab, source):
         plt.figure(1)
         for key in i[source].keys():
             res=i[source][key]["res"]
-            plt.scatter(x=float(key), y=res, color='b')
+            #plt.scatter(x=float(key), y=res, color='b')
+            plt.errorbar(x=float(key), y=res, yerr=i[source][key]["err_res"], fmt='o', color='b', ecolor='red', capsize=5)
         plt.xlim([1000.,1400.])
         plt.ylim([1,5])
         plt.title(f'Resolution for domain {dom}')

@@ -151,12 +151,12 @@ def FillResults2json(dom, list, cal):
         content['eff'] = peak.area/(n_decays_int*peak.Intensity) *100
         if peak.area and n_decays_int:
             try:
-                content['err_eff'] = np.sqrt(1/peak.area + 1/n_decays_int + peak.errIntensity/peak.Intensity**2)*peak.area/(n_decays_int*peak.Intensity)*100
+                content['err_eff'] = np.sqrt((1/peak.area + 1/n_decays_int + peak.errIntensity/peak.Intensity**2)*100)*peak.area/(n_decays_int*peak.Intensity)*100
             except: 
                 content['err_eff'] = 0
         #print(n_decays_sum, 'this is sum of decays')
         content['res'] = peak.fwhm/peak.pos_ch*peak.Etable
-        content['err_res'] = 0
+        content['err_res'] = 0.1
         content['pos_ch'] = peak.pos_ch
         # jsondata[peak.Etable] = content
         source[peak.Etable] = content
@@ -214,7 +214,7 @@ def SumAsciLimits(file, lim1, lim2):
     # lim2=3000
     with open('{}'.format(file),'r') as ifile:
         for line in ifile:
-            if ((nnline*2) not in range(lim1,lim2)):
+            if (nnline not in range(lim1,lim2)):
                 nnline += 1
                 continue
             try:
@@ -271,7 +271,7 @@ def main():
     limUp = 1200
 
     global myCurrentSetting
-    myCurrentSetting = TRecallEner(800,1200,100,4)
+    myCurrentSetting = TRecallEner(800,1200,100,4, 200, 1500)
 
     for domain in range (my_params.dom1, my_params.dom2+1):
         # if (domain != 109) and (domain != 119):
@@ -291,7 +291,7 @@ def main():
             # print(fitdata)
             global total
             #total = SumAsci(current_file)
-            total = SumAsciLimits(current_file, 400, 3000)
+            total = SumAsciLimits(current_file, myCurrentSetting.limStart, myCurrentSetting.limStop)
             ProcessFitDataStr(domain, my_source.name, fitdata, j_sources, j_lut)
 
 
