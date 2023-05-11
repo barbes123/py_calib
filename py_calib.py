@@ -8,9 +8,9 @@ import matplotlib.pyplot as plt
 import math, sys, os, json, subprocess
 from pathlib import Path
 
-ourpath = '/data10/live/IT/py_calib'
-
-
+ourpath = os.getenv('PY_CALIB')
+path='{}{}'.format(Path.home(),'/EliadeSorting/EliadeTools/RecalEnergy')
+print('PY_CALIB path: ', ourpath)
 
 sys.path.insert(1, 'lib')
 sys.path.insert(1, '{}/lib'.format(ourpath))
@@ -24,27 +24,28 @@ from libPlotEliade import PlotCalibration
 from TRecallEner import TRecallEner
 from libSettings import SetUpRecallEner
 
-path='{}{}'.format(Path.home(),'/EliadeSorting/EliadeTools/RecalEnergy')
-
-#datapath = 'data/' #keep /
 current_directory = os.getcwd()
-datapath = '{}/'.format(current_directory)
-print('Data path: ', datapath)
-# datapath = ''
+
+# print('Cur dir: ', current_directory)
+if (current_directory == ourpath):
+    print('Running directory is {}'.format(ourpath))
+    datapath = '{}/data/'.format(current_directory)
+else:
+    datapath = '{}/'.format(current_directory)
 
 print('Path to RecalEnergy {}'.format(path))
 save_results_to = 'figures/'
 
-blPlot = True
-debug = False
+
+print('Data path: ', datapath)
 
 lutfile = 'LUT_ELIADE.json'
-
 j_results = {}
-
 list_results = []
 
 blFirstElement = False
+blPlot = True
+debug = False
 
 
 j_sources = None

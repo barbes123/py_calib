@@ -7,7 +7,8 @@ import os
 import matplotlib.colors as mcolors
 from random import choice
 
-ourpath = '/data10/live/IT/py_calib'
+# ourpath = '/data10/live/IT/py_calib'
+ourpath = os.getenv('PY_CALIB')
 
 current_directory = os.getcwd()
 datapath = '{}/'.format(current_directory)
