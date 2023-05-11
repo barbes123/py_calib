@@ -93,23 +93,27 @@ class TMeasurement:
 
     def setup_run_from_json(self, data, val, server):
         self.found = False
-        for runnbr in data['measurements']:
-            if ((int(runnbr['run']) == val) and (int(runnbr['server']) == server)):
+        for runnbr in data:
+            # if ((int(runnbr['runNumber']) == val) and (int(runnbr['server']) == server)):
+            if (int(runnbr['runNumber']) == val) :
                 # self.source = runnbr['source']
                 if (self.found):
                     print('Multiple occurrence in run {} and server {}'.format(runnbr, server))
                     sys.exit()
-                self.run = runnbr['run']
-                self.tstart = datetime.strptime(runnbr['tstart'],time_format)
-                self.tstop = datetime.strptime(runnbr['tstop'],time_format)
+                self.run = runnbr['runNumber']
+                self.tstart = datetime.strptime(runnbr['start'],time_format)
+                self.tstop = datetime.strptime(runnbr['stop'],time_format)
                 self.found = True
                 self.server = server
                 self.run = val
                 self.distance = runnbr['distance']
-            if runnbr['source'] is None:
-               runnbr['source'] = '60Co'
-            else:
                 self.source = runnbr['source']
+                print('Your source, sir ', runnbr['source'])
+                # self.source = '60Co'
+            # if runnbr['source'] is None:
+            #    runnbr['source'] = '60Co'
+            # else:
+            #     self.source = runnbr['source']
                 # print("{}, YES".format(val))
 
     def __str__(self):

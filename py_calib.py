@@ -1,12 +1,19 @@
 #! /usr/bin/python3
 
 from os.path import exists #check if file exists
+
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 import math, sys, os, json, subprocess
 from pathlib import Path
 
+ourpath = '/data10/live/IT/py_calib'
+
+
+
 sys.path.insert(1, 'lib')
+sys.path.insert(1, '{}/lib'.format(ourpath))
 
 from libCalib1 import TIsotope as TIso
 from libCalib1 import TMeasurement as Tmeas
@@ -18,11 +25,18 @@ from TRecallEner import TRecallEner
 from libSettings import SetUpRecallEner
 
 path='{}{}'.format(Path.home(),'/EliadeSorting/EliadeTools/RecalEnergy')
+
+#datapath = 'data/' #keep /
+current_directory = os.getcwd()
+datapath = '{}/'.format(current_directory)
+print('Data path: ', datapath)
+# datapath = ''
+
 print('Path to RecalEnergy {}'.format(path))
 save_results_to = 'figures/'
 
 blPlot = True
-debug = True
+debug = False
 
 lutfile = 'LUT_ELIADE.json'
 
@@ -81,7 +95,7 @@ def MakeDir(path):
         print("The new directory {} is created!".format(path))
 
 def MakeSymLink(file, link):
-    os.chdir('data')
+    # os.chdir('data')
     if file_exists(link):
         print('Link {} to file {} exists '.format(link, file))
         os.chdir('..')
@@ -238,10 +252,11 @@ def main():
         print('RecalEnergy cannot be found. Ciao.')
         sys.exit()
 
-    j_sources = load_json('json/gamma_sources.json')
-    j_data = load_json('json/run_table.json')
+    j_sources = load_json('{}/json/gamma_sources.json'.format(ourpath))
+    #j_data = load_json('json/run_table.json')
+    j_data = load_json('{}/json/run_table_S{}.json'.format(ourpath, my_params.server))
     global j_lut
-    j_lut = load_json('{}'.format(lutfile))
+    j_lut = load_json('{}/{}'.format(ourpath, lutfile))
 
 
     MakeSymLink('HPGe.spe','mDelila_raw_py_1.spe')
@@ -276,10 +291,15 @@ def main():
     for domain in range (my_params.dom1, my_params.dom2+1):
         # if (domain != 109) and (domain != 119):
         #     continue
+
+        if (domain%10 != 9):
+            continue
+
         myCurrentSetting = SetUpRecallEner(j_lut, domain)
         if debug:
             print('I am trying to do fit for domain {}'.format(domain))
-        current_file = 'data/mDelila_raw_py_{}.spe'.format(domain)
+        current_file = '{}mDelila_raw_py_{}.spe'.format(datapath, domain)
+
         if file_exists(current_file):
             command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly2 -v 2'.format(path, current_file, my_source.name, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
             if debug:
@@ -301,22 +321,22 @@ def main():
     # with open('calib_res_{}.json'.format(my_run.run), 'w') as ofile:
     #     ofile.write(j_results)
 
-    with open('calib_res_{}.json'.format(my_run.run), 'w') as ofile:
+    with open('{}calib_res_{}.json'.format(datapath, my_run.run), 'w') as ofile:
         js_tab = json.dump(list_results, ofile, indent=3, default=str)
 
 
-    with open('calib_res_{}.json'.format(my_run.run), 'r') as ifile:
+    with open('{}calib_res_{}.json'.format(datapath, my_run.run), 'r') as ifile:
         js_tab = json.load(ifile)
         if blPlot == True:
             PlotDomain(js_tab, j_sources, my_source.name)
-            PlotClover(js_tab, j_sources, my_source.name)
+            PlotClover(js_tab, j_sources, my_source.name, 1)
             PlotCore(js_tab, j_sources, my_source.name)
             PlotCalibration(js_tab, j_sources, my_source.name)
             
 
-    global j_res
-    with open('calib_res_{}.json'.format(my_run.run), 'r') as ifile:
-        j_res = json.load(ifile)
+    # global j_res
+    # with open('{}calib_res_{}.json'.format(datapath, my_run.run), 'r') as ifile:
+        # j_res = json.load(ifile)
 
 if __name__ == "__main__":
    print('Input Parameters: server, run, domDown, domUp')

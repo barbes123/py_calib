@@ -7,9 +7,15 @@ import os
 import matplotlib.colors as mcolors
 from random import choice
 
+ourpath = '/data10/live/IT/py_calib'
+
+current_directory = os.getcwd()
+datapath = '{}/'.format(current_directory)
+
+
 global save_results_to
 # save_results_to = '/home/rmiron/Desktop/dir/python_exercises/calibrations/figures/'
-save_results_to = 'figures/'
+save_results_to = '{}figures/'.format(datapath)
 title_clover = ''
 list_of_clovers = {"CL29", "CL30", "CL31", "CL32", "CL33", "CL34", "CL35", "CL36", "HPGe", "SEG", "LaBr"}
 list_of_sources = {"60Co", "152Eu","137Cs", "133Ba"}
@@ -99,11 +105,11 @@ def legend_without_duplicate_labels(figure):
     by_label = dict(zip(labels, handles))
     figure.legend(by_label.values(), by_label.keys(), loc='lower right')
 
-def PlotJsonclover(data, gammatab, source):
+def PlotJsonclover(data, gammatab, source, my_det_type):
     print('I am in PlotJsonclover')
     MakeDir(save_results_to)
     
-    my_det_type = 2
+    # my_det_type = 2
     ### RESOLUTION, EFFICIENCY AND PEAK-TO-TOTAL RATIO FOR CLOVERS
     for cloverkey in list_of_clovers:
         blCloverFound = False
@@ -122,7 +128,7 @@ def PlotJsonclover(data, gammatab, source):
                         if source == gammakey: #if our source is in the list                                
                             for element in gammatab[source]["gammas"]: #for each gamma energy of the source
                                 plot_color="k"
-                                with open('json/gamma_set.json', 'r') as jason_file:
+                                with open('{}/json/gamma_set.json'.format(ourpath), 'r') as jason_file:
                                     gammaset=json.load(jason_file)
                                     plot_color=gammaset[source]['gammas'][element] #using different colors for each energy
                                 plt.figure(1) #efficiency plot
@@ -200,7 +206,7 @@ def PlotJsoncore(data, gammatab, source):
                 if source == gammakey:
                     for element in gammatab[source]["gammas"]:
                         plot_color="k"
-                        with open('json/gamma_set.json', 'r') as jason_file:
+                        with open('{}/json/gamma_set.json'.format(ourpath), 'r') as jason_file:
                                     gammaset=json.load(jason_file)
                                     plot_color=gammaset[source]['gammas'][element] #using different colors for each energy
                         plt.figure(1) #efficiency plot
