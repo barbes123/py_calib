@@ -26,9 +26,19 @@ def run20Co60source(js, dom): #file is LUT file
     return myCurrentSetting
 
 def run25Eu1252source(js, dom): #file is LUT file
-    temp_params = TRecallEner(800,1200,100,4)
-    return temp_params
-    pass
+    
+    myCurrentSetting = TRecallEner(0,1300,100,4,0, 1500)
+    for i in js:
+        domainnbr=i["domain"]
+        if dom==domainnbr:
+            type=i["detType"]
+            if type==2:
+                myCurrentSetting = TRecallEner(0,1300,100,4,0, 1500)
+            elif type==10:
+                myCurrentSetting = TRecallEner(0,500,100,4,0, 1500)
+            elif type==1:
+                myCurrentSetting = TRecallEner(0,1300,100,4,0, 1500)
+    return myCurrentSetting
 
 
 # class TRecallEner:
