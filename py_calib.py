@@ -43,12 +43,14 @@ lutfile = 'LUT_ELIADE.json'
 j_results = {}
 list_results = []
 
-blFirstElement = False
+
 blPlot = True
 debug = False
+OnlyCores = True
 
 
 j_sources = None
+blFirstElement = False
 
 global my_params
 
@@ -293,7 +295,7 @@ def main():
         # if (domain != 109) and (domain != 119):
         #     continue
 
-        if (domain%10 != 9):
+        if ((domain%10 != 9) and OnlyCores):
             continue
 
         myCurrentSetting = SetUpRecallEner(j_lut, domain)
