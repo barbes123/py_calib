@@ -22,7 +22,7 @@ def run20Co60source(js, dom): #file is LUT file
             elif type==10:
                 myCurrentSetting = TRecallEner(200, 600, 1000, 4, 100, 800)
             elif type==1:
-                myCurrentSetting = TRecallEner(800, 1600, 1000, 4, 200, 1500)
+                myCurrentSetting = TRecallEner(800, 1600, 100, 4, 200, 1500)
     return myCurrentSetting
 
 def run25Eu1252source(js, dom): #file is LUT file

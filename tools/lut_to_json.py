@@ -4,7 +4,7 @@ import json
 import sys
 from os.path import exists
 
-file_lut = 'LUT_ELIADE_S9_run20_raluca.dat'
+file_lut = 'LUT_CL31_S8_20230515.dat'
 def GetLUTFromTxt(file_name):
     lut_dic = []
     with open('{}'.format(file_name),'r') as fin:
