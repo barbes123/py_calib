@@ -1,0 +1,11 @@
+1. Add environemental variable and a path to py_calib
+
+export PY_CALIB="/home/eliade/py_calib"
+export PATH=$PATH:$PY_CALIB
+
+2. Install python pip and all the required modules
+
+sudo apt install python3-pip
+pip install numpy
+pip install matplotlib
+pip install scipy
