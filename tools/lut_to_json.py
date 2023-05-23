@@ -38,7 +38,7 @@ def GetLUTFromTxt(file_name):
                     par_list[par] = int(lut_line[index])
                 index+=1    
             # print(par_list)
-            par_list['TimeOffset'] = time_offset_pulser[ par_list['channel']//100 ]
+#            par_list['TimeOffset'] = time_offset_pulser[ par_list['channel']//100 ]
             par_list['on'] = 1
             lut_dic.append(par_list)
     lut_json = json.dumps(lut_dic, indent=3)
