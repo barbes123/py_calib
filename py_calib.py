@@ -276,6 +276,9 @@ def main():
     global my_source
     my_source = TIso(None, None, None, None)
     my_source.setup_source_from_json(j_sources, my_run.source)
+    if my_run.tstop < my_run.tstart:
+        print("Check start and stop time of this run. Tstart must be bigger than Tstop")
+        sys.exit()
     global n_decays_sum
     n_decays_sum, n_decays_err= my_source.GetNdecaysIntegral(my_run.tstart, my_run.tstop)
     global n_decays_int
@@ -318,8 +321,8 @@ def main():
             ProcessFitDataStr(domain, my_source.name, fitdata, j_sources, j_lut)
 
 
-    with open('new_{}'.format(lutfile), 'w') as ofile:
-        js_tab = json.dump(j_lut, ofile, indent=3, default=str)
+    # with open('new_{}'.format(lutfile), 'w') as ofile:
+    #     js_tab = json.dump(j_lut, ofile, indent=3, default=str)
 
     # with open('calib_res_{}.json'.format(my_run.run), 'w') as ofile:
     #     ofile.write(j_results)
