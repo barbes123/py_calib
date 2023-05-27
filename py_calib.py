@@ -46,7 +46,7 @@ list_results = []
 
 blPlot = True
 debug = False
-OnlyCores = True
+OnlyCores = False
 CalibDetType = 0
 
 
@@ -366,7 +366,7 @@ if __name__ == "__main__":
             if tmp >= 0 and tmp < 10:
                 CalibDetType = tmp
                 if CalibDetType == 1:
-                    OnlyCores = True #to be changed by Raluca or by me ;-) 
+                    OnlyCores = True #to be changed by Raluca or by me ;-)
             else:
                 print('CalibDetType is {} not known; setup default 0'.format(tmp))
    else:
