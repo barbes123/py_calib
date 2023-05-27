@@ -47,6 +47,7 @@ list_results = []
 blPlot = True
 debug = False
 OnlyCores = True
+CalibDetType = 0
 
 
 j_sources = None
@@ -345,14 +346,14 @@ def main():
         # j_res = json.load(ifile)
 
 if __name__ == "__main__":
-   print('Input Parameters: server, run, domDown, domUp')
+   print('Input Parameters: server, run, domDown, domUp, detType')
    n = len(sys.argv)
    print('Number of arguments {}'.format(n))
    if n == 1: #no arguments
        print('Default input values')
        my_params = TStartParams(6, 1, 109, 119)
        # print('Start Params ', my_params.__str__())
-   elif n == 5: #2 arguments
+   elif n == 5 or n == 6: #2 arguments
        print('Settings input values from arguments')
        dom1 = int(sys.argv[3])
        dom2 = int(sys.argv[4])
@@ -360,6 +361,14 @@ if __name__ == "__main__":
            my_params = TStartParams(sys.argv[1], sys.argv[2], dom2, dom1)
        else:
            my_params = TStartParams(sys.argv[1], sys.argv[2], dom1, dom2)
+       if n == 6:
+            tmp = int(sys.argv[5])
+            if tmp >= 0 and tmp < 10:
+                CalibDetType = tmp
+                if CalibDetType == 1:
+                    OnlyCores = True #to be changed by Raluca or by me ;-) 
+            else:
+                print('CalibDetType is {} not known; setup default 0'.format(tmp))
    else:
        print('Wrong number of parameters, ciao')
        sys.exit()
