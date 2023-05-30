@@ -3,6 +3,7 @@
 import json
 import sys
 from os.path import exists
+import os
 
 file_lut = 'LUT_ELIADE_S9_run20_raluca.json'
 file_calib = 'calib_res_60.json'
@@ -40,7 +41,25 @@ if __name__ == "__main__":
    new_lut = AddNewCalib(j_lut, j_calib)
    j_new_lut = json.dumps(new_lut, indent=3)
 
-   with open('new_{}'.format(file_lut), 'w') as fout:
+   foutPath = '{}'.format(file_lut.split('LUT_')[0])
+   foutName = 'newcalib_LUT_{}'.format(file_lut.split('LUT_')[1])
+   foutNameOld = 'LUT_{}'.format(file_lut.split('LUT_')[1])
+
+   print(foutPath, ' ', foutName)
+
+   if file_exists(foutName):
+       os.unlink(foutName)
+   if file_exists(foutNameOld):
+       os.unlink(foutNameOld)
+
+   os.symlink('{}{}'.format(foutPath,foutNameOld),foutNameOld)
+   os.symlink('{}{}'.format(foutPath, foutName), foutName)
+
+
+
+
+
+   with open('{}{}'.format(foutPath, foutName), 'w') as fout:
        fout.write(j_new_lut)
 
    # main()

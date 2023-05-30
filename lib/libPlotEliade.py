@@ -82,7 +82,7 @@ def PlotJsondom(data, gammatab, source):
             #plt.scatter(x=float(key), y=eff, color='b')
             
         plt.xlim([1000,1400])
-        if i["detType"]==1 or i["detType"]==10:
+        if (i["detType"]==1 or i["detType"]==10):
             plt.ylim([0, 0.1])
         elif i["detType"]==2:
             plt.ylim([0,0.01])

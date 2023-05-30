@@ -7,6 +7,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math, sys, os, json, subprocess
 from pathlib import Path
+from argparse import ArgumentParser
+
 
 ourpath = os.getenv('PY_CALIB')
 path='{}{}'.format(Path.home(),'/EliadeSorting/EliadeTools/RecalEnergy')
@@ -46,7 +48,7 @@ list_results = []
 
 blPlot = True
 debug = False
-OnlyCores = False
+# OnlyCores = False
 CalibDetType = 0
 
 
@@ -56,11 +58,12 @@ blFirstElement = False
 global my_params
 
 class TStartParams:
-    def __init__(self, server, runnbr, dom1, dom2):
+    def __init__(self, server, runnbr, dom1, dom2, det_type):
         self.server = int(server)
-        self.runnbr = int(runnbr)
+        self.runnbr = runnbr
         self.dom1 = int(dom1)
         self.dom2 = int(dom2)
+        self.det_type = det_type
 
     def __repr__(self):
         print('=========================================')
@@ -102,13 +105,11 @@ def MakeSymLink(file, link):
     # os.chdir('data')
     if file_exists(link):
         print('Link {} to file {} exists '.format(link, file))
-        os.chdir('..')
-        return
+        os.unlink(link)
     if file_exists(file):
         print(os.path.abspath(file))
         os.symlink(os.path.abspath(file), link)
         print('Link {} to file {} created '.format(link, file))
-    os.chdir('..')
 
 def ProcessFitDataStr(dom, my_source, lines, j_src, j_lut ):
     print('ProcessFitDataStr: now  split lines')
@@ -166,7 +167,7 @@ def FillResults2json(dom, list, cal):
     peaksum = 0
     for peak in list:
         content = {}
-        content['eff'] = peak.area/(n_decays_int*peak.Intensity) *100
+        content['eff'] = peak.area/(n_decays_int*peak.Intensity) # *100
         if peak.area and n_decays_int:
             try:
                 content['err_eff'] = np.sqrt((1/peak.area + 1/n_decays_int + peak.errIntensity/peak.Intensity**2)*100)*peak.area/(n_decays_int*peak.Intensity)*100
@@ -298,9 +299,23 @@ def main():
     for domain in range (my_params.dom1, my_params.dom2+1):
         # if (domain != 109) and (domain != 119):
         #     continue
+        current_det = 0
 
-        if ((domain%10 != 9) and OnlyCores):
+        # blGo = True
+
+        if my_params.det_type != 0:
+            for entry in j_lut:
+                if entry['domain'] == domain:
+                    current_det = entry['detType']
+                    print('~ ',domain  ,'!!!!!!!!!!!!!!!!!!!!!!!!!! ', entry['detType'], ' ' ,entry['channel'], ' ', entry['serial'], ' ', current_det, ' ',my_params.det_type)
+                    break
+
+        if my_params.det_type != current_det:
             continue
+
+
+        # if ((domain%10 != 9) and OnlyCores):
+        #     continue
 
         myCurrentSetting = SetUpRecallEner(j_lut, domain)
         if debug:
@@ -346,32 +361,63 @@ def main():
         # j_res = json.load(ifile)
 
 if __name__ == "__main__":
-   print('Input Parameters: server, run, domDown, domUp, detType')
-   n = len(sys.argv)
-   print('Number of arguments {}'.format(n))
-   if n == 1: #no arguments
-       print('Default input values')
-       my_params = TStartParams(6, 1, 109, 119)
-       # print('Start Params ', my_params.__str__())
-   elif n == 5 or n == 6: #2 arguments
-       print('Settings input values from arguments')
-       dom1 = int(sys.argv[3])
-       dom2 = int(sys.argv[4])
-       if dom1 >= dom2:
-           my_params = TStartParams(sys.argv[1], sys.argv[2], dom2, dom1)
-       else:
-           my_params = TStartParams(sys.argv[1], sys.argv[2], dom1, dom2)
-       if n == 6:
-            tmp = int(sys.argv[5])
-            if tmp >= 0 and tmp < 10:
-                CalibDetType = tmp
-                if CalibDetType == 1:
-                    OnlyCores = True #to be changed by Raluca or by me ;-)
-            else:
-                print('CalibDetType is {} not known; setup default 0'.format(tmp))
-   else:
-       print('Wrong number of parameters, ciao')
-       sys.exit()
+    dom1 = 100
+    dom2 = 109
+    server = 9
+    runnbr = 63
+    det_type = 0
 
-   print('Start Params are set', my_params.__str__())
-   main()
+    parser = ArgumentParser()
+
+    parser.add_argument("-s", "--server", dest="server", default=server, type=int, choices=range(10),
+                        help="DAQ ELIADE server, default = {}".format(server))
+    parser.add_argument("-r", "--run", type=int,
+                        dest="runnbr", default=runnbr,
+                        help="Run number, default = {}".format(runnbr))
+    parser.add_argument("-d", "--domains",  nargs=2,
+                        dest="dom", default=[dom1, dom2],
+                        help="from domain, default = {} {}".format(dom1, dom2))
+    parser.add_argument("-t", "--type",
+                        dest="det_type", default=det_type,  type=int,
+                        help="type of detector to be calibrated; default = 0".format(det_type))
+
+    config = parser.parse_args()
+
+    print(config)
+
+    # if dom1 >= dom2:
+    #     my_params = TStartParams(server, runnbr, dom2, dom1)
+    # else:
+    my_params = TStartParams(config.server, config.runnbr, config.dom[0], config.dom[1], config.det_type)
+
+
+    # print('Input Parameters: server, run, domDown, domUp, detType')
+   # n = len(sys.argv)
+   # print('Number of arguments {}'.format(n))
+   # if n == 1: #no arguments
+   #     print('Default input values')
+   #     my_params = TStartParams(6, 1, 109, 119)
+   #     # print('Start Params ', my_params.__str__())
+   # elif n == 5 or n == 6: #2 arguments
+   #     print('Settings input values from arguments')
+   #     dom1 = int(sys.argv[3])
+   #     dom2 = int(sys.argv[4])
+   #     if dom1 >= dom2:
+   #         my_params = TStartParams(sys.argv[1], sys.argv[2], dom2, dom1)
+   #     else:
+   #         my_params = TStartParams(sys.argv[1], sys.argv[2], dom1, dom2)
+   #     if n == 6:
+   #          tmp = int(sys.argv[5])
+   #          if tmp >= 0 and tmp < 10:
+   #              CalibDetType = tmp
+   #              if CalibDetType == 1:
+   #                  OnlyCores = True #to be changed by Raluca or by me ;-)
+   #          else:
+   #              print('CalibDetType is {} not known; setup default 0'.format(tmp))
+   # else:
+   #     print('Wrong number of parameters, ciao')
+   #     sys.exit()
+   #
+   # print('Start Params are set', my_params.__str__())
+   #
+    main()

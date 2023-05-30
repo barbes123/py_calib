@@ -4,7 +4,7 @@ from TRecallEner import TRecallEner
 # *******************************
 def SetUpRecallEner(js, dom):
     if dom == 1:
-        return TRecallEner(200, 400, 1000, 4, 100, 700)
+        return TRecallEner(200, 400, 10000, 4, 250, 400)
     elif dom == 2:
         return TRecallEner(200, 400, 100, 7, 100, 700)
     elif dom == 3:
