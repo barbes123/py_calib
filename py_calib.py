@@ -350,10 +350,10 @@ def main():
     with open('{}calib_res_{}.json'.format(datapath, my_run.run), 'r') as ifile:
         js_tab = json.load(ifile)
         if blPlot == True:
-            PlotDomain(js_tab, j_sources, my_source.name)
-            PlotClover(js_tab, j_sources, my_source.name, 1)
-            PlotCore(js_tab, j_sources, my_source.name)
-            PlotCalibration(js_tab, j_sources, my_source.name)
+            PlotDomain(js_tab, j_sources, my_source.name, j_lut)
+            PlotClover(js_tab, j_sources, my_source.name, 1, j_lut)
+            PlotCore(js_tab, j_sources, my_source.name, j_lut)
+            PlotCalibration(js_tab, j_sources, my_source.name, j_lut)
             
 
     # global j_res
@@ -391,33 +391,33 @@ if __name__ == "__main__":
     my_params = TStartParams(config.server, config.runnbr, config.dom[0], config.dom[1], config.det_type)
 
 
-    # print('Input Parameters: server, run, domDown, domUp, detType')
-   # n = len(sys.argv)
-   # print('Number of arguments {}'.format(n))
-   # if n == 1: #no arguments
-   #     print('Default input values')
-   #     my_params = TStartParams(6, 1, 109, 119)
-   #     # print('Start Params ', my_params.__str__())
-   # elif n == 5 or n == 6: #2 arguments
-   #     print('Settings input values from arguments')
-   #     dom1 = int(sys.argv[3])
-   #     dom2 = int(sys.argv[4])
-   #     if dom1 >= dom2:
-   #         my_params = TStartParams(sys.argv[1], sys.argv[2], dom2, dom1)
-   #     else:
-   #         my_params = TStartParams(sys.argv[1], sys.argv[2], dom1, dom2)
-   #     if n == 6:
-   #          tmp = int(sys.argv[5])
-   #          if tmp >= 0 and tmp < 10:
-   #              CalibDetType = tmp
-   #              if CalibDetType == 1:
-   #                  OnlyCores = True #to be changed by Raluca or by me ;-)
-   #          else:
-   #              print('CalibDetType is {} not known; setup default 0'.format(tmp))
-   # else:
-   #     print('Wrong number of parameters, ciao')
-   #     sys.exit()
-   #
-   # print('Start Params are set', my_params.__str__())
-   #
+#     print('Input Parameters: server, run, domDown, domUp, detType')
+#     n = len(sys.argv)
+#     print('Number of arguments {}'.format(n))
+#     if n == 1: #no arguments
+#        print('Default input values')
+#        my_params = TStartParams(6, 1, 109, 119)
+#        # print('Start Params ', my_params.__str__())
+#     elif n == 5 or n == 6: #2 arguments
+#        print('Settings input values from arguments')
+#        dom1 = int(sys.argv[3])
+#        dom2 = int(sys.argv[4])
+#        if dom1 >= dom2:
+#            my_params = TStartParams(sys.argv[1], sys.argv[2], dom2, dom1)
+#        else:
+#            my_params = TStartParams(sys.argv[1], sys.argv[2], dom1, dom2)
+#        if n == 6:
+#             tmp = int(sys.argv[5])
+#             if tmp >= 0 and tmp < 10:
+#                 CalibDetType = tmp
+#                 if CalibDetType == 1:
+#                     OnlyCores = True #to be changed by Raluca or by me ;-)
+#             else:
+#                 print('CalibDetType is {} not known; setup default 0'.format(tmp))
+#     else:
+#        print('Wrong number of parameters, ciao')
+#        sys.exit()
+   
+#     print('Start Params are set', my_params.__str__())
+#    #
     main()

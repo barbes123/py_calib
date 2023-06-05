@@ -8,6 +8,8 @@ from scipy.integrate import quad
 
 time_format = "%Y-%m-%d %H:%M:%S"
 
+list_of_sources = {"60Co", "152Eu","137Cs", "133Ba"}
+
 class TIsotope:
     def __init__(self, name, t12, date0, a0):
         self.name = name
@@ -107,7 +109,10 @@ class TMeasurement:
                 self.server = server
                 self.run = val
                 self.distance = runnbr['distance']
-                self.source = runnbr['source']
+                if runnbr['source'] in list_of_sources:
+                    self.source = runnbr['source']
+                else:
+                    self.source = "60Co"
                 print('Your source, sir ', runnbr['source'])
                 # self.source = '60Co'
             # if runnbr['source'] is None:

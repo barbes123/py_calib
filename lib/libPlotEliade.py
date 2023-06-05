@@ -48,56 +48,94 @@ def FindXlim(name):
     elif name == "CL31":
         plt.xlim([800.,841.])
 
+# global lutfile
+
+# lutfile =  'LUT_ELIADE.json'
+
+def find_domain(domain, lutfile):
+    # print("found {}".format(domain))
+    for item in lutfile:
+        if item["domain"] == domain:
+            return True
+    return False
+
+# def find_domain(domain, lutfile):
+#     try:
+#         next(item for item in lutfile if item["domain"] == domain)
+#         return True
+#     except StopIteration:
+#         return False
 
 
-def PlotJsondom(data, gammatab, source):
+    
+    
+    # if domain in lutfile:
+    #     file_name = LUT_ELIADE[domain]
+    #     # Process the file here
+    #     print(f"Processing {file_name}")
+    #     # Rest of the code for processing the file
+    # else:
+    #     spe_file = domain + ".spe"
+    #     if os.path.isfile(spe_file):
+    #         # Process the .spe file directly
+    #         print(f"Processing {spe_file}")
+    #         # Rest of the code for processing the .spe file
+    #     else:
+    #         print("Domain not found and corresponding .spe file not found.")
+
+
+def PlotJsondom(data, gammatab, source, lutfile):
 
     MakeDir(save_results_to)
 
     for i in data:
         # print('checking type {}'.format(type(i['domain'])))
         dom = i["domain"]
+
+        if find_domain(dom, lutfile)==False:
+            continue
+        else:
         
-        plt.figure(1)
-        for key in i[source].keys():
-            res=i[source][key]["res"]
-            #plt.scatter(x=float(key), y=res, color='b')
-            plt.errorbar(x=float(key), y=res, yerr=i[source][key]["err_res"], fmt='o', color='b', ecolor='red', capsize=5)
-        plt.xlim([1000.,1400.])
-        plt.ylim([1,5])
-        plt.title(f'Resolution for domain {dom}')
-        plt.xlabel('Energy (keV)')
-        plt.ylabel('Resolution (keV)')
-        plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
-        #plt.legend()
-        interactive(True)
-        #plt.show()
-        file_name1 = 'dom_{}_res.png'.format(dom)
-        plt.savefig(save_results_to + file_name1)
-        plt.close()
-        plt.figure(2)
-        for key in i[source].keys():
-            eff = i[source][key]["eff"]
-            plt.errorbar(x=float(key), y=eff, yerr=i[source][key]["err_eff"], fmt='o', color='b', ecolor='red', capsize=5)
-            #plt.scatter(x=float(key), y=eff, color='b')
+            plt.figure(1)
+            for key in i[source].keys():
+                res=i[source][key]["res"]
+                #plt.scatter(x=float(key), y=res, color='b')
+                plt.errorbar(x=float(key), y=res, yerr=i[source][key]["err_res"], fmt='o', color='b', ecolor='red', capsize=5)
+            plt.xlim([1000.,1400.])
+            plt.ylim([1,5])
+            plt.title(f'Resolution for domain {dom}')
+            plt.xlabel('Energy (keV)')
+            plt.ylabel('Resolution (keV)')
+            plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
+            #plt.legend()
+            interactive(True)
+            #plt.show()
+            file_name1 = 'dom_{}_res.png'.format(dom)
+            plt.savefig(save_results_to + file_name1)
+            plt.close()
+            plt.figure(2)
+            for key in i[source].keys():
+                eff = i[source][key]["eff"]
+                plt.errorbar(x=float(key), y=eff, yerr=i[source][key]["err_eff"], fmt='o', color='b', ecolor='red', capsize=5)
+                #plt.scatter(x=float(key), y=eff, color='b')
+                
+            plt.xlim([1000,1400])
+            if (i["detType"]==1 or i["detType"]==10):
+                plt.ylim([0, 0.1])
+            elif i["detType"]==2:
+                plt.ylim([0,0.01])
+            #plt.ylim([0.0001,0.00015])
+            plt.title(f'Efficiency for domain {dom}')
+            plt.xlabel('Energy (keV)')
+            plt.ylabel('Efficiency (%)')
+            plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
+            #plt.legend()
             
-        plt.xlim([1000,1400])
-        if (i["detType"]==1 or i["detType"]==10):
-            plt.ylim([0, 0.1])
-        elif i["detType"]==2:
-            plt.ylim([0,0.01])
-        #plt.ylim([0.0001,0.00015])
-        plt.title(f'Efficiency for domain {dom}')
-        plt.xlabel('Energy (keV)')
-        plt.ylabel('Efficiency (%)')
-        plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
-        #plt.legend()
-        
-        plt.show()
-        file_name2 = 'dom_{}_eff.png'.format(dom)
-        plt.savefig(save_results_to + file_name2)
-        interactive(False)
-        plt.close()
+            plt.show()
+            file_name2 = 'dom_{}_eff.png'.format(dom)
+            plt.savefig(save_results_to + file_name2)
+            interactive(False)
+            plt.close()
     print("Finished domain graphs")
     return  True
 
@@ -106,7 +144,7 @@ def legend_without_duplicate_labels(figure):
     by_label = dict(zip(labels, handles))
     figure.legend(by_label.values(), by_label.keys(), loc='lower right')
 
-def PlotJsonclover(data, gammatab, source, my_det_type):
+def PlotJsonclover(data, gammatab, source, my_det_type, lutfile):
     print('I am in PlotJsonclover')
     MakeDir(save_results_to)
     
@@ -115,35 +153,38 @@ def PlotJsonclover(data, gammatab, source, my_det_type):
     for cloverkey in list_of_clovers:
         blCloverFound = False
         for key in data: # Browse through data in output file
-            if key["serial"].rstrip(key["serial"][-1]) == cloverkey: #check if clover is found
-                if key["detType"] == my_det_type: #check if the detector is the type that we want
-                    blCloverFound = True
-                    plt.figure(0) #peak-to-total plot
-                    plot_color = "b"
-                    
-                    try:
-                        plt.errorbar(x=key["domain"], y=key["PT"], yerr=key["err_PT"],fmt='o', color=plot_color, ecolor='red', capsize=5)
-                    except:
-                        plt.scatter(x=key["domain"], y=key["PT"], color=plot_color)
-                    for gammakey in list_of_sources: # browse through the list of sources
-                        if source == gammakey: #if our source is in the list                                
-                            for element in gammatab[source]["gammas"]: #for each gamma energy of the source
-                                plot_color="k"
-                                with open('{}/json/gamma_set.json'.format(ourpath), 'r') as jason_file:
-                                    gammaset=json.load(jason_file)
-                                    plot_color=gammaset[source]['gammas'][element] #using different colors for each energy
-                                plt.figure(1) #efficiency plot
-                                try:
-                                    plt.scatter(x=key["domain"], y=key[source][element]["eff"], color=plot_color, label=f"{element}")
-                                    plt.errorbar(x=key["domain"], y=key[source][element]["eff"], yerr=key[source][element]["err_eff"], fmt='o', color=plot_color, ecolor=plot_color, capsize=5)
-                                except:
-                                    continue #print("Energy {} missing from domain {}".format(key[source][element], key["domain"]))
-                                plt.figure(2) #resolution plot
-                                try:
-                                    plt.scatter(x=key["domain"], y=key[source][element]["res"], color=plot_color, label=f"{element}")
-                                    plt.errorbar(x=key["domain"], y=key[source][element]["res"], yerr=key[source][element]["err_res"], fmt='o', color=plot_color, ecolor=plot_color, capsize=5)
-                                except:
-                                    continue #print("Energy {} missing from domain {}".format(key[source][element], key["domain"]))
+            if find_domain(key["domain"], lutfile)==False:
+                continue
+            else:
+                if key["serial"].rstrip(key["serial"][-1]) == cloverkey: #check if clover is found
+                    if key["detType"] == my_det_type: #check if the detector is the type that we want
+                        blCloverFound = True
+                        plt.figure(0) #peak-to-total plot
+                        plot_color = "b"
+                        
+                        try:
+                            plt.errorbar(x=key["domain"], y=key["PT"], yerr=key["err_PT"],fmt='o', color=plot_color, ecolor='red', capsize=5)
+                        except:
+                            plt.scatter(x=key["domain"], y=key["PT"], color=plot_color)
+                        for gammakey in list_of_sources: # browse through the list of sources
+                            if source == gammakey: #if our source is in the list                                
+                                for element in gammatab[source]["gammas"]: #for each gamma energy of the source
+                                    plot_color="k"
+                                    with open('{}/json/gamma_set.json'.format(ourpath), 'r') as jason_file:
+                                        gammaset=json.load(jason_file)
+                                        plot_color=gammaset[source]['gammas'][element] #using different colors for each energy
+                                    plt.figure(1) #efficiency plot
+                                    try:
+                                        plt.scatter(x=key["domain"], y=key[source][element]["eff"], color=plot_color, label=f"{element}")
+                                        plt.errorbar(x=key["domain"], y=key[source][element]["eff"], yerr=key[source][element]["err_eff"], fmt='o', color=plot_color, ecolor=plot_color, capsize=5)
+                                    except:
+                                        continue #print("Energy {} missing from domain {}".format(key[source][element], key["domain"]))
+                                    plt.figure(2) #resolution plot
+                                    try:
+                                        plt.scatter(x=key["domain"], y=key[source][element]["res"], color=plot_color, label=f"{element}")
+                                        plt.errorbar(x=key["domain"], y=key[source][element]["res"], yerr=key[source][element]["err_res"], fmt='o', color=plot_color, ecolor=plot_color, capsize=5)
+                                    except:
+                                        continue #print("Energy {} missing from domain {}".format(key[source][element], key["domain"]))
         if blCloverFound == True:
 
             FindXlim(cloverkey) #each clover has a different x-axis interval
@@ -196,32 +237,35 @@ def PlotJsonclover(data, gammatab, source, my_det_type):
     return True
 
    
-def PlotJsoncore(data, gammatab, source):
+def PlotJsoncore(data, gammatab, source, lutfile):
 
     MakeDir(save_results_to)
     #my_det_type=1
     for key in data:
         #clover=i["serial"]
-        if key["detType"] == 1:
-            for gammakey in list_of_sources:
-                if source == gammakey:
-                    for element in gammatab[source]["gammas"]:
-                        plot_color="k"
-                        with open('{}/json/gamma_set.json'.format(ourpath), 'r') as jason_file:
-                                    gammaset=json.load(jason_file)
-                                    plot_color=gammaset[source]['gammas'][element] #using different colors for each energy
-                        plt.figure(1) #efficiency plot
-                        try:
-                            plt.scatter(x=key["domain"], y=key[source][element]["eff"], color=plot_color, label=f"{element}")
-                            plt.errorbar(x=key["domain"], y=key[source][element]["eff"], yerr=key[source][element]["err_eff"], fmt='o', color=plot_color, ecolor=plot_color, capsize=5)
-                        except:
-                            continue
-                        plt.figure(2) #resolution plot
-                        try:
-                            plt.scatter(x=key["domain"], y=key[source][element]["res"], color=plot_color, label=f"{element}")
-                            plt.errorbar(x=key["domain"], y=key[source][element]["res"], yerr=key[source][element]["err_res"], fmt='o', color=plot_color, ecolor=plot_color, capsize=5)
-                        except:
-                            continue
+        if find_domain(key["domain"], lutfile)==False:
+                continue
+        else:
+            if key["detType"] == 1:
+                for gammakey in list_of_sources:
+                    if source == gammakey:
+                        for element in gammatab[source]["gammas"]:
+                            plot_color="k"
+                            with open('{}/json/gamma_set.json'.format(ourpath), 'r') as jason_file:
+                                        gammaset=json.load(jason_file)
+                                        plot_color=gammaset[source]['gammas'][element] #using different colors for each energy
+                            plt.figure(1) #efficiency plot
+                            try:
+                                plt.scatter(x=key["domain"], y=key[source][element]["eff"], color=plot_color, label=f"{element}")
+                                plt.errorbar(x=key["domain"], y=key[source][element]["eff"], yerr=key[source][element]["err_eff"], fmt='o', color=plot_color, ecolor=plot_color, capsize=5)
+                            except:
+                                continue
+                            plt.figure(2) #resolution plot
+                            try:
+                                plt.scatter(x=key["domain"], y=key[source][element]["res"], color=plot_color, label=f"{element}")
+                                plt.errorbar(x=key["domain"], y=key[source][element]["res"], yerr=key[source][element]["err_res"], fmt='o', color=plot_color, ecolor=plot_color, capsize=5)
+                            except:
+                                continue
         #FindXlim(clover)
         plt.figure(1)
         #plt.xlim(100,841)
@@ -257,7 +301,7 @@ def PlotJsoncore(data, gammatab, source):
     print("Finished graphs for all core1")
     return  True
 
-def PlotCalibration(data, gammatab, source):
+def PlotCalibration(data, gammatab, source, lutfile):
     MakeDir(save_results_to)
     number_of_our_colors = 30
     our_color_plate = iter(cm.rainbow(np.linspace(0, 1, number_of_our_colors)))
@@ -269,24 +313,27 @@ def PlotCalibration(data, gammatab, source):
         our_color_plate = iter(cm.rainbow(np.linspace(0, 1, number_of_our_colors)))
         blCloverFound = False
         for key in data: # Browse through data in output file
-            if key["serial"].rstrip(key["serial"][-1]) == cloverkey: #check if clover is found
-                if key["pol_list"]:
-                    if key["detType"] == my_det_type: #check if the detector is the type that we want
-                        blCloverFound = True
-                        dom=key["domain"]
+            if find_domain(key["domain"], lutfile)==False:
+                continue
+            else:
+                if key["serial"].rstrip(key["serial"][-1]) == cloverkey: #check if clover is found
+                    if key["pol_list"]:
+                        if key["detType"] == my_det_type: #check if the detector is the type that we want
+                            blCloverFound = True
+                            dom=key["domain"]
 
-                        try:
-                            current_color = next(our_color_plate)
-                        except:
-                            current_color = 'red'
+                            try:
+                                current_color = next(our_color_plate)
+                            except:
+                                current_color = 'red'
 
-                        plt.plot([1, 2000], [float(key["pol_list"][0])+float(key["pol_list"][1])*1,  float(key["pol_list"][0])+float(key["pol_list"][1])*2000], color = current_color, label=f"{dom}", linewidth=1)
+                            plt.plot([1, 2000], [float(key["pol_list"][0])+float(key["pol_list"][1])*1,  float(key["pol_list"][0])+float(key["pol_list"][1])*2000], color = current_color, label=f"{dom}", linewidth=1)
 
-                        for gammakey in list_of_sources: # browse through the list of sources
-                            if source == gammakey: #if our source is in the list                                
-                                for element in gammatab[source]["gammas"]: #for each gamma energy of the source
-                                        plt.scatter(x=key[source][element]["pos_ch"], y=float(element), color=current_color)
-                        max_energy=max([float(i) for i in list(gammatab[source]["gammas"].keys())])
+                            for gammakey in list_of_sources: # browse through the list of sources
+                                if source == gammakey: #if our source is in the list                                
+                                    for element in gammatab[source]["gammas"]: #for each gamma energy of the source
+                                            plt.scatter(x=key[source][element]["pos_ch"], y=float(element), color=current_color)
+                            max_energy=max([float(i) for i in list(gammatab[source]["gammas"].keys())])
 
                  
         if blCloverFound == True:
