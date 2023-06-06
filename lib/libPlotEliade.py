@@ -221,7 +221,7 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile):
 
             plt.figure(0)
             FindXlim(cloverkey)  # Peak to Total
-            plt.ylim([0.05,0.1])
+            # plt.ylim([0.05,0.1])
             plt.title(f'Peak to Total ratio for clover {cloverkey}')
             plt.xlabel('Domain')
             plt.ylabel('Peak-to-total ratio')

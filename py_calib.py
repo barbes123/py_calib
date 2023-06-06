@@ -167,7 +167,7 @@ def FillResults2json(dom, list, cal):
     peaksum = 0
     for peak in list:
         content = {}
-        content['eff'] = peak.area/(n_decays_int*peak.Intensity) # *100
+        content['eff'] = peak.area/(n_decays_int*peak.Intensity)  *100
         if peak.area and n_decays_int:
             try:
                 content['err_eff'] = np.sqrt((1/peak.area + 1/n_decays_int + peak.errIntensity/peak.Intensity**2)*100)*peak.area/(n_decays_int*peak.Intensity)*100
