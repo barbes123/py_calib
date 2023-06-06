@@ -307,7 +307,7 @@ def main():
             for entry in j_lut:
                 if entry['domain'] == domain:
                     current_det = entry['detType']
-                    print('~ ',domain  ,'!!!!!!!!!!!!!!!!!!!!!!!!!! ', entry['detType'], ' ' ,entry['channel'], ' ', entry['serial'], ' ', current_det, ' ',my_params.det_type)
+                    # print('~ ',domain  ,'!!!!!!!!!!!!!!!!!!!!!!!!!! ', entry['detType'], ' ' ,entry['channel'], ' ', entry['serial'], ' ', current_det, ' ',my_params.det_type)
                     break
 
         if my_params.det_type != current_det:
