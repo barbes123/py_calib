@@ -9,3 +9,7 @@ sudo apt install python3-pip
 pip install numpy
 pip install matplotlib
 pip install scipy
+
+3. Create symblinks to /usr/bin
+cd tools
+./setup_py.sh
