@@ -4,9 +4,9 @@ from TRecallEner import TRecallEner
 # *******************************
 def SetUpRecallEner(js, dom):
     if dom == 1:
-        return TRecallEner(200, 400, 10000, 4, 250, 400)
+        return TRecallEner(200, 400, 10000, 15, 200, 400)
     elif dom == 2:
-        return TRecallEner(200, 400, 100, 7, 100, 700)
+        return TRecallEner(200, 400, 1000, 10, 200, 700)
     elif dom == 3:
         return TRecallEner(200, 400, 1000, 15, 100, 700)
     return run20Co60source(js, dom)

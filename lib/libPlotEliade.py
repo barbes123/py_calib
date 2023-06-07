@@ -7,6 +7,14 @@ import os
 import matplotlib.colors as mcolors
 from random import choice
 
+##################################################################
+# This library contains functions to plot results from data analysis.
+# PlotJsondom - graphs for indvidual domains
+# PlotJsonclover -  plots for all domains of a clover
+# PlotJsoncore - plots only core 1
+# PlotCalibration - plots calibration curves
+##################################################################
+
 # ourpath = '/data10/live/IT/py_calib'
 ourpath = os.getenv('PY_CALIB')
 
@@ -48,7 +56,7 @@ def FindXlim(name):
     elif name == "CL31":
         plt.xlim([800.,841.])
 
-# global lutfile
+
 
 # lutfile =  'LUT_ELIADE.json'
 
@@ -58,30 +66,6 @@ def find_domain(domain, lutfile):
         if item["domain"] == domain:
             return True
     return False
-
-# def find_domain(domain, lutfile):
-#     try:
-#         next(item for item in lutfile if item["domain"] == domain)
-#         return True
-#     except StopIteration:
-#         return False
-
-
-    
-    
-    # if domain in lutfile:
-    #     file_name = LUT_ELIADE[domain]
-    #     # Process the file here
-    #     print(f"Processing {file_name}")
-    #     # Rest of the code for processing the file
-    # else:
-    #     spe_file = domain + ".spe"
-    #     if os.path.isfile(spe_file):
-    #         # Process the .spe file directly
-    #         print(f"Processing {spe_file}")
-    #         # Rest of the code for processing the .spe file
-    #     else:
-    #         print("Domain not found and corresponding .spe file not found.")
 
 
 def PlotJsondom(data, gammatab, source, lutfile):
@@ -121,9 +105,17 @@ def PlotJsondom(data, gammatab, source, lutfile):
                 
             plt.xlim([1000,1400])
             if (i["detType"]==1 or i["detType"]==10):
-                plt.ylim([0, 0.1])
+                if(int(i["domain"])==1):
+                    plt.ylim([1,2.5])
+                else:
+                    plt.ylim([0, 0.1])
             elif i["detType"]==2:
-                plt.ylim([0,0.01])
+                if(int(i["domain"])==2):
+                    plt.ylim([0.5,1.5])
+                else:
+                    plt.ylim([0,0.01])
+            # if (i["domain"==1] or i["domain"]==2):
+            #     plt.ylim([0.5, 2])
             #plt.ylim([0.0001,0.00015])
             plt.title(f'Efficiency for domain {dom}')
             plt.xlabel('Energy (keV)')
