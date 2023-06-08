@@ -87,6 +87,8 @@ def PlotJsondom(data, gammatab, source, lutfile):
                 plt.errorbar(x=float(key), y=res, yerr=i[source][key]["err_res"], fmt='o', color='b', ecolor='red', capsize=5)
             plt.xlim([1000.,1400.])
             plt.ylim([1,5])
+            if i["domain"]==3:
+                plt.ylim([40,45])
             plt.title(f'Resolution for domain {dom}')
             plt.xlabel('Energy (keV)')
             plt.ylabel('Resolution (keV)')
@@ -214,6 +216,10 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile):
             plt.figure(0)
             FindXlim(cloverkey)  # Peak to Total
             # plt.ylim([0.05,0.1])
+            if my_det_type==1 or my_det_type==10:
+                plt.ylim([0.15, 0.2])
+            elif my_det_type==2: # (segments)
+                plt.ylim([0,0.1])
             plt.title(f'Peak to Total ratio for clover {cloverkey}')
             plt.xlabel('Domain')
             plt.ylabel('Peak-to-total ratio')
@@ -239,6 +245,8 @@ def PlotJsoncore(data, gammatab, source, lutfile):
                 continue
         else:
             if key["detType"] == 1:
+                if key["domain"] == 1:
+                    continue
                 for gammakey in list_of_sources:
                     if source == gammakey:
                         for element in gammatab[source]["gammas"]:
