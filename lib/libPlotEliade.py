@@ -96,7 +96,7 @@ def PlotJsondom(data, gammatab, source, lutfile):
             #plt.legend()
             interactive(True)
             #plt.show()
-            file_name1 = 'dom_{}_res.png'.format(dom)
+            file_name1 = 'dom_{}_res.eps'.format(dom)
             plt.savefig(save_results_to + file_name1)
             plt.close()
             plt.figure(2)
@@ -126,7 +126,7 @@ def PlotJsondom(data, gammatab, source, lutfile):
             #plt.legend()
             
             plt.show()
-            file_name2 = 'dom_{}_eff.png'.format(dom)
+            file_name2 = 'dom_{}_eff.eps'.format(dom)
             plt.savefig(save_results_to + file_name2)
             interactive(False)
             plt.close()
@@ -195,7 +195,7 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile):
             plt.grid(color='black', linestyle='--', linewidth=0.5)
             legend_without_duplicate_labels(plt)
 
-            file_name1 = 'eliade_{}_efficiency.png'.format(cloverkey)
+            file_name1 = 'eliade_{}_efficiency.eps'.format(cloverkey)
             plt.savefig(save_results_to + file_name1)
             plt.close()
 
@@ -209,7 +209,7 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile):
             plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
             legend_without_duplicate_labels(plt)
 
-            file_name2 = 'eliade_{}_resolution.png'.format(cloverkey)
+            file_name2 = 'eliade_{}_resolution.eps'.format(cloverkey)
             plt.savefig(save_results_to + file_name2)
             plt.close()
 
@@ -225,7 +225,7 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile):
             plt.ylabel('Peak-to-total ratio')
             plt.grid(color='black', linestyle='--', linewidth=0.5)
 
-            file_name3 = 'eliade_{}_peaktotal.png'.format(cloverkey)
+            file_name3 = 'eliade_{}_peaktotal.eps'.format(cloverkey)
             plt.savefig(save_results_to + file_name3)
             plt.close()
 
@@ -289,12 +289,12 @@ def PlotJsoncore(data, gammatab, source, lutfile):
 
         
     plt.figure(1)    
-    file_name5 = 'eliade_efficiency_core1.png'
+    file_name5 = 'eliade_efficiency_core1.eps'
     plt.savefig(save_results_to + file_name5)
     plt.close()   
 
     plt.figure(2)
-    file_name6 = 'eliade_resolution_core1.png'
+    file_name6 = 'eliade_resolution_core1.eps'
     plt.savefig(save_results_to + file_name6)
     plt.close()
 
@@ -347,7 +347,7 @@ def PlotCalibration(data, gammatab, source, lutfile):
                 #legend_without_duplicate_labels(plt)
                 plt.legend(ncol=3,loc='lower right',prop={'size': 6})
                 # plt.show()
-                file_name='eliade_{}_calibration.png'.format(cloverkey)
+                file_name='eliade_{}_calibration.eps'.format(cloverkey)
                 plt.savefig(save_results_to + file_name)
                 plt.close()  
                 blCloverFound=False
