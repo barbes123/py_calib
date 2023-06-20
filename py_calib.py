@@ -51,23 +51,23 @@ debug = False
 # OnlyCores = False
 CalibDetType = 0
 
-
 j_sources = None
 blFirstElement = False
 
 global my_params
 
 class TStartParams:
-    def __init__(self, server, runnbr, dom1, dom2, det_type):
+    def __init__(self, server, runnbr, dom1, dom2, det_type, bg):
         self.server = int(server)
         self.runnbr = runnbr
         self.dom1 = int(dom1)
         self.dom2 = int(dom2)
         self.det_type = det_type
+        self.bg = bg
 
     def __repr__(self):
         print('=========================================')
-        print('Server {}, Run {}, domFrom {}, domTo {}'.format(self.server, self.runnbr, self.dom1, self.dom2))
+        print('Server {}, Run {}, domFrom {}, domTo {}, bg {}'.format(self.server, self.runnbr, self.dom1, self.dom2, self.bg))
         print('=========================================')
 
 class TPeak:
@@ -114,20 +114,23 @@ def MakeSymLink(file, link):
 def ProcessFitDataStr(dom, my_source, lines, j_src, j_lut ):
     print('ProcessFitDataStr: now  split lines')
 
-    # print(lines)
+    if debug:
+        print(lines)
+
     words = [s for s in lines.split('#2') if s]
     # del words[0]
     words.pop(0)
 
     PeakList = []
     cal = []
-
     for word in words:
-        if 'Cal' in word:
+        if 'Cal1' in word:#for poly3 change to Cal2
             cal = []
             temp = [t for t in word.split('[ ') if t]
             temp1 = [t1 for t1 in temp[1].split(' ') if t1]
             del temp1[len(temp1) - 1]
+            if my_params.bg == 1:
+                del temp1[len(temp1) - 1]
             for s in temp1:
                 cal.append(float(s))
             print('Calibration for domain {} {}'.format(dom, cal))
@@ -288,10 +291,15 @@ def main():
     print(my_source.__str__())
     print('sum {}; err {}; int {}'.format(n_decays_sum, n_decays_err, n_decays_int))
 
+    # blBackGround = False
+    # print('!!!!!!',my_params.bg)
+    # if my_params.bg > 0:
+    #     blBackGround = True
+
     # print('Gammas ', j_sources['Co60']['gammas'])
 
-    limDown = 800
-    limUp = 1200
+    # limDown = 800
+    # limUp = 1200
 
     global myCurrentSetting
     myCurrentSetting = TRecallEner(800,1200,100,4, 200, 1500)
@@ -323,10 +331,19 @@ def main():
         current_file = '{}mDelila_raw_py_{}.spe'.format(datapath, domain)
 
         if file_exists(current_file):
-            command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly2 -v 2'.format(path, current_file, my_source.name, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
+            # if blBackGround:
+            if my_params.bg == 1:
+                src = '{} -ener 1460.82 -ener 2614.51'.format(my_source.name)
+            else:
+                src = my_source.name
+
+            # command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly2 -v 2'.format(path, current_file, my_source.name, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
+            # command_line = '{} -spe {} -{} -ener {} -ener {} -lim {} {} -fmt A 16384 -dwa {} {} -poly2 -v 2'.format(path, current_file, my_source.name,'1460.82','2614.51', myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
+            command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly2 -v 2'.format(path, current_file, src, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
+            print('{}'.format(command_line))
             if debug:
                 print('I am ready to do fit for domain {} : '.format(domain))
-                print('{}'.format(command_line))
+
             result_scr = subprocess.run(['{}'.format(command_line)], shell=True, capture_output=True)
             # print(result_scr)
             fitdata = result_scr.stdout.decode()
@@ -366,6 +383,7 @@ if __name__ == "__main__":
     server = 9
     runnbr = 63
     det_type = 0
+    bg = 0
 
     parser = ArgumentParser()
 
@@ -380,15 +398,19 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--type",
                         dest="det_type", default=det_type,  type=int,
                         help="type of detector to be calibrated; default = 0".format(det_type))
+    parser.add_argument("-b", "--background",
+                        dest="bg", default=bg, type=int,
+                        help="to take in energy calib background lines; default = {}".format(bg))
 
     config = parser.parse_args()
 
     print(config)
-
     # if dom1 >= dom2:
     #     my_params = TStartParams(server, runnbr, dom2, dom1)
     # else:
-    my_params = TStartParams(config.server, config.runnbr, config.dom[0], config.dom[1], config.det_type)
+    # if config.
+
+    my_params = TStartParams(config.server, config.runnbr, config.dom[0], config.dom[1], config.det_type, config.bg)
 
 
 #     print('Input Parameters: server, run, domDown, domUp, detType')
