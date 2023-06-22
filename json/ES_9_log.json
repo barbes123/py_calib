@@ -1,5 +1,14 @@
 [
      {
+        "runNumber": 65,
+        "start": "2023-06-22 15:00:23",
+        "stop": "2023-06-22 15:24:25",
+        "expName": "ELIADE_Gate",
+        "comment": "",
+        "source": "60Co",
+        "distance": "x=80485 y=8534"
+    },
+    {
         "runNumber": 64,
         "start": "2023-05-30 13:42:30",
         "stop": "2023-05-30 15:56:42",
