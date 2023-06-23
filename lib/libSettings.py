@@ -57,7 +57,7 @@ def run68Eu152source(js, dom): #file is LUT file
         if dom==domainnbr:
             type=i["detType"]
             if type==2:
-                myCurrentSetting = TRecallEner(0,1300,100,7,100, 1500)
+                myCurrentSetting = TRecallEner(50,1300,10,3,100,1500)
             elif type==10:
                 myCurrentSetting = TRecallEner(0,500,100,4,0, 500)
             elif type==1:

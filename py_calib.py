@@ -74,7 +74,8 @@ class TPeak:
     def __init__(self, domain, line):
         self.domain  = domain
         self.area = float(line[3])
-        self.Etable = float(line[7])
+        self.Etable = line[7]
+        # self.Etable = float(line[7])
         self.pos_ch = float(line [4])
         self.fwhm = float(line[5])
         self.Intensity = 0
@@ -180,7 +181,7 @@ def FillResults2json(dom, list, cal):
             except: 
                 content['err_eff'] = 0
         #print(n_decays_sum, 'this is sum of decays')
-        content['res'] = peak.fwhm/peak.pos_ch*peak.Etable
+        content['res'] = peak.fwhm/peak.pos_ch*float(peak.Etable)
         content['err_res'] = 0.1
         content['pos_ch'] = peak.pos_ch
         # jsondata[peak.Etable] = content

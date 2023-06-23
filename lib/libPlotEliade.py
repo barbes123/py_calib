@@ -338,7 +338,11 @@ def PlotCalibration(data, gammatab, source, lutfile):
                             for gammakey in list_of_sources: # browse through the list of sources
                                 if source == gammakey: #if our source is in the list                                
                                     for element in gammatab[source]["gammas"]: #for each gamma energy of the source
+                                        try:
                                             plt.scatter(x=key[source][element]["pos_ch"], y=float(element), color=current_color)
+                                        except:
+                                            print('Warning skipping plot domain {} for gamma {} because not fitted'.format(key['domain'], element))
+                                            # continue
                             max_energy=max([float(i) for i in list(gammatab[source]["gammas"].keys())])
 
                  
