@@ -1,5 +1,32 @@
 [
      {
+        "runNumber": 68,
+        "start": "2023-06-22 17:01:36",
+        "stop": "2023-06-22 23:44:03",
+        "expName": "ELIADE_Gate",
+        "comment": "",
+        "source": "152Eu",
+        "distance": "x=80154 y=6307"
+    },
+    {
+        "runNumber": 67,
+        "start": "2023-06-22 16:15:04",
+        "stop": "2023-06-22 16:43:49",
+        "expName": "ELIADE_Gate",
+        "comment": "",
+        "source": "60Co",
+        "distance": "x=78000 y=6307"
+    },
+    {
+        "runNumber": 66,
+        "start": "2023-06-22 15:31:44",
+        "stop": "2023-06-22 16:11:49",
+        "expName": "ELIADE_Gate",
+        "comment": "",
+        "source": "60Co",
+        "distance": "x=79501 y=6307"
+    },
+    {
         "runNumber": 65,
         "start": "2023-06-22 15:00:23",
         "stop": "2023-06-22 15:24:25",
