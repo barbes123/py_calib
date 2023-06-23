@@ -127,8 +127,11 @@ def ProcessFitDataStr(dom, my_source, lines, j_src, j_lut ):
         if 'Cal1' in word:#for poly3 change to Cal2
             cal = []
             temp = [t for t in word.split('[ ') if t]
+            # print("#########",temp)
+            # print("!!!!!temp[1]", temp[1])
             temp1 = [t1 for t1 in temp[1].split(' ') if t1]
-            del temp1[len(temp1) - 1]
+            # print("#########",temp1)
+            del temp1[len(temp1) -1]
             if my_params.bg == 1:
                 del temp1[len(temp1) - 1]
             for s in temp1:
@@ -325,7 +328,7 @@ def main():
         # if ((domain%10 != 9) and OnlyCores):
         #     continue
 
-        myCurrentSetting = SetUpRecallEner(j_lut, domain)
+        myCurrentSetting = SetUpRecallEner(j_lut, domain, my_source.name)
         if debug:
             print('I am trying to do fit for domain {}'.format(domain))
         current_file = '{}mDelila_raw_py_{}.spe'.format(datapath, domain)
@@ -339,7 +342,8 @@ def main():
 
             # command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly2 -v 2'.format(path, current_file, my_source.name, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
             # command_line = '{} -spe {} -{} -ener {} -ener {} -lim {} {} -fmt A 16384 -dwa {} {} -poly2 -v 2'.format(path, current_file, my_source.name,'1460.82','2614.51', myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
-            command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly2 -v 2'.format(path, current_file, src, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
+            #command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly2 -v 2'.format(path, current_file, src, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
+            command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly1 -v 2'.format(path, current_file, src, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
             print('{}'.format(command_line))
             if debug:
                 print('I am ready to do fit for domain {} : '.format(domain))

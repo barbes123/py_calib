@@ -85,7 +85,10 @@ def PlotJsondom(data, gammatab, source, lutfile):
                 res=i[source][key]["res"]
                 #plt.scatter(x=float(key), y=res, color='b')
                 plt.errorbar(x=float(key), y=res, yerr=i[source][key]["err_res"], fmt='o', color='b', ecolor='red', capsize=5)
-            plt.xlim([1000.,1400.])
+            if source=="60Co":
+                plt.xlim([1000.,1400.])
+            elif source=="152Eu":
+                plt.xlim([100, 1500])
             plt.ylim([1,5])
             if i["domain"]==3:
                 plt.ylim([40,45])
@@ -105,7 +108,10 @@ def PlotJsondom(data, gammatab, source, lutfile):
                 plt.errorbar(x=float(key), y=eff, yerr=i[source][key]["err_eff"], fmt='o', color='b', ecolor='red', capsize=5)
                 #plt.scatter(x=float(key), y=eff, color='b')
                 
-            plt.xlim([1000,1400])
+            if source=="60Co":
+                plt.xlim([1000.,1400.])
+            elif source=="152Eu":
+                plt.xlim([100, 1500])
             if (i["detType"]==1 or i["detType"]==10):
                 if(int(i["domain"])==1):
                     plt.ylim([1,2.5])
@@ -136,7 +142,7 @@ def PlotJsondom(data, gammatab, source, lutfile):
 def legend_without_duplicate_labels(figure):
     handles, labels = plt.gca().get_legend_handles_labels()
     by_label = dict(zip(labels, handles))
-    figure.legend(by_label.values(), by_label.keys(), loc='lower right')
+    figure.legend(by_label.values(), by_label.keys(), loc='upper right')
 
 def PlotJsonclover(data, gammatab, source, my_det_type, lutfile):
     print('I am in PlotJsonclover')
