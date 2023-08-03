@@ -181,7 +181,7 @@ def FillResults2json(dom, list, cal):
             except: 
                 content['err_eff'] = 0
         #print(n_decays_sum, 'this is sum of decays')
-        content['res'] = peak.fwhm/peak.pos_ch*float(peak.Etable)
+        content['res'] = peak.fwhm/peak.pos_ch*float(peak.  Etable)
         content['err_res'] = 0.1
         content['pos_ch'] = peak.pos_ch
         # jsondata[peak.Etable] = content

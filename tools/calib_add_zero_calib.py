@@ -22,7 +22,7 @@ def GetJSON_FILE(file_json):
 def AddNewCalib(mylut):
    print(mylut)
    for ch_lut in mylut:
-       ch_lut['pol_list'] = ['0', '1']
+       ch_lut['pol_list'] = [0, 1]
    return  mylut
 
 if __name__ == "__main__":
