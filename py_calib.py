@@ -154,10 +154,13 @@ def ProcessFitDataStr(dom, my_source, lines, j_src, j_lut ):
                 PeakList.append(peak)
                 # peak.__str__()
 
-    FillResults2json(dom, PeakList, cal)
-    # print('Print PeakList {} elements'.format(len(PeakList)))
-    for p in PeakList:
-        p.__str__()
+    if len(PeakList) == 0:
+        print('ProcessFitDataStr::: no peaks were found for dom {}'.format(dom))
+    else:
+        FillResults2json(dom, PeakList, cal)
+        # print('Print PeakList {} elements'.format(len(PeakList)))
+        for p in PeakList:
+            p.__str__()
 
 def FillResults2json(dom, list, cal):
     jsondata = {}
