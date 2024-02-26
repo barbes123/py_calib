@@ -7,5 +7,14 @@
         "comment": "",
         "source": "60Co",
         "distance": "20"
-    } 
+    },
+    {
+        "runNumber": 1201,
+        "start": "2022-08-05 16:54:11",
+        "stop": "2022-08-05 17:54:11",
+        "expName": "ES1",
+        "comment": "",
+        "source": "60Co",
+        "distance": "20"
+    }  
 ]

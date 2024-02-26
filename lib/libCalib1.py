@@ -8,7 +8,7 @@ from scipy.integrate import quad
 
 time_format = "%Y-%m-%d %H:%M:%S"
 
-list_of_sources = {"60Co", "152Eu","137Cs", "133Ba"}
+list_of_sources = {"60Co", "152Eu","137Cs", "133Ba", '252Cf'}
 
 class TIsotope:
     def __init__(self, name, t12, date0, a0):
@@ -44,10 +44,10 @@ class TIsotope:
         return math.log(2, math.e)/self.t12
 
     def __repr__(self):
-        return print('Isotope: {}, T12= {} s, Date {}, A0 = {}'.format(self.name, self.t12, self.date0, self.a0))
+        return print('Isotope: {}, T12= {:.2e} s, Date {}, A0 = {}'.format(self.name, self.t12, self.date0, self.a0))
 
     def __str__(self):
-        return print('Isotope: {}, T12= {} s, Date {}, A0 = {}'.format(self.name, self.t12, self.date0, self.a0))
+        return print('Isotope: {}, T12= {:.2e} s, Date {}, A0 = {}'.format(self.name, self.t12, self.date0, self.a0))
 
     def Activity(self, time1):
         t = time1 - self.date0
@@ -62,7 +62,7 @@ class TIsotope:
         t2 = (stop - self.date0).total_seconds()
         ndecays = lambda t, a0, decay_constant: a0 * np.exp(-1 * decay_constant * t)
         nn, err = quad(ndecays, t1, t2, args=(self.a0, self.decay_constant()))
-        print("Error from the quad integral is {}".format(err))
+        # print("Error from the quad integral is {}".format(err))
         return nn, err
 
 class TMeasurement:
@@ -113,7 +113,7 @@ class TMeasurement:
                     self.source = runnbr['source']
                 else:
                     self.source = "60Co"
-                print('Your source, sir ', runnbr['source'])
+                print('Your source, sir, is ', runnbr['source'])
                 # self.source = '60Co'
             # if runnbr['source'] is None:
             #    runnbr['source'] = '60Co'
