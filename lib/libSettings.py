@@ -4,6 +4,14 @@ from TRecallEner import TRecallEner
 ############################
 #limDown, limUp, ampl, fwhm, limStart, limStop
 # *******************************
+
+def SetUpRecallEnerFromJson(dom, lut_recall):
+    for i in lut_recall:
+        if i['domain'] == dom:
+            return TRecallEner(i['fitLimits'][0], i['fitLimits'][1], i['ampl'], i['fwhm'], i['PTLimits'][0], i['PTLimits'][1])
+    print('Domain {} is not found in LUT_RECALL.json; setting up the default values'.format(dom))
+    return TRecallEner(200, 400, 1000, 10, 200, 700)
+
 def SetUpRecallEner(js, dom, source):
     if source == "60Co":
         if dom == 1:

@@ -8,11 +8,15 @@ import matplotlib.pyplot as plt
 import math, sys, os, json, subprocess
 from pathlib import Path
 from argparse import ArgumentParser
+import inspect
 
-
-ourpath = os.getenv('PY_CALIB')
-path='{}{}'.format(Path.home(),'/EliadeSorting/EliadeTools/RecalEnergy')
-print('PY_CALIB path: ', ourpath)
+try:
+    ourpath = os.getenv('PY_CALIB')
+    path='{}{}'.format(Path.home(),'/EliadeSorting/EliadeTools/RecalEnergy')
+    print('PY_CALIB path: ', ourpath)
+except:
+    print('Cannont find environmental PY_CALIB variable, please, check')
+    sys.exit()
 
 sys.path.insert(1, 'lib')
 sys.path.insert(1, '{}/lib'.format(ourpath))
@@ -25,6 +29,7 @@ from libPlotEliade import PlotJsoncore as PlotCore
 from libPlotEliade import PlotCalibration
 from TRecallEner import TRecallEner
 from libSettings import SetUpRecallEner
+from libSettings import SetUpRecallEnerFromJson
 
 current_directory = os.getcwd()
 
@@ -42,6 +47,7 @@ save_results_to = 'figures/'
 print('Data path: ', datapath)
 
 lutfile = 'LUT_ELIADE.json'
+lutreallener = 'LUT_RECALL.json'
 j_results = {}
 list_results = []
 
@@ -217,6 +223,7 @@ def FillResults2json(dom, list, cal):
 def load_json(file):
     fname = '{}'.format(file)
     if not file_exists(fname):
+        print('load_json:: file {} is not found as called from {}'.format(file, inspect.stack()[1].function))
         sys.exit()
     with open(fname,'r') as myfile:
         return json.load(myfile)
@@ -272,7 +279,8 @@ def main():
     j_data = load_json('{}/json/run_table_S{}.json'.format(ourpath, my_params.server))
     global j_lut
     j_lut = load_json('{}/{}'.format(ourpath, lutfile))
-
+    global  j_lut_recall
+    j_lut_recall = load_json('{}/{}'.format(ourpath, lutreallener))
 
     MakeSymLink('HPGe.spe','mDelila_raw_py_1.spe')
     MakeSymLink('SEG.spe','mDelila_raw_py_2.spe')
@@ -304,20 +312,11 @@ def main():
     #     blBackGround = True
 
     # print('Gammas ', j_sources['Co60']['gammas'])
-
-    # limDown = 800
-    # limUp = 1200
-
-    global myCurrentSetting
-    myCurrentSetting = TRecallEner(800,1200,100,4, 200, 1500)
+    # global myCurrentSetting
+    # myCurrentSetting = TRecallEner(800,1200,100,4, 200, 1500)
 
     for domain in range (my_params.dom1, my_params.dom2+1):
-        # if (domain != 109) and (domain != 119):
-        #     continue
         current_det = 0
-
-        # blGo = True
-
         if my_params.det_type != 0:
             for entry in j_lut:
                 if entry['domain'] == domain:
@@ -328,11 +327,8 @@ def main():
         if my_params.det_type != current_det:
             continue
 
-
-        # if ((domain%10 != 9) and OnlyCores):
-        #     continue
-
-        myCurrentSetting = SetUpRecallEner(j_lut, domain, my_source.name)
+        # myCurrentSetting = SetUpRecallEner(j_lut, domain, my_source.name)
+        myCurrentSetting = SetUpRecallEnerFromJson(domain, j_lut_recall)
         if debug:
             print('I am trying to do fit for domain {}'.format(domain))
         current_file = '{}mDelila_raw_py_{}.spe'.format(datapath, domain)
