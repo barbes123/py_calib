@@ -414,11 +414,11 @@ if __name__ == "__main__":
 
     print(config)
 
-    if not file_exists(lutfile):
+    if not file_exists('{}/{}'.format(ourpath, lutfile)):
         print('No LUT_ELIADE.json is given: {}. Cannot continue.'.format(lutfile))
         sys.exit()
 
-    if not file_exists(lutreallener):
+    if not file_exists('{}/{}'.format(ourpath, lutreallener)):
         print('No LUT_RECALL.json is given: {}. Cannot continue.'.format(lutreallener))
         sys.exit()
 
