@@ -291,8 +291,11 @@ def PlotJsoncore(data, gammatab, source, lutfile):
                                 continue
         #FindXlim(clover)
         plt.figure(1)
-        #plt.xlim(100,841)
-        plt.xlim(xmin, xmax)
+        # xmin, xmax = FinXlimGeneric(clover, lutfile)
+        # xmin -= 1
+        # xmax += 1
+        plt.xlim(100,841)
+        # plt.xlim(xmin, xmax)
         plt.ylim([0,0.1])
         #title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
         plt.title('Efficiency for core 1 ')
@@ -302,8 +305,8 @@ def PlotJsoncore(data, gammatab, source, lutfile):
         legend_without_duplicate_labels(plt)
 
         plt.figure(2)
-        #FindXlim(clover)
-        plt.xlim(xmin, xmax)
+        # FindXlim(clover)
+        # plt.xlim(xmin, xmax)
         plt.ylim([1,5])
         #title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
         plt.title(f'Resolution for core 1')
@@ -377,6 +380,7 @@ def PlotCalibration(data, gammatab, source, lutfile):
                 plt.legend(ncol=3,loc='lower right',prop={'size': 6})
                 # plt.show()
                 file_name='eliade_{}_calibration.eps'.format(cloverkey)
+                file_name='eliade_{}_calibration.jpg'.format(cloverkey)
                 plt.savefig(save_results_to + file_name)
                 plt.close()  
                 blCloverFound=False
