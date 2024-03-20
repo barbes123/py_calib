@@ -1,4 +1,6 @@
 import json
+import sys
+
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import cm
 from matplotlib import interactive
@@ -37,6 +39,14 @@ def MakeDir(path):
     if not isExist:
         os.makedirs(path)
         print("The new directory {} is created!".format(path))
+
+def FinXlimGeneric(key, js_lut):
+    list_domains = []
+    for el in js_lut:
+        if el["serial"].rstrip(el["serial"][-1]) == key:
+            list_domains.append(el['domain'])
+    # print(min(list_domains), max(list_domains))
+    return min(list_domains), max(list_domains)
 
 def FindXlim(name):
     if name == "CL29": #according to the current LUT
@@ -187,10 +197,15 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile):
                                         continue #print("Energy {} missing from domain {}".format(key[source][element], key["domain"]))
         if blCloverFound == True:
 
-            FindXlim(cloverkey) #each clover has a different x-axis interval
+            # FindXlim(cloverkey) #each clover has a different x-axis interval
+            xmin, xmax = FinXlimGeneric(cloverkey, lutfile)
+            xmin-=1
+            xmax+=1
+            plt.xlim(xmin, xmax)
 
             plt.figure(1)
-            FindXlim(cloverkey)  # efficiency
+            plt.xlim(xmin, xmax)
+            # FindXlim(cloverkey)  # efficiency #dt commented
             if my_det_type==1 or my_det_type==10:
                 plt.ylim([0, 0.1])
             elif my_det_type==2: # (segments)
@@ -207,7 +222,8 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile):
 
 
             plt.figure(2)
-            FindXlim(cloverkey) #resolution
+            # FindXlim(cloverkey) #resolution
+            plt.xlim(xmin, xmax)
             plt.ylim([1,5])
             plt.title(f'Resolution for clover {cloverkey}')
             plt.xlabel('Domain')
@@ -220,7 +236,8 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile):
             plt.close()
 
             plt.figure(0)
-            FindXlim(cloverkey)  # Peak to Total
+            # FindXlim(cloverkey)  # Peak to Total
+            plt.xlim(xmin, xmax)
             # plt.ylim([0.05,0.1])
             if my_det_type==1 or my_det_type==10:
                 plt.ylim([0.15, 0.2])
@@ -275,6 +292,7 @@ def PlotJsoncore(data, gammatab, source, lutfile):
         #FindXlim(clover)
         plt.figure(1)
         #plt.xlim(100,841)
+        plt.xlim(xmin, xmax)
         plt.ylim([0,0.1])
         #title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
         plt.title('Efficiency for core 1 ')
@@ -285,6 +303,7 @@ def PlotJsoncore(data, gammatab, source, lutfile):
 
         plt.figure(2)
         #FindXlim(clover)
+        plt.xlim(xmin, xmax)
         plt.ylim([1,5])
         #title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
         plt.title(f'Resolution for core 1')
