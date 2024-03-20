@@ -4,7 +4,7 @@ from datetime import datetime
 import numpy as np
 import math
 from scipy.integrate import quad
-
+import inspect
 
 time_format = "%Y-%m-%d %H:%M:%S"
 
@@ -97,7 +97,11 @@ class TMeasurement:
         self.found = False
         for runnbr in data:
             # if ((int(runnbr['runNumber']) == val) and (int(runnbr['server']) == server)):
-            if (int(runnbr['runNumber']) == val) :
+            # if (int(runnbr['runNumber']) == val) :
+            if not isinstance(runnbr['runNumber'], int):
+                print(inspect.currentframe().f_code.co_name,' Function the runNumber in the json file (list of runs) is not integer ')
+
+            if runnbr['runNumber'] == val:
                 # self.source = runnbr['source']
                 if (self.found):
                     print('Multiple occurrence in run {} and server {}'.format(runnbr, server))
