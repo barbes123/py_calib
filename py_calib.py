@@ -60,6 +60,15 @@ CalibDetType = 0
 j_sources = None
 blFirstElement = False
 
+
+if file_exists(lutfile):
+    print('No LUT_ELIADE.json is given. Cannot continue.')
+    sys.exit()
+if file_exists(lutreallener):
+    print('No LUT_RECALL.json is given. Cannot continue.')
+    sys.exit()  
+
+
 global my_params
 
 class TStartParams:
@@ -327,8 +336,8 @@ def main():
         if my_params.det_type != current_det:
             continue
 
-        # myCurrentSetting = SetUpRecallEner(j_lut, domain, my_source.name)
-        myCurrentSetting = SetUpRecallEnerFromJson(domain, j_lut_recall)
+        myCurrentSetting = SetUpRecallEner(j_lut, domain, my_source.name)
+        #myCurrentSetting = SetUpRecallEnerFromJson(domain, j_lut_recall)
         if debug:
             print('I am trying to do fit for domain {}'.format(domain))
         current_file = '{}mDelila_raw_py_{}.spe'.format(datapath, domain)

@@ -48,5 +48,14 @@ if __name__ == "__main__":
    newlut = AddTimeCalib2LUT(j_lut,'TimeCalib.dat')
    j_new_lut = json.dumps(newlut, indent=3)
 
-   with open('new_ta_{}'.format(file_lut), 'w') as fout:
+   path = file_lut.split('LUT_')[0]
+   file = file_lut.split('LUT_')[1]
+
+   fullpath = path + 'new_ta_LUT_' + file
+
+   # print('TEST',fullpath)
+
+
+   # with open('new_ta_{}'.format(file_lut), 'w') as fout:
+   with open(fullpath, 'w') as fout:
        fout.write(j_new_lut)
