@@ -30,6 +30,7 @@ from libPlotEliade import PlotCalibration
 from TRecallEner import TRecallEner
 from libSettings import SetUpRecallEner
 from libSettings import SetUpRecallEnerFromJson
+from utilities import *
 
 current_directory = os.getcwd()
 
@@ -66,7 +67,7 @@ if file_exists(lutfile):
     sys.exit()
 if file_exists(lutreallener):
     print('No LUT_RECALL.json is given. Cannot continue.')
-    sys.exit()  
+    sys.exit()
 
 
 global my_params
