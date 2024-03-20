@@ -62,10 +62,11 @@ j_sources = None
 blFirstElement = False
 
 
-if file_exists(lutfile):
+if not file_exists(lutfile):
     print('No LUT_ELIADE.json is given. Cannot continue.')
     sys.exit()
-if file_exists(lutreallener):
+
+if not file_exists(lutreallener):
     print('No LUT_RECALL.json is given. Cannot continue.')
     sys.exit()
 
