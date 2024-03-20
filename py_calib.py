@@ -62,13 +62,6 @@ j_sources = None
 blFirstElement = False
 
 
-if not file_exists(lutfile):
-    print('No LUT_ELIADE.json is given. Cannot continue.')
-    sys.exit()
-
-if not file_exists(lutreallener):
-    print('No LUT_RECALL.json is given. Cannot continue.')
-    sys.exit()
 
 
 global my_params
@@ -420,6 +413,16 @@ if __name__ == "__main__":
     config = parser.parse_args()
 
     print(config)
+
+    if not file_exists(lutfile):
+        print('No LUT_ELIADE.json is given: {}. Cannot continue.'.format(lutfile))
+        sys.exit()
+
+    if not file_exists(lutreallener):
+        print('No LUT_RECALL.json is given: {}. Cannot continue.'.format(lutreallener))
+        sys.exit()
+
+
     # if dom1 >= dom2:
     #     my_params = TStartParams(server, runnbr, dom2, dom1)
     # else:
