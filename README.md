@@ -9,12 +9,16 @@ by Teodora Sebe (2024)
 ssh eliade@172.18.4.13X (where x is 1,2,3,4,5,6,7,8 or 9) or e1/e2/e3/e4
 - check you should be in ~/DELILA directory
 
-For Local DAQ edit StartMode in PHA.conf for s1-s8:
+-For Local DAQ edit StartMode in PHA.conf for s1-s8:
+
 _StartMode SYNC_1ST_SW_
 
-For Global DAQ edit PHA.conf for s2-s8:
+- For Global DAQ edit PHA.conf for s2-s8:
+  
 _StartMode SYNCIN_SLAVE_
+
 for s1:
+
 _StartMode SYNC_1ST_SW_
 
 
