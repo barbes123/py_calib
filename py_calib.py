@@ -53,7 +53,7 @@ j_results = {}
 list_results = []
 
 
-blPlot = True
+# blPlot = True
 debug = False
 # OnlyCores = False
 CalibDetType = 0
@@ -67,13 +67,14 @@ blFirstElement = False
 global my_params
 
 class TStartParams:
-    def __init__(self, server, runnbr, dom1, dom2, det_type, bg):
+    def __init__(self, server, runnbr, dom1, dom2, det_type, bg, grType):
         self.server = int(server)
         self.runnbr = runnbr
         self.dom1 = int(dom1)
         self.dom2 = int(dom2)
         self.det_type = det_type
         self.bg = bg
+        self.grType = grType
 
     def __repr__(self):
         print('=========================================')
@@ -374,11 +375,13 @@ def main():
 
     with open('{}calib_res_{}.json'.format(datapath, my_run.run), 'r') as ifile:
         js_tab = json.load(ifile)
-        if blPlot == True:
-            PlotDomain(js_tab, j_sources, my_source.name, j_lut)
-            PlotClover(js_tab, j_sources, my_source.name, 1, j_lut)
-            PlotCore(js_tab, j_sources, my_source.name, j_lut)
-            PlotCalibration(js_tab, j_sources, my_source.name, j_lut)
+        # if blPlot == True:
+        if my_params.grType != 'none':
+            PlotDomain(js_tab, j_sources, my_source.name, j_lut, my_params.grType)
+            PlotClover(js_tab, j_sources, my_source.name, 1, j_lut, my_params.grType)
+            PlotClover(js_tab, j_sources, my_source.name, 2, j_lut, my_params.grType)
+            PlotCore(js_tab, j_sources, my_source.name, j_lut, my_params.grType)
+            PlotCalibration(js_tab, j_sources, my_source.name, j_lut, my_params.grType)
             
 
     # global j_res
@@ -392,6 +395,7 @@ if __name__ == "__main__":
     runnbr = 63
     det_type = 0
     bg = 0
+    grType = 'jpg'
 
     parser = ArgumentParser()
 
@@ -409,6 +413,9 @@ if __name__ == "__main__":
     parser.add_argument("-b", "--background",
                         dest="bg", default=bg, type=int,
                         help="to take in energy calib background lines; default = {}".format(bg))
+    parser.add_argument("-g", "--graphic type: eps, jpg or none ",
+                        dest="grType", default=grType, type=str, choices=('eps','jpg','none'),
+                        help="Available graphic output: jpg, eps none (no graphs); default = {}".format(grType))
 
     config = parser.parse_args()
 
@@ -422,13 +429,7 @@ if __name__ == "__main__":
         print('No LUT_RECALL.json is given: {}. Cannot continue.'.format(lutreallener))
         sys.exit()
 
-
-    # if dom1 >= dom2:
-    #     my_params = TStartParams(server, runnbr, dom2, dom1)
-    # else:
-    # if config.
-
-    my_params = TStartParams(config.server, config.runnbr, config.dom[0], config.dom[1], config.det_type, config.bg)
+    my_params = TStartParams(config.server, config.runnbr, config.dom[0], config.dom[1], config.det_type, config.bg, config.grType)
 
 
 #     print('Input Parameters: server, run, domDown, domUp, detType')

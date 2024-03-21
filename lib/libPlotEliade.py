@@ -9,6 +9,9 @@ import os
 import matplotlib.colors as mcolors
 from random import choice
 
+opt = 'jpg'
+# opt = 'eps'
+
 ##################################################################
 # This library contains functions to plot results from data analysis.
 # PlotJsondom - graphs for indvidual domains
@@ -78,7 +81,7 @@ def find_domain(domain, lutfile):
     return False
 
 
-def PlotJsondom(data, gammatab, source, lutfile):
+def PlotJsondom(data, gammatab, source, lutfile, opt='eps'):
 
     MakeDir(save_results_to)
 
@@ -109,7 +112,7 @@ def PlotJsondom(data, gammatab, source, lutfile):
             #plt.legend()
             interactive(True)
             #plt.show()
-            file_name1 = 'dom_{}_res.eps'.format(dom)
+            file_name1 = 'dom_{}_res.{}'.format(dom, opt)
             plt.savefig(save_results_to + file_name1)
             plt.close()
             plt.figure(2)
@@ -142,7 +145,7 @@ def PlotJsondom(data, gammatab, source, lutfile):
             #plt.legend()
             
             plt.show()
-            file_name2 = 'dom_{}_eff.eps'.format(dom)
+            file_name2 = 'dom_{}_eff.{}'.format(dom, opt)
             plt.savefig(save_results_to + file_name2)
             interactive(False)
             plt.close()
@@ -154,7 +157,7 @@ def legend_without_duplicate_labels(figure):
     by_label = dict(zip(labels, handles))
     figure.legend(by_label.values(), by_label.keys(), loc='upper right')
 
-def PlotJsonclover(data, gammatab, source, my_det_type, lutfile):
+def PlotJsonclover(data, gammatab, source, my_det_type, lutfile, opt='eps'):
     print('I am in PlotJsonclover')
     MakeDir(save_results_to)
     
@@ -216,7 +219,7 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile):
             plt.grid(color='black', linestyle='--', linewidth=0.5)
             legend_without_duplicate_labels(plt)
 
-            file_name1 = 'eliade_{}_efficiency.eps'.format(cloverkey)
+            file_name1 = 'eliade_{}_efficiency.{}'.format(cloverkey, opt)
             plt.savefig(save_results_to + file_name1)
             plt.close()
 
@@ -231,7 +234,7 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile):
             plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
             legend_without_duplicate_labels(plt)
 
-            file_name2 = 'eliade_{}_resolution.eps'.format(cloverkey)
+            file_name2 = 'eliade_{}_resolution.{}'.format(cloverkey, opt)
             plt.savefig(save_results_to + file_name2)
             plt.close()
 
@@ -248,7 +251,7 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile):
             plt.ylabel('Peak-to-total ratio')
             plt.grid(color='black', linestyle='--', linewidth=0.5)
 
-            file_name3 = 'eliade_{}_peaktotal.eps'.format(cloverkey)
+            file_name3 = 'eliade_{}_peaktotal.{}'.format(cloverkey, opt)
             plt.savefig(save_results_to + file_name3)
             plt.close()
 
@@ -258,7 +261,7 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile):
     return True
 
    
-def PlotJsoncore(data, gammatab, source, lutfile):
+def PlotJsoncore(data, gammatab, source, lutfile, opt='eps'):
 
     MakeDir(save_results_to)
     #my_det_type=1
@@ -317,19 +320,19 @@ def PlotJsoncore(data, gammatab, source, lutfile):
 
         
     plt.figure(1)    
-    file_name5 = 'eliade_efficiency_core1.eps'
+    file_name5 = 'eliade_efficiency_core1.{}'.format(opt)
     plt.savefig(save_results_to + file_name5)
     plt.close()   
 
     plt.figure(2)
-    file_name6 = 'eliade_resolution_core1.eps'
+    file_name6 = 'eliade_resolution_core1.{}'.format(opt)
     plt.savefig(save_results_to + file_name6)
     plt.close()
 
     print("Finished graphs for all core1")
     return  True
 
-def PlotCalibration(data, gammatab, source, lutfile):
+def PlotCalibration(data, gammatab, source, lutfile, opt='eps'):
     MakeDir(save_results_to)
     number_of_our_colors = 30
     our_color_plate = iter(cm.rainbow(np.linspace(0, 1, number_of_our_colors)))
@@ -379,8 +382,8 @@ def PlotCalibration(data, gammatab, source, lutfile):
                 #legend_without_duplicate_labels(plt)
                 plt.legend(ncol=3,loc='lower right',prop={'size': 6})
                 # plt.show()
-                file_name='eliade_{}_calibration.eps'.format(cloverkey)
-                file_name='eliade_{}_calibration.jpg'.format(cloverkey)
+                file_name='eliade_{}_calibration.{}'.format(cloverkey, opt)
+                file_name='eliade_{}_calibration.{}'.format(cloverkey, opt)
                 plt.savefig(save_results_to + file_name)
                 plt.close()  
                 blCloverFound=False
