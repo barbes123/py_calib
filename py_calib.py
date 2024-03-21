@@ -414,8 +414,9 @@ if __name__ == "__main__":
                         dest="bg", default=bg, type=int,
                         help="to take in energy calib background lines; default = {}".format(bg))
     parser.add_argument("-g", "--graphic type: eps, jpg or none ",
-                        dest="grType", default=grType, type=str, choices=('eps','jpg','none'),
-                        help="Available graphic output: jpg, eps none (no graphs); default = {}".format(grType))
+                        dest="grType", default=grType, type=str, choices=('eps', 'jpeg', 'jpg', 'png', 'svg', 'svgz', 'tif', 'tiff', 'webp','none'),
+                        # eps, jpeg, jpg, pdf, pgf, png, ps, raw, rgba, svg, svgz, tif, tiff, webp
+                        help="Available graphic output: eps, jpeg, jpg, png, svg, svgz, tif, tiff, webp or none (no graphs); default = {}".format(grType))
 
     config = parser.parse_args()
 
