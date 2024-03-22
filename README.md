@@ -6,7 +6,10 @@ by Teodora Sebe (2024)
   
   ## 1. Enable the DAQ on the server (s1-...s9)
 - Connect to the server: 
-ssh eliade@172.18.4.13X (where x is 1,2,3,4,5,6,7,8 or 9) or e1/e2/e3/e4
+ssh eliade@172.18.4.13X (where x is 1,2,3,4,5,6,7,8 or 9, x=the number of the server that you are using) or e1/e2/e3/e4
+
+_TIP_:If you don't know what is the corresponding server for the detector that you are using, access Eliade Wiki, enter Look Up Tables and search for that detector. The corresponding server will be on the right side of the table.
+
 - check you should be in ~/DELILA directory
 
 -For Local DAQ edit StartMode in PHA.conf for s1-s8:
@@ -21,23 +24,15 @@ for s1:
 
 _StartMode SYNC_1ST_SW_
 
+_TIP1:_ in order to access PHA.conf, use the _vim_ command in Terminal
+_TIP2:_  you can exit PHA.conf by pressing _:q_
 
-We need to change the start mode, from Syncin_Slave to sync_1st_sw (you modify
-which one of them will look like a comment by adding or removing the # at the beginning)
-example of how it should look:
-⦁
-Exit via :q and run the program run.py
-run.py -l local.xml
-⦁
-Access the server of the detector and configure the type of source that you are using
-via ELIADE WIKI->LookUpTables->server5
-2. Open the daq GUI: ( example 172.18.4.135/controller) and press STARTi.e: Access Eliade Wiki, enter Look Up Tables and search for the detector that you are
-using. After you find it, click on the server that accesses it (for the example above, we used
-Clover 34 which has server 5) then press start.
-Mention: you can access it directly via the vpn above, if you know which server
-corresponds to the detector (the 5 at the end of the IP adress corresponds to the server, so
-just replace it with the right one).
-3. Press STOP and check if the data are on the disks (example /eliadedisks/s5/root_file)
+-run the program _run.py_
+_run.py -l local.xml_
+
+2. Open the daq GUI: Access 172.18.4.13X/controller (where x is 1,2,3,4,5,6,7,8 or 9,) on Firefox and press the "Configure" button. Fill in the type of source that you are using and press Start.
+
+4. Press STOP and check if the data are on the disks (example /eliadedisks/s5/root_file)
 i.e: Wait 10-15 mins so that enough data is taken then press Stop. Close the server (it
 appears as eliadeS5). Go to the machine that you want to use for the data analyse.
 Mention: if you see that you are operating on S5, close the terminal and open a new one
