@@ -1,0 +1,479 @@
+[
+    {
+        "runNumber": 53,
+        "start": "2024-03-20 11:13:40",
+        "stop": "2024-03-20 12:14:20",
+        "expName": "ES4",
+        "comment": null,
+        "source": "60Co",
+        "distance": null
+    },
+    {
+        "runNumber": 52,
+        "start": "2024-03-20 10:59:50",
+        "stop": "2024-03-20 11:12:50",
+        "expName": "ES4",
+        "comment": null,
+        "source": "60Co",
+        "distance": null
+    },
+    {
+        "runNumber": 51,
+        "start": "2024-01-23 15:31:34",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 50,
+        "start": "2023-09-15 08:59:25",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 49,
+        "start": "2023-09-15 08:58:42",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 48,
+        "start": "2023-05-08 15:08:25",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 47,
+        "start": "2023-02-06 14:38:12",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 46,
+        "start": "2023-02-03 12:22:47",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 45,
+        "start": "2023-02-03 11:41:13",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 44,
+        "start": "2023-02-03 11:39:01",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 43,
+        "start": "2023-01-13 12:20:28",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 42,
+        "start": "2023-01-13 12:17:45",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 41,
+        "start": "2023-01-13 12:12:00",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 40,
+        "start": "2023-01-13 12:05:54",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 39,
+        "start": "2023-01-13 11:50:36",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 38,
+        "start": "2023-01-13 11:48:54",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 37,
+        "start": "2023-01-13 11:42:53",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 36,
+        "start": "2023-01-13 11:22:10",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 35,
+        "start": "2023-01-13 10:56:41",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 34,
+        "start": "2022-08-25 10:10:14",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 33,
+        "start": "2022-08-24 18:52:57",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 32,
+        "start": "2022-08-24 18:49:28",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 31,
+        "start": "2022-08-24 18:41:34",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 30,
+        "start": "2022-08-24 18:21:26",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 29,
+        "start": "2022-08-24 18:09:56",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 28,
+        "start": "2022-08-24 18:08:12",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 27,
+        "start": "2022-08-24 17:57:20",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 26,
+        "start": "2022-02-21 11:07:38",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 25,
+        "start": "2022-02-21 11:05:56",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 24,
+        "start": "2022-02-21 09:57:03",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 23,
+        "start": "2022-02-21 09:54:50",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 22,
+        "start": "2022-02-18 15:03:45",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 21,
+        "start": "2022-02-18 15:01:23",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 20,
+        "start": "2022-02-18 14:55:54",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 19,
+        "start": "2022-02-18 14:53:50",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 18,
+        "start": "2022-02-18 14:52:47",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 17,
+        "start": "2022-02-18 11:20:37",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 16,
+        "start": "2022-02-18 10:53:19",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 15,
+        "start": "2022-02-18 10:49:07",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 14,
+        "start": "2022-02-18 10:48:11",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 13,
+        "start": "2022-02-17 16:41:07",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 12,
+        "start": "2022-02-17 16:20:57",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 11,
+        "start": "2022-02-17 16:18:55",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 10,
+        "start": "2022-02-17 16:14:31",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 9,
+        "start": "2022-02-17 14:51:28",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 8,
+        "start": "2022-02-17 14:43:34",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 7,
+        "start": "2022-02-17 14:40:55",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 6,
+        "start": "2022-02-17 14:39:06",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 5,
+        "start": "2022-02-17 14:36:54",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 4,
+        "start": "2022-02-17 12:03:08",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 3,
+        "start": "2022-02-17 12:01:03",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 2,
+        "start": "2022-02-17 11:59:49",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    },
+    {
+        "runNumber": 1,
+        "start": "2022-02-17 11:57:34",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES4",
+        "comment": null,
+        "source": null,
+        "distance": null
+    }
+]
