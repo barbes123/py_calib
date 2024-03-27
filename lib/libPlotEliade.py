@@ -234,7 +234,7 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile, opt='eps'):
             plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
             legend_without_duplicate_labels(plt)
 
-            file_name2 = 'eliade_{}_resolution.{}'.format(cloverkey, opt)
+            file_name2 = 'eliade_{}_{}_resolution.{}'.format(cloverkey, my_det_type, opt)
             plt.savefig(save_results_to + file_name2)
             plt.close()
 
@@ -246,12 +246,12 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile, opt='eps'):
                 plt.ylim([0.15, 0.2])
             elif my_det_type==2: # (segments)
                 plt.ylim([0,0.1])
-            plt.title(f'Peak to Total ratio for clover {cloverkey}')
+            plt.title(f'Peak to Total ratio for clover {cloverkey} {my_det_type}')
             plt.xlabel('Domain')
             plt.ylabel('Peak-to-total ratio')
             plt.grid(color='black', linestyle='--', linewidth=0.5)
 
-            file_name3 = 'eliade_{}_peaktotal.{}'.format(cloverkey, opt)
+            file_name3 = 'eliade_{}_{}_peaktotal.{}'.format(cloverkey, my_det_type ,opt)
             plt.savefig(save_results_to + file_name3)
             plt.close()
 
@@ -261,7 +261,7 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile, opt='eps'):
     return True
 
    
-def PlotJsoncore(data, gammatab, source, lutfile, opt='eps'):
+def PlotJsoncore(data, gammatab, source, lutfile, detKey = 1, opt='eps'):
 
     MakeDir(save_results_to)
     #my_det_type=1
@@ -270,7 +270,7 @@ def PlotJsoncore(data, gammatab, source, lutfile, opt='eps'):
         if find_domain(key["domain"], lutfile)==False:
                 continue
         else:
-            if key["detType"] == 1:
+            if key["detType"] == detKey:
                 if key["domain"] == 1:
                     continue
                 for gammakey in list_of_sources:
@@ -301,7 +301,8 @@ def PlotJsoncore(data, gammatab, source, lutfile, opt='eps'):
         # plt.xlim(xmin, xmax)
         plt.ylim([0,0.1])
         #title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
-        plt.title('Efficiency for core 1 ')
+        CloverName = key["serial"][:len(key["serial"])-1]
+        plt.title('Efficiency for core {} {}'.format(CloverName, detKey))
         plt.xlabel('Domain')
         plt.ylabel('Efficiency (%)')
         plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
@@ -312,7 +313,7 @@ def PlotJsoncore(data, gammatab, source, lutfile, opt='eps'):
         # plt.xlim(xmin, xmax)
         plt.ylim([1,5])
         #title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
-        plt.title(f'Resolution for core 1')
+        plt.title('Resolution for core {} {}'.format(CloverName,detKey))
         plt.xlabel('Domain')
         plt.ylabel('Resolution (keV)')
         plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
@@ -320,26 +321,26 @@ def PlotJsoncore(data, gammatab, source, lutfile, opt='eps'):
 
         
     plt.figure(1)    
-    file_name5 = 'eliade_efficiency_core1.{}'.format(opt)
+    file_name5 = 'eliade_efficiency_{}_core{}.{}'.format(CloverName, detKey, opt)
     plt.savefig(save_results_to + file_name5)
     plt.close()   
 
     plt.figure(2)
-    file_name6 = 'eliade_resolution_core1.{}'.format(opt)
+    file_name6 = 'eliade_resolution_{}_core{}.{}'.format(CloverName, detKey, opt)
     plt.savefig(save_results_to + file_name6)
     plt.close()
 
-    print("Finished graphs for all core1")
+    print("Finished graphs for all core{} {}".format(CloverName, detKey))
     return  True
 
-def PlotCalibration(data, gammatab, source, lutfile, opt='eps'):
+def PlotCalibration(data, gammatab, source, lutfile, my_det_type = 2, opt='eps'):
     MakeDir(save_results_to)
     number_of_our_colors = 30
     our_color_plate = iter(cm.rainbow(np.linspace(0, 1, number_of_our_colors)))
     # niter = 0
 
     for cloverkey in list_of_clovers:
-        my_det_type=2
+        # my_det_type=2
         number_of_our_colors = 40
         our_color_plate = iter(cm.rainbow(np.linspace(0, 1, number_of_our_colors)))
         blCloverFound = False
@@ -378,12 +379,12 @@ def PlotCalibration(data, gammatab, source, lutfile, opt='eps'):
                 plt.ylim([0,max_energy+delta])#maximum energy from source + delta: [0; max+delta]
                 plt.xlabel('Channel')
                 plt.ylabel('Energy (keV)')
-                plt.title(f'Calibration for clover {cloverkey}')
+                plt.title(f'Calibration for clover {cloverkey} {my_det_type}')
                 #legend_without_duplicate_labels(plt)
                 plt.legend(ncol=3,loc='lower right',prop={'size': 6})
                 # plt.show()
-                file_name='eliade_{}_calibration.{}'.format(cloverkey, opt)
-                file_name='eliade_{}_calibration.{}'.format(cloverkey, opt)
+                file_name='eliade_{}_{}_calibration.{}'.format(cloverkey,my_det_type, opt)
+                file_name='eliade_{}_{}_calibration.{}'.format(cloverkey, my_det_type,opt)
                 plt.savefig(save_results_to + file_name)
                 plt.close()  
                 blCloverFound=False
