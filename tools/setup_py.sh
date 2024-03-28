@@ -5,6 +5,11 @@ my_home=$HOME
 
 echo $my_home
 
+echo /usr/local/bin/pc
+sudo unlink /usr/local/bin/pc
+echo $PY_CALIB/py_calib.py
+sudo ln -s $PY_CALIB/py_calib.py /usr/local/bin/pc
+
 echo /usr/local/bin/lut.print
 sudo unlink /usr/local/bin/lut.print
 echo $PWD/lut_print.py
