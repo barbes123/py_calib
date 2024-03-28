@@ -225,13 +225,13 @@ def FillResults2json(dom, list, cal):
         print(list_results)
     return True
 
-def load_json(file):
-    fname = '{}'.format(file)
-    if not file_exists(fname):
-        print('load_json:: file {} is not found as called from {}'.format(file, inspect.stack()[1].function))
-        sys.exit()
-    with open(fname,'r') as myfile:
-        return json.load(myfile)
+# def load_json(file):
+#     fname = '{}'.format(file)
+#     if not file_exists(fname):
+#         print('load_json:: file {} is not found as called from {}'.format(file, inspect.stack()[1].function))
+#         sys.exit()
+#     with open(fname,'r') as myfile:
+#         return json.load(myfile)
 
 def SumAsci(file):
     sum = 0
@@ -380,9 +380,10 @@ def main():
             PlotDomain(js_tab, j_sources, my_source.name, j_lut, my_params.grType)
             PlotClover(js_tab, j_sources, my_source.name, 1, j_lut, my_params.grType)
             PlotClover(js_tab, j_sources, my_source.name, 2, j_lut, my_params.grType)
-            PlotCore(js_tab, j_sources, my_source.name, j_lut, my_params.grType)
-            PlotCalibration(js_tab, j_sources, my_source.name, j_lut, my_params.grType)
-            
+            PlotCore(js_tab, j_sources, my_source.name, j_lut, 1, my_params.grType)
+            PlotCalibration(js_tab, j_sources, my_source.name, j_lut, 1, my_params.grType)
+            PlotCalibration(js_tab, j_sources, my_source.name, j_lut, 2, my_params.grType)
+
 
     # global j_res
     # with open('{}calib_res_{}.json'.format(datapath, my_run.run), 'r') as ifile:

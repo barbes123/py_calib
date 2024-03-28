@@ -5,8 +5,13 @@ def load_json(file):
     fname = '{}'.format(file)
     if not file_exists(fname):
         sys.exit()
-    with open(fname,'r') as myfile:
-        return json.load(myfile)
+    try:
+        with open(fname,'r') as myfile:
+            return json.load(myfile)
+    except:
+        print(f'\033[31m Error: I am not able to load json table from {fname}', '\033[0m')
+        sys.exit()
+
 def file_exists(myfile):
     if not exists(myfile):
         print('file_exists(): File {} does not exist'.format(myfile))
