@@ -25,8 +25,10 @@ from libCalib1 import TIsotope as TIso
 from libCalib1 import TMeasurement as Tmeas
 from libPlotEliade import PlotJsondom as PlotDomain
 from libPlotEliade import PlotJsonclover as PlotClover
+from libPlotEliade import PlotCeBr
 from libPlotEliade import PlotJsoncore as PlotCore
 from libPlotEliade import PlotCalibration
+from libPlotEliade import PlotCalibrationCeBr
 from TRecallEner import TRecallEner
 from libSettings import SetUpRecallEner
 from libSettings import SetUpRecallEnerFromJson
@@ -332,8 +334,8 @@ def main():
         if my_params.det_type != current_det:
             continue
 
-        myCurrentSetting = SetUpRecallEner(j_lut, domain, my_source.name)
-        #myCurrentSetting = SetUpRecallEnerFromJson(domain, j_lut_recall)
+        # myCurrentSetting = SetUpRecallEner(j_lut, domain, my_source.name)
+        myCurrentSetting = SetUpRecallEnerFromJson(domain, j_lut_recall)
         if debug:
             print('I am trying to do fit for domain {}'.format(domain))
         current_file = '{}mDelila_raw_py_{}.spe'.format(datapath, domain)
@@ -378,11 +380,16 @@ def main():
         # if blPlot == True:
         if my_params.grType != 'none':
             PlotDomain(js_tab, j_sources, my_source.name, j_lut, my_params.grType)
+
             PlotClover(js_tab, j_sources, my_source.name, 1, j_lut, my_params.grType)
             PlotClover(js_tab, j_sources, my_source.name, 2, j_lut, my_params.grType)
+            PlotCeBr(js_tab, j_sources, my_source.name, 3, j_lut, my_params.grType)
+
             PlotCore(js_tab, j_sources, my_source.name, j_lut, 1, my_params.grType)
             PlotCalibration(js_tab, j_sources, my_source.name, j_lut, 1, my_params.grType)
             PlotCalibration(js_tab, j_sources, my_source.name, j_lut, 2, my_params.grType)
+            PlotCalibrationCeBr(js_tab, j_sources, my_source.name, j_lut, 3, my_params.grType)
+
 
 
     # global j_res
