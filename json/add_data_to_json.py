@@ -35,6 +35,12 @@ def merge(js_master, js_slave):
     new_js_master = json.dumps(new_dic, indent=3)
     return new_js_master
 
+def SplitFullName(fullname, ext='.json'):
+    split = fullname.split('/')
+    file = split[len(split)-1]
+    path = fullname.split(file)[0]
+    return path, file
+
 
 if __name__ == "__main__":
    if (len(sys.argv) > 2):
@@ -50,10 +56,9 @@ if __name__ == "__main__":
 
    js_new = merge(js_master, js_slave)
 
-   path = file_master.split('ES_')[0]
-   file = file_master.split('ES_')[1]
+   path, file = SplitFullName(file_master)
 
-   fullpath = path + 'new_ES_' + file
+   fullpath = path + 'new_' + file
 
    with open(fullpath, 'w') as fout:
        fout.write(js_new)
