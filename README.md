@@ -74,6 +74,7 @@ _~/py_calib/json ln -s GetRunTable/data/tmp_ES_5_log.json run_table_S5.json_
 _~/py_calib ln -s ~/onlineEliade/LookUpTables/s5/LUT_ELIADE_S1_CL34_60Co.json LUT_ELIADE.json_
 
 (_Observation 1:_ You link the Lut with with a file that is used for similar calibration, i.e if it was used before for 60Co, you can use it for other 60Co experiments. Always check to see if the parameters match with your data
+
 _Observation 2:_ When you open the current folder via ls –ltr, you will see something like this if it worked
 lrwxrwxrwx 1 eliade eliade 70 mar 14 13:12 LUT_ELIADE.json ->/home/eliade/onlineEliade/LookUpTables/s5/LUT_ELIADE_S1_CL34_60Co.json)
 
