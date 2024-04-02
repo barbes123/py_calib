@@ -40,7 +40,7 @@ Mention: if you see that you are operating on S5, close the terminal and open a 
 In order to check if the data is saved, enter the path from above on Terminal (s5 corresponds to the server that we used earlier, so replace 5 with the corresponding number of the server). When you stopped the measurement, on the right side of the STOP button says "next measurement is 146..." (or something similar, I didn't check to take it word by word) which means that your measurement is 145 and you should look for the ROOT file with number 145.
 
 
-  ##2. FOR CALIBRATION
+# FOR CALIBRATION
 -Update the database (json) with new enrties. For this, you have to access the json database from py_calib:
 
 _cd ~/py_calib/json/GetRunTable_
