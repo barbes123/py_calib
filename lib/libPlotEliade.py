@@ -245,9 +245,9 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile, opt='eps'):
             plt.xlim(xmin, xmax)
             # plt.ylim([0.05,0.1])
             if my_det_type==1 or my_det_type==10:
-                plt.ylim([0.15, 0.2])
+                plt.ylim([0.05, 0.3])
             elif my_det_type==2: # (segments)
-                plt.ylim([0,0.1])
+                plt.ylim([0,0.2])
             plt.title(f'Peak to Total ratio for clover {cloverkey} {my_det_type}')
             plt.xlabel('Domain')
             plt.ylabel('Peak-to-total ratio')
@@ -264,6 +264,7 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile, opt='eps'):
 
    
 def PlotJsoncore(data, gammatab, source, lutfile, detKey = 1, opt='eps'):
+    debugPlotJsoncore = True
 
     MakeDir(save_results_to)
     CloverName=''
@@ -274,8 +275,9 @@ def PlotJsoncore(data, gammatab, source, lutfile, detKey = 1, opt='eps'):
             continue
         if key["detType"] != detKey:
             continue
-        # if key["domain"] == 1:
-        #     continue
+        if debugPlotJsoncore:
+            print('key["domain"]', key["domain"])
+
         for gammakey in list_of_sources:
             if source == gammakey:
                 for element in gammatab[source]["gammas"]:
@@ -285,53 +287,63 @@ def PlotJsoncore(data, gammatab, source, lutfile, detKey = 1, opt='eps'):
                                 plot_color=gammaset[source]['gammas'][element] #using different colors for each energy
                     plt.figure(1) #efficiency plot
                     try:
+                        CloverName = key["serial"][:len(key["serial"]) - 1]#for plotting
                         plt.scatter(x=key["domain"], y=key[source][element]["eff"], color=plot_color, label=f"{element}")
                         plt.errorbar(x=key["domain"], y=key[source][element]["eff"], yerr=key[source][element]["err_eff"], fmt='o', color=plot_color, ecolor=plot_color, capsize=5)
+                        if debugPlotJsoncore:
+                            print('key["domain"]', key["domain"], 'key[source][element]["eff"]', key[source][element]["eff"],'plot_color', plot_color)
                     except:
+                        print('Warining in PlotJsoncore y=key[source][element]["eff"] plot')
                         continue
                     plt.figure(2) #resolution plot
                     try:
                         plt.scatter(x=key["domain"], y=key[source][element]["res"], color=plot_color, label=f"{element}")
                         plt.errorbar(x=key["domain"], y=key[source][element]["res"], yerr=key[source][element]["err_res"], fmt='o', color=plot_color, ecolor=plot_color, capsize=5)
+                        if debugPlotJsoncore:
+                            print('key["domain"]', key["domain"], 'key[source][element]["res"]',
+                              key[source][element]["res"],'plot_color', plot_color)
                     except:
+                        print('Warining in PlotJsoncore y=key[source][element]["res"] plot')
                         continue
-        #FindXlim(clover)
-        plt.figure(1)
-        # xmin, xmax = FinXlimGeneric(clover, lutfile)
-        # xmin -= 1
-        # xmax += 1
-        plt.xlim(100,841)
-        # plt.xlim(xmin, xmax)
-        plt.ylim([0,0.1])
-        #title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
-        CloverName = key["serial"][:len(key["serial"])-1]
-        plt.title('Efficiency for core {} {}'.format(CloverName, detKey))
-        plt.xlabel('Domain')
-        plt.ylabel('Efficiency (%)')
-        plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
-        legend_without_duplicate_labels(plt)
+    #FindXlim(clover)
+    plt.figure(1)
+    # xmin, xmax = FinXlimGeneric(clover, lutfile)
+    # xmin -= 1
+    # xmax += 1
+    plt.xlim(100,841)
+    # plt.xlim(xmin, xmax)
+    plt.ylim([0,0.1])
+    #title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
+    # CloverName = key["serial"][:len(key["serial"])-1]
+    plt.title('Efficiency for core {} {}'.format(CloverName, detKey))
+    print('CloverName',CloverName, key['detType'])
+    plt.xlabel('Domain')
+    plt.ylabel('Efficiency (%)')
+    plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
+    legend_without_duplicate_labels(plt)
 
-        plt.figure(2)
-        # FindXlim(clover)
-        # plt.xlim(xmin, xmax)
-        plt.ylim([1,5])
-        #title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
-        plt.title('Resolution for core {} {}'.format(CloverName,detKey))
-        plt.xlabel('Domain')
-        plt.ylabel('Resolution (keV)')
-        plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
-        legend_without_duplicate_labels(plt)
+    plt.figure(2)
+    # FindXlim(clover)
+    # plt.xlim(xmin, xmax)
+    plt.xlim(100, 841)
+    plt.ylim([1,5])
+    #title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
+    plt.title('Resolution for core {} det key {}'.format(CloverName,detKey))
+    plt.xlabel('Domain')
+    plt.ylabel('Resolution (keV)')
+    plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
+    legend_without_duplicate_labels(plt)
 
 
-        plt.figure(1)
-        file_name5 = 'eliade_efficiency_{}_core{}.{}'.format(CloverName, detKey, opt)
-        plt.savefig(save_results_to + file_name5)
-        plt.close()
+    plt.figure(1)
+    file_name5 = 'eliade_efficiency_{}_core{}.{}'.format(CloverName, detKey, opt)
+    plt.savefig(save_results_to + file_name5)
+    plt.close()
 
-        plt.figure(2)
-        file_name6 = 'eliade_resolution_{}_core{}.{}'.format(CloverName, detKey, opt)
-        plt.savefig(save_results_to + file_name6)
-        plt.close()
+    plt.figure(2)
+    file_name6 = 'eliade_resolution_{}_core{}.{}'.format(CloverName, detKey, opt)
+    plt.savefig(save_results_to + file_name6)
+    plt.close()
 
     print("Finished graphs for all core{} {}".format(CloverName, detKey))
     return True
@@ -402,6 +414,8 @@ def PlotCalibrationCeBr(data, gammatab, source, lutfile, my_det_type=3, opt='eps
     MakeDir(save_results_to)
     number_of_our_colors = 30
     our_color_plate = iter(cm.rainbow(np.linspace(0, 1, number_of_our_colors)))
+    colors = ["red", "orange", "yellow", "green", "blue", "indigo", "violet"] #in parallel to the rinbow which does not work
+    color_index = 0
 
     for cebrkey in list_of_cebr:
         # my_det_type=2
@@ -415,6 +429,7 @@ def PlotCalibrationCeBr(data, gammatab, source, lutfile, my_det_type=3, opt='eps
                 continue
             else:
                 if key["serial"] == cebrkey:  # check if cebr is found
+                    # print('key[detType]', key['detType'], 'key["serial"]', key["serial"])
                     if key["pol_list"]:
                         # if key["detType"] == my_det_type:  # check if the detector is the type that we want
                         blCeBrFound = True
@@ -423,6 +438,11 @@ def PlotCalibrationCeBr(data, gammatab, source, lutfile, my_det_type=3, opt='eps
                             current_color = next(our_color_plate)
                         except:
                             current_color = 'red'
+                            print('Warning in PlotCalibrationCeBr same plot color will be used')
+                        # print('current_color', current_color)
+                        # print('colors[color_index]',colors[color_index], color_index)
+                        color_index+=1
+                        current_color = colors[color_index]
 
                         plt.plot([1, 16000], [float(key["pol_list"][0]) + float(key["pol_list"][1]) * 1,
                                              float(key["pol_list"][0]) + float(key["pol_list"][1]) * 16000],
@@ -441,22 +461,22 @@ def PlotCalibrationCeBr(data, gammatab, source, lutfile, my_det_type=3, opt='eps
                                         # continue
                         max_energy = max([float(i) for i in list(gammatab[source]["gammas"].keys())])
 
-        if blCeBrFound == True:
-            delta = 200
-            # print("calib")
-            plt.xlim([0, 16000])
-            plt.ylim([0, max_energy + delta])  # maximum energy from source + delta: [0; max+delta]
-            plt.xlabel('Channel')
-            plt.ylabel('Energy (keV)')
-            plt.title(f'Calibration for CeBr {cebrkey} {my_det_type}')
-            # legend_without_duplicate_labels(plt)
-            plt.legend(ncol=3, loc='lower right', prop={'size': 6})
-            # plt.show()
-            file_name = 'eliade_{}_{}_calibration.{}'.format(cebrkey, my_det_type, opt)
-            file_name = 'eliade_{}_{}_calibration.{}'.format(cebrkey, my_det_type, opt)
-            plt.savefig(save_results_to + file_name)
-            plt.close()
-            blCloverFound = False
+    if blCeBrFound == True:
+        delta = 200
+        # print("calib")
+        plt.xlim([0, 16000])
+        plt.ylim([0, max_energy + delta])  # maximum energy from source + delta: [0; max+delta]
+        plt.xlabel('Channel')
+        plt.ylabel('Energy (keV)')
+        plt.title(f'Calibration for CeBr {cebrkey} {my_det_type}')
+        # legend_without_duplicate_labels(plt)
+        plt.legend(ncol=3, loc='lower right', prop={'size': 6})
+        # plt.show()
+        file_name = 'eliade_{}_calibration.{}'.format(my_det_type, opt)
+        file_name = 'eliade_{}_calibration.{}'.format(my_det_type, opt)
+        plt.savefig(save_results_to + file_name)
+        plt.close()
+        blCloverFound = False
     return True
 
 
@@ -509,63 +529,47 @@ def PlotCeBr(data, gammatab, source, my_det_type, lutfile, opt='eps'):
                                                      ecolor=plot_color, capsize=5)
                                     except:
                                         continue  # print("Energy {} missing from domain {}".format(key[source][element], key["domain"]))
-        if blCeBrFound == True:
+    if blCeBrFound == True:
+        plt.figure(0)
+        plt.xlim(990, 1000)
+        plt.ylim([0.01, 0.3])
 
-            # FindXlim(cloverkey) #each clover has a different x-axis interval
-            # xmin, xmax = FinXlimGeneric(cebrkey, lutfile)
-            # xmin -= 1
-            # xmax += 1
-            # plt.xlim(xmin, xmax)
-            #
-            # plt.figure(1)
-            # plt.xlim(xmin, xmax)
-            # # FindXlim(cloverkey)  # efficiency #dt commented
-            # if my_det_type == 1 or my_det_type == 10:
-            #     plt.ylim([0, 0.1])
-            # elif my_det_type == 2:  # (segments)
-            #     plt.ylim([0, 0.01])
-            # plt.title(f'Efficiency for {cebrkey}')
-            # plt.xlabel('Domain')
-            # plt.ylabel('Efficiency (%)')
-            # plt.grid(color='black', linestyle='--', linewidth=0.5)
-            # legend_without_duplicate_labels(plt)
-            #
-            # file_name1 = 'eliade_{}_efficiency.{}'.format(cloverkey, opt)
-            # plt.savefig(save_results_to + file_name1)
-            # plt.close()
-            #
-            # plt.figure(2)
-            # # FindXlim(cloverkey) #resolution
-            # plt.xlim(xmin, xmax)
-            # plt.ylim([1, 5])
-            # plt.title(f'Resolution for {cloverkey}')
-            # plt.xlabel('Domain')
-            # plt.ylabel('Resolution (keV)')
-            # plt.grid(color='black', linestyle='--', linewidth=0.5)
-            # legend_without_duplicate_labels(plt)
-            #
-            # file_name2 = 'eliade_{}_{}_resolution.{}'.format(cloverkey, my_det_type, opt)
-            # plt.savefig(save_results_to + file_name2)
-            # plt.close()
+        plt.title(f'Peak to Total ratio for CeBr {my_det_type}')
+        plt.xlabel('Domain')
+        plt.ylabel('Peak-to-total ratio')
+        plt.grid(color='black', linestyle='--', linewidth=0.5)
 
-            plt.figure(0)
-            # FindXlim(cloverkey)  # Peak to Total
-            plt.xlim(980, 1100)
-            # plt.ylim([0.05,0.1])
-            if my_det_type == 1 or my_det_type == 10:
-                plt.ylim([0.15, 0.2])
-            elif my_det_type == 2:  # (segments)
-                plt.ylim([0, 0.1])
-            plt.title(f'Peak to Total ratio for {cebrkey} {my_det_type}')
-            plt.xlabel('Domain')
-            plt.ylabel('Peak-to-total ratio')
-            plt.grid(color='black', linestyle='--', linewidth=0.5)
+        file_name0 = 'eliade_CEBR_{}_peaktotal.{}'.format(my_det_type, opt)
+        plt.savefig(save_results_to + file_name0)
+        plt.close()
 
-            file_name3 = 'eliade_{}_{}_peaktotal.{}'.format(cebrkey, my_det_type, opt)
-            plt.savefig(save_results_to + file_name3)
-            plt.close()
+        plt.figure(1)
+        plt.xlim(990, 1000)
+        plt.ylim([0.01, 0.4])
 
-            blCeBrFound = False
+        plt.title(f'Efficiency for CeBr {my_det_type}')
+        plt.xlabel('Domain')
+        plt.ylabel('Efficiency')
+        plt.grid(color='black', linestyle='--', linewidth=0.5)
+
+        file_name1 = 'eliade_CEBR_{}_eff.{}'.format(my_det_type, opt)
+        plt.savefig(save_results_to + file_name1)
+        plt.close()
+
+        plt.figure(2)
+        plt.xlim(990, 1000)
+        plt.ylim([0, 50])
+
+        plt.title(f'Resolution for CeBr {my_det_type}')
+        plt.xlabel('Domain')
+        plt.ylabel('Resolution')
+        plt.grid(color='black', linestyle='--', linewidth=0.5)
+
+        file_name2 = 'eliade_CEBR_{}_res.{}'.format(my_det_type, opt)
+        plt.savefig(save_results_to + file_name2)
+        plt.close()
+
+        blCeBrFound = False
     print('Finished CeBr graphs')
 
     return True

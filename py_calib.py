@@ -383,11 +383,12 @@ def main():
 
             PlotClover(js_tab, j_sources, my_source.name, 1, j_lut, my_params.grType)
             PlotClover(js_tab, j_sources, my_source.name, 2, j_lut, my_params.grType)
-            PlotCeBr(js_tab, j_sources, my_source.name, 3, j_lut, my_params.grType)
 
             PlotCore(js_tab, j_sources, my_source.name, j_lut, 1, my_params.grType)
             PlotCalibration(js_tab, j_sources, my_source.name, j_lut, 1, my_params.grType)
             PlotCalibration(js_tab, j_sources, my_source.name, j_lut, 2, my_params.grType)
+
+            PlotCeBr(js_tab, j_sources, my_source.name, 3, j_lut, my_params.grType)
             PlotCalibrationCeBr(js_tab, j_sources, my_source.name, j_lut, 3, my_params.grType)
 
 
