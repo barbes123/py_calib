@@ -69,7 +69,7 @@ blFirstElement = False
 global my_params
 
 class TStartParams:
-    def __init__(self, server, runnbr, dom1, dom2, det_type, bg, grType):
+    def __init__(self, server, runnbr, dom1, dom2, det_type, bg, grType, prefix):
         self.server = int(server)
         self.runnbr = runnbr
         self.dom1 = int(dom1)
@@ -77,6 +77,7 @@ class TStartParams:
         self.det_type = det_type
         self.bg = bg
         self.grType = grType
+        self.prefix = prefix
 
     def __repr__(self):
         print('=========================================')
@@ -289,9 +290,13 @@ def main():
     global  j_lut_recall
     j_lut_recall = load_json('{}/{}'.format(ourpath, lutreallener))
 
-    MakeSymLink('HPGe.spe','mDelila_raw_py_1.spe')
-    MakeSymLink('SEG.spe','mDelila_raw_py_2.spe')
-    MakeSymLink('LaBr.spe','mDelila_raw_py_3.spe')
+    # MakeSymLink('HPGe.spe','mDelila_raw_py_1.spe')
+    # MakeSymLink('SEG.spe','mDelila_raw_py_2.spe')
+    # MakeSymLink('LaBr.spe','mDelila_raw_py_3.spe')
+
+    MakeSymLink('HPGe.spe','{}_py_1.spe'.format(prefix))
+    MakeSymLink('SEG.spe', '{}_py_2.spe'.format(prefix))
+    MakeSymLink('LaBr.spe','{}_py_3.spe'.format(prefix))
 
     # print('Printing source table')
     print('my_params.run', my_params.runnbr)
@@ -338,7 +343,8 @@ def main():
         myCurrentSetting = SetUpRecallEnerFromJson(domain, j_lut_recall)
         if debug:
             print('I am trying to do fit for domain {}'.format(domain))
-        current_file = '{}mDelila_raw_py_{}.spe'.format(datapath, domain)
+        current_file = '{}{}_py_{}.spe'.format(datapath,prefix,domain)
+        # current_file = '{}mDelila_raw_py_{}.spe'.format(datapath, domain)
 
         if file_exists(current_file):
             # if blBackGround:
@@ -347,6 +353,8 @@ def main():
             else:
                 src = my_source.name
 
+            # print(prefix)
+            # sys.exit()
             # command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly2 -v 2'.format(path, current_file, my_source.name, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
             # command_line = '{} -spe {} -{} -ener {} -ener {} -lim {} {} -fmt A 16384 -dwa {} {} -poly2 -v 2'.format(path, current_file, my_source.name,'1460.82','2614.51', myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
             #command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly2 -v 2'.format(path, current_file, src, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
@@ -405,6 +413,7 @@ if __name__ == "__main__":
     det_type = 0
     bg = 0
     grType = 'jpg'
+    prefix = 'mDelila_raw'
 
     parser = ArgumentParser()
 
@@ -422,10 +431,15 @@ if __name__ == "__main__":
     parser.add_argument("-b", "--background",
                         dest="bg", default=bg, type=int,
                         help="to take in energy calib background lines; default = {}".format(bg))
-    parser.add_argument("-g", "--graphic type: eps, jpg or none ",
+    parser.add_argument("-gr", "--graphic type: eps, jpg or none ",
                         dest="grType", default=grType, type=str, choices=('eps', 'jpeg', 'jpg', 'png', 'svg', 'svgz', 'tif', 'tiff', 'webp','none'),
                         # eps, jpeg, jpg, pdf, pgf, png, ps, raw, rgba, svg, svgz, tif, tiff, webp
                         help="Available graphic output: eps, jpeg, jpg, png, svg, svgz, tif, tiff, webp or none (no graphs); default = {}".format(grType))
+    parser.add_argument("-prefix", "--prefix to the files to be analyzed",
+                        dest="prefix", default=grType, type=str,
+                        help="Prefix for matrix (TH2) to be analyzed mDelila_raw or mDelila or ...".format(
+                            prefix))
+
 
     config = parser.parse_args()
 
@@ -439,7 +453,7 @@ if __name__ == "__main__":
         print('No LUT_RECALL.json is given: {}. Cannot continue.'.format(lutreallener))
         sys.exit()
 
-    my_params = TStartParams(config.server, config.runnbr, config.dom[0], config.dom[1], config.det_type, config.bg, config.grType)
+    my_params = TStartParams(config.server, config.runnbr, config.dom[0], config.dom[1], config.det_type, config.bg, config.grType, config.prefix)
 
 
 #     print('Input Parameters: server, run, domDown, domUp, detType')

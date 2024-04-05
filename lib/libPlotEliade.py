@@ -127,14 +127,16 @@ def PlotJsondom(data, gammatab, source, lutfile, opt='eps'):
                 plt.xlim([1000.,1400.])
             elif source=="152Eu":
                 plt.xlim([100, 1500])
+
             if (i["detType"]==1 or i["detType"]==10):
                 if(int(i["domain"])==1):
-                    plt.ylim([1,2.5])
+                    # plt.ylim([0,2.5])
+                    plt.ylim([0,1])
                 else:
                     plt.ylim([0, 0.1])
             elif i["detType"]==2:
-                if(int(i["domain"])==2):
-                    plt.ylim([0.5,1.5])
+                if i["domain"]==2:
+                    plt.ylim([0.0,.5])
                 else:
                     plt.ylim([0,0.01])
             # if (i["domain"==1] or i["domain"]==2):
@@ -264,7 +266,7 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile, opt='eps'):
 
    
 def PlotJsoncore(data, gammatab, source, lutfile, detKey = 1, opt='eps'):
-    debugPlotJsoncore = True
+    debugPlotJsoncore = False
 
     MakeDir(save_results_to)
     CloverName=''
@@ -274,6 +276,8 @@ def PlotJsoncore(data, gammatab, source, lutfile, detKey = 1, opt='eps'):
         if find_domain(key["domain"], lutfile)==False:
             continue
         if key["detType"] != detKey:
+            continue
+        if key["domain"] < 100:
             continue
         if debugPlotJsoncore:
             print('key["domain"]', key["domain"])
@@ -316,7 +320,7 @@ def PlotJsoncore(data, gammatab, source, lutfile, detKey = 1, opt='eps'):
     #title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
     # CloverName = key["serial"][:len(key["serial"])-1]
     plt.title('Efficiency for core {} {}'.format(CloverName, detKey))
-    print('CloverName',CloverName, key['detType'])
+    # print('CloverName',CloverName, key['detType'])
     plt.xlabel('Domain')
     plt.ylabel('Efficiency (%)')
     plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
