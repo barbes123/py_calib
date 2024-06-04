@@ -139,7 +139,10 @@ def ProcessFitDataStr(dom, my_source, lines, j_src, j_lut ):
     PeakList = []
     cal = []
     for word in words:
-        if 'Cal1' in word:#for poly3 change to Cal2
+        #if 'Cal2' in word:#for poly3 change to Cal2
+        #    cal = []
+        #    temp = [t for t in word.split('Cal2=[ ') if t]
+        if 'Cal' in word:#for poly3 change to Cal2
             cal = []
             temp = [t for t in word.split('[ ') if t]
             # print("#########",temp)
@@ -147,8 +150,8 @@ def ProcessFitDataStr(dom, my_source, lines, j_src, j_lut ):
             temp1 = [t1 for t1 in temp[1].split(' ') if t1]
             # print("#########",temp1)
             del temp1[len(temp1) -1]
-            if my_params.bg == 1:
-                del temp1[len(temp1) - 1]
+            # if my_params.bg == 1:
+                # del temp1[len(temp1) - 1]
             for s in temp1:
                 cal.append(float(s))
             print('Calibration for domain {} {}'.format(dom, cal))
@@ -356,7 +359,7 @@ def main():
             # print(prefix)
             # sys.exit()
             # command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly2 -v 2'.format(path, current_file, my_source.name, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
-            # command_line = '{} -spe {} -{} -ener {} -ener {} -lim {} {} -fmt A 16384 -dwa {} {} -poly2 -v 2'.format(path, current_file, my_source.name,'1460.82','2614.51', myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
+            # command_line = '{} -spe {} -{} -ener {} -ener {} -lim {} {} -fmt A 16384 -dwa {} {} -poly2 -v 2'.format(path, current_file, my_source.name,'1460.82','2614.51', myCurrentSetting.limDown, myCurrentSetting.limUp, 2., myCurrentSetting.ampl)
             #command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly2 -v 2'.format(path, current_file, src, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
             command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly1 -v 2'.format(path, current_file, src, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
             print('{}'.format(command_line))
