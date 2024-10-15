@@ -40,34 +40,49 @@ Mention: if you see that you are operating on S5, close the terminal and open a 
 In order to check if the data is saved, enter the path from above on Terminal (s5 corresponds to the server that we used earlier, so replace 5 with the corresponding number of the server). When you stopped the measurement, on the right side of the STOP button says "next measurement is 146..." (or something similar, I didn't check to take it word by word) which means that your measurement is 145 and you should look for the ROOT file with number 145.
 
 
-# CALIBRATION
-- Update the database (json) with new enrties. For this, you have to access the json database from py_calib:
+## CALIBRATION
 
-_cd ~/py_calib/json/GetRunTable_
+### 1. Update the database (json) with new run enrties. 
+For this, you have to access the json database from py_calib:
+
+    cd ~/py_calib/json/GetRunTable
 
 Mention: You can open the folder one by one if you want to see what's in them
 
-- Initiate the program get_web_json.py to start updating the list
+Start the program get_web_json.py to start updating the list
 
-_~/py_calib/json/GetRunTable ./get_web_json.py_
+    ~/py_calib/json/GetRunTable ./get_web_json.py
 
-- Check if the update was done by accessint the data folder from GetRunTable
+Check if the update was done by accessint the data folder from GetRunTable
 
-_cd ~/py_calib/json/GetRunTable/data_
+    cd ~/py_calib/json/GetRunTable/data
 
-- Check the file of you server to see if it updated (in this case, the file that has ES_5 and we should look for the last update to be 145)
+Check the file of you server to see if it updated (in this case, the file that has ES_5 and we should look for the last update to be 145)
 
-_~/py_calib/json/GetRunTable/data less tmp_ES_5_log.json_
+    ~/py_calib/json/GetRunTable/data less tmp_ES_5_log.json
+    
 (Exit the file by pressing q)
 
-- Go back to the database via the json folder
+Go back to the database via the json folder
 
-_cd ~/py_calib/json_
+    cd ~/py_calib/json
 
-- Create a link with the actualized database
+Copy manually (hopefully the script will be ready soon by someone) new entries from  GetRunTable/data/tmp_ES_5_log.json to run_table_S5.json. Check the time start/stop and the source fields. Example:
 
-_~/py_calib/json ln -s GetRunTable/data/tmp_ES_5_log.json run_table_S5.json_
-(Check if the file run_table_S5.json appeared in the json folder)
+
+    {
+        "runNumber": 154,
+        "start": "2024-10-08 12:02:52",
+        "stop": "2024-10-09 17:12:12",
+        "expName": "ES2",
+        "comment": "",
+        "source": "BG",
+        "distance": ""
+    }
+
+
+     
+
 
 - Go one folder behind (py_calib) and repeat the last step for LUT and connect it to onlineEliade
 
