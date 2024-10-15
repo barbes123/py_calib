@@ -86,7 +86,7 @@ IF IT DOESN'T WORK USE THE UNLINK FUNCTION FROM TERMINAL AND STARTOVER WITH THE 
 
 _unlink LUT_RECALL.json_
 
-- Go to eliadedisks, select your server and choose selector_dmitry (if there is _selector_dmitry don't use it, it's outdated)
+- Go to eliadedisks, select your server and choose the folder in which you want the root files, for this example, I used selector_dmitry (if there is _selector_dmitry don't use it, it's outdated)
 
 _/eliadedisks/s5/selector_dmitry_
 (Look into the folder if you want to see what's in there)
