@@ -8,7 +8,7 @@ import inspect
 
 time_format = "%Y-%m-%d %H:%M:%S"
 
-list_of_sources = {"60Co", "152Eu","137Cs", "133Ba", '252Cf'}
+list_of_sources = {'60Co','60CoWeak', '152Eu','137Cs', '133Ba', '252Cf'}
 
 class TIsotope:
     def __init__(self, name, t12, date0, a0):
@@ -25,6 +25,7 @@ class TIsotope:
             self.t12 = 0
         if self.date0 is None:
             self.date0 = '60Co'
+            print('The source None; I will use 60Co as default')
         if self.a0 is None:
             self.a0 = a0
 
@@ -84,6 +85,7 @@ class TMeasurement:
             self.run = 0
         if self.source is None:
             self.source = '60Co'
+            print('The source None; I will use 60Co as default')
         if self.tstart is None:
             self.tstart = default_time
         if self.tstop is None:
@@ -117,7 +119,7 @@ class TMeasurement:
                     self.source = runnbr['source']
                 else:
                     self.source = "60Co"
-                print('Your source, sir, is ', runnbr['source'])
+                print('The source from data: ', runnbr['source'])
                 # self.source = '60Co'
             # if runnbr['source'] is None:
             #    runnbr['source'] = '60Co'

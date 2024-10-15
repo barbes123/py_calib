@@ -32,7 +32,7 @@ global save_results_to
 save_results_to = '{}figures/'.format(datapath)
 title_clover = ''
 list_of_clovers = {"CL29", "CL30", "CL31", "CL32", "CL33", "CL34", "CL35", "CL36", "HPGe", "SEG", "LaBr"}
-list_of_sources = {"60Co", "152Eu","137Cs", "133Ba"}
+list_of_sources = {'60Co','60CoWeak', '152Eu','137Cs', '133Ba'}
 list_of_cebr = {"CEBR1","CEBR2","CEBR3","CEBR4"}
 
 #res and eff vs ener for each domain
@@ -93,7 +93,9 @@ def PlotJsondom(data, gammatab, source, lutfile, opt='eps'):
         if find_domain(dom, lutfile)==False:
             continue
         else:
-        
+            # print('F1 ', i)
+            # print('F2 ', i['60CoWeak'])
+            # print('F3 ', i['60CoWeak'].keys())
             plt.figure(1)
             for key in i[source].keys():
                 res=i[source][key]["res"]
@@ -103,7 +105,7 @@ def PlotJsondom(data, gammatab, source, lutfile, opt='eps'):
                 plt.xlim([1000.,1400.])
             elif source=="152Eu":
                 plt.xlim([100, 1500])
-            plt.ylim([1,5])
+            plt.ylim([2,8])
             if i["detType"]==3:
                 plt.ylim([30,50])
                 # print('plt.ylim([40,45])')
@@ -122,7 +124,7 @@ def PlotJsondom(data, gammatab, source, lutfile, opt='eps'):
                 eff = i[source][key]["eff"]
                 plt.errorbar(x=float(key), y=eff, yerr=i[source][key]["err_eff"], fmt='o', color='b', ecolor='red', capsize=5)
                 #plt.scatter(x=float(key), y=eff, color='b')
-                
+
             if source=="60Co":
                 plt.xlim([1000.,1400.])
             elif source=="152Eu":
@@ -147,7 +149,7 @@ def PlotJsondom(data, gammatab, source, lutfile, opt='eps'):
             plt.ylabel('Efficiency (%)')
             plt.grid(color = 'black', linestyle = '--', linewidth = 0.5)
             #plt.legend()
-            
+
             plt.show()
             file_name2 = 'dom_{}_eff.{}'.format(dom, opt)
             plt.savefig(save_results_to + file_name2)
@@ -162,7 +164,7 @@ def legend_without_duplicate_labels(figure):
     figure.legend(by_label.values(), by_label.keys(), loc='upper right')
 
 def PlotJsonclover(data, gammatab, source, my_det_type, lutfile, opt='eps'):
-    print('I am in PlotJsonclover')
+    print('<<<<< I am in PlotJsonclover >>>>>')
     MakeDir(save_results_to)
     
     # my_det_type = 2
@@ -207,7 +209,7 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile, opt='eps'):
             # FindXlim(cloverkey) #each clover has a different x-axis interval
             xmin, xmax = FinXlimGeneric(cloverkey, lutfile)
             xmin-=1
-            xmax+=1
+            xmax+=2
             plt.xlim(xmin, xmax)
 
             plt.figure(1)
@@ -295,7 +297,7 @@ def PlotJsoncore(data, gammatab, source, lutfile, detKey = 1, opt='eps'):
                         plt.scatter(x=key["domain"], y=key[source][element]["eff"], color=plot_color, label=f"{element}")
                         plt.errorbar(x=key["domain"], y=key[source][element]["eff"], yerr=key[source][element]["err_eff"], fmt='o', color=plot_color, ecolor=plot_color, capsize=5)
                         if debugPlotJsoncore:
-                            print('key["domain"]', key["domain"], 'key[source][element]["eff"]', key[source][element]["eff"],'plot_color', plot_color)
+                            print('CloverName',CloverName,'key["domain"]', key["domain"], 'key[source][element]["eff"]', key[source][element]["eff"],'plot_color', plot_color)
                     except:
                         print('Warining in PlotJsoncore y=key[source][element]["eff"] plot')
                         continue
@@ -349,7 +351,7 @@ def PlotJsoncore(data, gammatab, source, lutfile, detKey = 1, opt='eps'):
     plt.savefig(save_results_to + file_name6)
     plt.close()
 
-    print("Finished graphs for all core{} {}".format(CloverName, detKey))
+    print("PlotJsoncore: Finished graphs for all core{} {}".format(CloverName, detKey))
     return True
 
 def PlotCalibration(data, gammatab, source, lutfile, my_det_type = 2, opt='eps'):
@@ -415,6 +417,7 @@ def PlotCalibration(data, gammatab, source, lutfile, my_det_type = 2, opt='eps')
 
 
 def PlotCalibrationCeBr(data, gammatab, source, lutfile, my_det_type=3, opt='eps'):
+    print('<<<<< I am in PlotCalibrationCeBr >>>>>')
     MakeDir(save_results_to)
     number_of_our_colors = 30
     our_color_plate = iter(cm.rainbow(np.linspace(0, 1, number_of_our_colors)))
@@ -485,7 +488,7 @@ def PlotCalibrationCeBr(data, gammatab, source, lutfile, my_det_type=3, opt='eps
 
 
 def PlotCeBr(data, gammatab, source, my_det_type, lutfile, opt='eps'):
-    print('I am in PlotPTCeBr')
+    print('<<<<< I am in PlotCeBr >>>>>')
     MakeDir(save_results_to)
 
     # my_det_type = 2
@@ -535,7 +538,7 @@ def PlotCeBr(data, gammatab, source, my_det_type, lutfile, opt='eps'):
                                         continue  # print("Energy {} missing from domain {}".format(key[source][element], key["domain"]))
     if blCeBrFound == True:
         plt.figure(0)
-        plt.xlim(990, 1000)
+        plt.xlim(900, 1000)
         plt.ylim([0.01, 0.3])
 
         plt.title(f'Peak to Total ratio for CeBr {my_det_type}')
@@ -548,7 +551,7 @@ def PlotCeBr(data, gammatab, source, my_det_type, lutfile, opt='eps'):
         plt.close()
 
         plt.figure(1)
-        plt.xlim(990, 1000)
+        plt.xlim(900, 1000)
         plt.ylim([0.01, 0.4])
 
         plt.title(f'Efficiency for CeBr {my_det_type}')
@@ -561,7 +564,7 @@ def PlotCeBr(data, gammatab, source, my_det_type, lutfile, opt='eps'):
         plt.close()
 
         plt.figure(2)
-        plt.xlim(990, 1000)
+        plt.xlim(900, 1000)
         plt.ylim([0, 50])
 
         plt.title(f'Resolution for CeBr {my_det_type}')

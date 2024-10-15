@@ -127,7 +127,7 @@ def MakeSymLink(file, link):
         print('Link {} to file {} created '.format(link, file))
 
 def ProcessFitDataStr(dom, my_source, lines, j_src, j_lut ):
-    print('ProcessFitDataStr: now  split lines')
+    print('ProcessFitDataStr: now  split lines, source is',my_source)
 
     if debug:
         print(lines)
@@ -361,6 +361,10 @@ def main():
             # command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly2 -v 2'.format(path, current_file, my_source.name, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
             # command_line = '{} -spe {} -{} -ener {} -ener {} -lim {} {} -fmt A 16384 -dwa {} {} -poly2 -v 2'.format(path, current_file, my_source.name,'1460.82','2614.51', myCurrentSetting.limDown, myCurrentSetting.limUp, 2., myCurrentSetting.ampl)
             #command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly2 -v 2'.format(path, current_file, src, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
+
+            if '60Co' in src:
+                src = '60Co'
+
             command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly1 -v 2'.format(path, current_file, src, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
             print('{}'.format(command_line))
             if debug:
@@ -390,10 +394,18 @@ def main():
         js_tab = json.load(ifile)
         # if blPlot == True:
         if my_params.grType != 'none':
+
+            source = my_source.name
+            if '60Co' in my_source.name:
+                source = '60Co'
+
+            # print('my_source.name ', my_source.name, ' ', source)
+            # print(j_sources)
             PlotDomain(js_tab, j_sources, my_source.name, j_lut, my_params.grType)
 
+
             PlotClover(js_tab, j_sources, my_source.name, 1, j_lut, my_params.grType)
-            PlotClover(js_tab, j_sources, my_source.name, 2, j_lut, my_params.grType)
+            PlotClover(js_tab, j_sources, source, 2, j_lut, my_params.grType)
 
             PlotCore(js_tab, j_sources, my_source.name, j_lut, 1, my_params.grType)
             PlotCalibration(js_tab, j_sources, my_source.name, j_lut, 1, my_params.grType)
