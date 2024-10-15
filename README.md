@@ -80,13 +80,12 @@ Copy manually (hopefully the script will be ready soon by someone) new entries f
         "distance": ""
     }
 
+### 2. Update look up tables. 
 
-     
+Go one folder up (to py_calib) and update the sybmolinc links in the 'py_calib' folder:
 
-
-- Go one folder behind (py_calib) and repeat the last step for LUT and connect it to onlineEliade
-
-_~/py_calib ln -s ~/onlineEliade/LookUpTables/s5/LUT_ELIADE_S1_CL34_60Co.json LUT_ELIADE.json_
+    ln -s ~/onlineEliade/LookUpTables/s5/LUT_ELIADE_S1_CL34_60Co.json LUT_ELIADE.json
+    ln -s ~/onlineEliade/LookUpTables/s5/LUT_ELIADE_S1_CL34_60Co.json LUT_ELIADE.json
 
 (_Observation 1:_ You link the Lut with with a file that is used for similar calibration, i.e if it was used before for 60Co, you can use it for other 60Co experiments. Always check to see if the parameters match with your data
 
