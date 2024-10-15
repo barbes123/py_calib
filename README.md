@@ -85,7 +85,9 @@ Copy manually (hopefully the script will be ready soon by someone) new entries f
 Go one folder up (to py_calib) and update the sybmolinc links in the 'py_calib' folder:
 
     ln -s ~/onlineEliade/LookUpTables/s5/LUT_ELIADE_S1_CL34_60Co.json LUT_ELIADE.json
-    ln -s ~/onlineEliade/LookUpTables/s5/LUT_ELIADE_S1_CL34_60Co.json LUT_ELIADE.json
+    ln -s ~/onlineEliade/LookUpTables/s5/LUT_RECALL_S4_RUN52.json LUT_ELIADE.json
+
+Alternatively, you can use 'prep_py_calib.py' from the 'tools', copy it to the *.spe files location and modify by specifying the correct LUTS.
 
 (_Observation 1:_ You link the Lut with with a file that is used for similar calibration, i.e if it was used before for 60Co, you can use it for other 60Co experiments. Always check to see if the parameters match with your data
 
