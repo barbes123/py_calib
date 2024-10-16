@@ -1,5 +1,86 @@
 [
    {
+        "runNumber": 26,
+        "start": "2024-10-15 17:31:46",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES3",
+        "comment": "",
+        "source": "152Eu",
+        "distance": ""
+    },
+    {
+        "runNumber": 25,
+        "start": "2024-10-11 11:55:54",
+        "stop": "2024-10-15 16:46:55",
+        "expName": "ES3",
+        "comment": "",
+        "source": "60CoWeak",
+        "distance": ""
+    },
+    {
+        "runNumber": 24,
+        "start": "2024-10-11 11:53:02",
+        "stop": "2024-10-11 11:53:07",
+        "expName": "ES3",
+        "comment": "",
+        "source": "152Eu",
+        "distance": ""
+    },
+    {
+        "runNumber": 23,
+        "start": "2024-10-11 11:44:33",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES3",
+        "comment": "",
+        "source": "152Eu",
+        "distance": ""
+    },
+    {
+        "runNumber": 22,
+        "start": "2024-10-11 11:27:42",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES3",
+        "comment": "",
+        "source": "152Eu",
+        "distance": ""
+    },
+    {
+        "runNumber": 21,
+        "start": "2024-10-11 10:50:34",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES3",
+        "comment": "",
+        "source": "152Eu",
+        "distance": ""
+    },
+    {
+        "runNumber": 20,
+        "start": "2024-05-15 13:44:11",
+        "stop": "2024-05-17 12:51:34",
+        "expName": "ES3",
+        "comment": "",
+        "source": "152Eu",
+        "distance": ""
+    },
+    {
+        "runNumber": 19,
+        "start": "2024-04-29 11:36:14",
+        "stop": "2024-05-15 13:24:26",
+        "expName": "ES3",
+        "comment": "",
+        "source": "60Co",
+        "distance": ""
+    },
+    {
+        "runNumber": 18,
+        "start": "2024-04-26 13:27:08",
+        "stop": "2024-04-29 11:10:30",
+        "expName": "ES3",
+        "comment": "",
+        "source": "137Cs",
+        "distance": ""
+    },   
+   {
       "runNumber": 17,
       "start": "2024-04-05 14:41:23",
       "stop": "2024-04-05 16:52:04",
