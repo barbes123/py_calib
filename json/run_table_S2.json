@@ -5,7 +5,7 @@
         "stop": "1970-01-01 02:00:00",
         "expName": "ES2",
         "comment": "",
-        "source": "152Eu",
+        "source": "60Co",
         "distance": ""
     },
     {
@@ -14,7 +14,7 @@
         "stop": "2024-10-15 16:46:52",
         "expName": "ES2",
         "comment": "",
-        "source": "152Eu",
+        "source": "60Co",
         "distance": ""
     },     
     {
@@ -23,7 +23,7 @@
         "stop": "2024-11-09 11:32:00",
         "expName": "ES2",
         "comment": "",
-        "source": "60CoWeak",
+        "source": "60Co",
         "distance": ""
     },
     {
