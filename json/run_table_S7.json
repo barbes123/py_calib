@@ -1,4 +1,76 @@
 [
+     {
+        "runNumber": 138,
+        "start": "2024-10-22 11:07:10",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES7",
+        "comment": "",
+        "source": "60Co",
+        "distance": "99"
+    },
+    {
+        "runNumber": 137,
+        "start": "2024-10-21 19:06:11",
+        "stop": "2024-10-22 10:49:10",
+        "expName": "ES7",
+        "comment": "",
+        "source": "60Co",
+        "distance": "99"
+    },
+    {
+        "runNumber": 136,
+        "start": "2024-10-21 18:16:46",
+        "stop": "2024-10-21 19:02:45",
+        "expName": "ES7",
+        "comment": "",
+        "source": "60Co",
+        "distance": "99"
+    },
+    {
+        "runNumber": 135,
+        "start": "2024-10-21 17:58:53",
+        "stop": "2024-10-21 18:09:09",
+        "expName": "ES7",
+        "comment": "",
+        "source": "60Co",
+        "distance": "99"
+    },
+    {
+        "runNumber": 134,
+        "start": "2024-10-21 17:54:31",
+        "stop": "2024-10-21 17:58:36",
+        "expName": "ES7",
+        "comment": "",
+        "source": "60Co",
+        "distance": "99"
+    },
+    {
+        "runNumber": 133,
+        "start": "2024-10-21 17:51:08",
+        "stop": "2024-10-21 17:54:12",
+        "expName": "ES7",
+        "comment": "",
+        "source": "60Co",
+        "distance": "99"
+    },
+    {
+        "runNumber": 132,
+        "start": "2024-10-21 17:21:35",
+        "stop": "2024-10-21 17:37:30",
+        "expName": "ES7",
+        "comment": "",
+        "source": "60Co",
+        "distance": "99"
+    },
+    {
+        "runNumber": 131,
+        "start": "2024-10-21 17:03:50",
+        "stop": "2024-10-21 17:19:56",
+        "expName": "ES7",
+        "comment": "",
+        "source": "152Eu",
+        "distance": "99"
+    },    
     {
         "runNumber": 130,
         "start": "2024-10-21 14:44:02",
