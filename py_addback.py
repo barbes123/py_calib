@@ -392,6 +392,7 @@ def main():
             if my_source.name == gammakey:
                 for element in j_sources[my_source.name]["gammas"]:
                     key[my_source.name][element]['addback'] = key[my_source.name][element]["eff"] / fold1[my_source.name][element]["eff"]
+                    key[my_source.name][element]['err_ab'] = key[my_source.name][element]['addback'] * (key[my_source.name][element]["err_eff"]/key[my_source.name][element]["eff"]  + fold1[my_source.name][element]["err_eff"]/key[my_source.name][element]["eff"])
 
     with open('{}addback_{}.json'.format(datapath, my_run.run), 'w') as ofile:
         js_tab = json.dump(list_results, ofile, indent=3, default=str)

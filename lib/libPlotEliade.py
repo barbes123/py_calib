@@ -580,3 +580,92 @@ def PlotCeBr(data, gammatab, source, my_det_type, lutfile, opt='eps'):
     print('Finished CeBr graphs')
 
     return True
+
+
+# def PlotJsonFold(data, gammatab, source, my_det_type, lutfile, opt='eps'):
+def PlotJsonFold(data, gammatab, source, my_det_type, opt='eps'):
+    print('<<<<< I am in PlotJsonFold >>>>>')
+    MakeDir(save_results_to)
+
+    plt.figure(0)
+    for key in data:
+        plt.scatter(x=key["fold"], y=key["PT"], color='red')
+
+    for key in data:
+        for gammakey in list_of_sources:  # browse through the list of sources
+            if source == gammakey:  # if our source is in the list
+                for element in gammatab[source]["gammas"]:  # for each gamma energy of the source
+                    plot_color = "k"
+                    with open('{}/json/gamma_set.json'.format(ourpath), 'r') as jason_file:
+                        gammaset = json.load(jason_file)
+                        plot_color = gammaset[source]['gammas'][element]  # using different colors for each energy
+
+                    plt.figure(1)  # efficiency plot
+                    try:
+                        plt.scatter(x=key["fold"], y=key[source][element]["eff"], color=plot_color,
+                                    label=f"{element}")
+                        plt.errorbar(x=key["fold"], y=key[source][element]["eff"],
+                                     yerr=key[source][element]["err_eff"], fmt='o', color=plot_color,
+                                     ecolor=plot_color, capsize=5)
+                    except:
+                        print('Fold efficiency Plot failed')
+                        continue  # print("Energy {} missing from domain {}".format(key[source][element], key["domain"]))
+                    plt.figure(2)  # resolution plot
+                    try:
+                        plt.scatter(x=key["fold"], y=key[source][element]["res"], color=plot_color,
+                                    label=f"{element}")
+                        plt.errorbar(x=key["fold"], y=key[source][element]["res"],
+                                     yerr=key[source][element]["err_res"], fmt='o', color=plot_color,
+                                     ecolor=plot_color, capsize=5)
+                    except:
+                        print('Fold resolution Plot failed')
+                        continue  # print("Energy {} missing from domain {}".format(key[source][element], key["domain"]))
+
+                    plt.figure(3)  # resolution plot
+                    try:
+                        plt.scatter(x=key["fold"], y=key[source][element]["addback"], color=plot_color,
+                                    label=f"{element}")
+                        plt.errorbar(x=key["fold"], y=key[source][element]["addback"],
+                                     yerr=key[source][element]["err_ab"], fmt='o', color=plot_color,
+                                     ecolor=plot_color, capsize=5)
+                    except:
+                        print('Fold addback Plot failed')
+                        continue  # print("Energy {} missing from domain {}".format(key[source][element], key["domain"]))
+
+    plt.figure(0)
+    plt.title(f'Peak To Total for Fold Spectra')
+    plt.xlabel('Fold')
+    plt.ylabel('PT')
+    file_name_pt = 'fold_{}_peaktotal.{}'.format(key["fold"], opt)
+    plt.savefig(save_results_to + file_name_pt)
+    plt.close()
+
+
+    plt.figure(1)
+    plt.title(f'Efficiency Fold Spectra')
+    plt.xlabel('Fold')
+    plt.ylabel('Efficiency, %')
+    file_name_eff = 'fold_{}_eff.{}'.format(key["fold"], opt)
+    plt.savefig(save_results_to + file_name_eff)
+    plt.close()
+
+    plt.figure(2)
+    plt.title(f'Resolution for Fold Spectra')
+    plt.xlabel('Fold')
+    plt.ylabel('Resolution, keV')
+    file_name_res = 'fold_{}_res.{}'.format(key["fold"], opt)
+    plt.savefig(save_results_to + file_name_res)
+    plt.close()
+
+    plt.figure(3)
+    plt.title(f'Add Back Factor')
+    plt.xlabel('Fold')
+    plt.ylabel('Add Back factor')
+    file_name_ab = 'fold_{}_ab.{}'.format(key["fold"], opt)
+    plt.savefig(save_results_to + file_name_ab)
+    plt.close()
+
+
+    print('Finished Fold graphs')
+
+    return True
