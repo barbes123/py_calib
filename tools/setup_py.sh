@@ -42,5 +42,15 @@ sudo ln -s $PWD/time_calib_zero.py /usr/local/bin/lut.add.zerota
 
 echo /usr/local/bin/lut.ab
 sudo unlink /usr/local/bin/lut.ab
-echo $PWD/py_addback.py
+echo $PY_CALIB/py_addback.py
 sudo ln -s $PY_CALIB/py_addback.py /usr/local/bin/lut.ab
+
+echo /usr/local/bin/lut.getdatafromserver
+sudo unlink /usr/local/bin/lut.getdatafromserver
+echo $PWD/get_web_json.py
+sudo ln -s $PWD/get_web_json.py /usr/local/bin/lut.getdatafromserver
+
+echo /usr/local/bin/lut.adddata2json
+sudo unlink /usr/local/bin/lut.adddata2json
+echo $PWD/add_data_to_json.py
+sudo ln -s $PWD/add_data_to_json.py /usr/local/bin/lut.adddata2json
