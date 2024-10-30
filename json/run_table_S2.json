@@ -1,513 +1,405 @@
 [
-      {
-        "runNumber": 157,
-        "start": "2024-10-15 17:31:45",
-        "stop": "1970-01-01 02:00:00",
-        "expName": "ES2",
-        "comment": "",
-        "source": "60Co",
-        "distance": ""
-    },
-    {
-        "runNumber": 156,
-        "start": "2024-10-11 11:48:15",
-        "stop": "2024-10-15 16:46:52",
-        "expName": "ES2",
-        "comment": "",
-        "source": "60Co",
-        "distance": ""
-    },     
-    {
-        "runNumber": 155,
-        "start": "2024-10-09 17:15:52",
-        "stop": "2024-11-09 11:32:00",
-        "expName": "ES2",
-        "comment": "",
-        "source": "60Co",
-        "distance": ""
-    },
-    {
-        "runNumber": 154,
-        "start": "2024-10-08 12:02:52",
-        "stop": "2024-10-09 17:12:12",
-        "expName": "ES2",
-        "comment": "",
-        "source": "BG",
-        "distance": ""
-    },
-    {
-        "runNumber": 153,
-        "start": "2024-10-08 11:52:05",
-        "stop": "2024-10-08 11:52:10",
-        "expName": "ES2",
-        "comment": "",
-        "source": "152Eu",
-        "distance": ""
-    },
-    {
-        "runNumber": 152,
-        "start": "2024-07-24 16:30:50",
-        "stop": "2024-07-29 10:22:37",
-        "expName": "ES2",
-        "comment": "",
-        "source": "152Eu",
-        "distance": ""
-    },
-    {
-        "runNumber": 151,
-        "start": "2024-07-23 10:39:30",
-        "stop": "2024-07-24 09:59:56",
-        "expName": "ES2",
-        "comment": "",
-        "source": "152Eu",
-        "distance": ""
-    },
-    {
-        "runNumber": 150,
-        "start": "2024-07-23 10:36:51",
-        "stop": "2024-07-23 10:38:53",
-        "expName": "ES2",
-        "comment": "",
-        "source": "152Eu",
-        "distance": ""
-    },
-    {
-        "runNumber": 149,
-        "start": "2024-07-23 10:32:33",
-        "stop": "2024-07-23 10:35:09",
-        "expName": "ES2",
-        "comment": "",
-        "source": "152Eu",
-        "distance": ""
-    },
-    {
-        "runNumber": 148,
-        "start": "2024-07-23 10:28:37",
-        "stop": "2024-07-23 10:30:04",
-        "expName": "ES2",
-        "comment": "",
-        "source": "152Eu",
-        "distance": ""
-    },
-    {
-        "runNumber": 147,
-        "start": "2024-05-27 16:17:53",
-        "stop": "2024-05-27 16:19:44",
-        "expName": "ES2",
-        "comment": "",
-        "source": "152Eu",
-        "distance": ""
-    },
-    {
-        "runNumber": 146,
-        "start": "2024-05-23 14:34:00",
-        "stop": "2024-05-24 10:13:09",
-        "expName": "ES2",
-        "comment": "",
-        "source": "152Eu",
-        "distance": ""
-    },
-    {
-        "runNumber": 145,
-        "start": "2024-05-21 17:02:41",
-        "stop": "2024-05-22 10:48:47",
-        "expName": "ES2",
-        "comment": "",
-        "source": "152Eu",
-        "distance": ""
-    },
-    {
-        "runNumber": 144,
-        "start": "2024-05-21 16:59:51",
-        "stop": "2024-05-21 17:00:47",
-        "expName": "ES2",
-        "comment": "",
-        "source": "152Eu",
-        "distance": ""
-    },
-    {
-        "runNumber": 143,
-        "start": "2024-05-21 15:00:11",
-        "stop": "2024-05-21 15:21:13",
-        "expName": "ES2",
-        "comment": "",
-        "source": "152Eu",
-        "distance": ""
-    },
-    {
-        "runNumber": 142,
-        "start": "2024-05-15 13:44:09",
-        "stop": "2024-05-17 12:51:31",
-        "expName": "ES2",
-        "comment": "",
-        "source": "152Eu",
-        "distance": ""
-    },
-    {
-        "runNumber": 141,
-        "start": "2024-04-29 11:35:30",
-        "stop": "2024-05-15 13:24:22",
-        "expName": "ES2",
-        "comment": "",
-        "source": "60Co",
-        "distance": ""
-    },
-    {
-        "runNumber": 140,
-        "start": "2024-04-26 13:24:58",
-        "stop": "2024-04-29 11:10:26",
-        "expName": "ES2",
-        "comment": "",
-        "source": "137Cs",
-        "distance": ""
-    },  
    {
-      "runNumber": 139,
-      "start": "2024-04-05 14:40:51",
-      "stop": "2024-04-05 16:51:58",
+      "runNumber": 158,
+      "start": "2024-10-28 11:22:50",
+      "stop": "2024-10-29 11:22:50",
       "expName": "ES2",
       "comment": "",
-      "source": "60Co",
+      "source": "152Eu",
       "distance": ""
    },
    {
-      "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
+      "runNumber": 157,
+      "start": "2024-10-15 17:31:45",
+      "stop": "2024-10-28 11:02:24",
       "expName": "ES2",
       "comment": "",
-      "source": null,
-      "distance": null
-   },
-   {
-      "runNumber": 138,
-      "start": "2024-04-01 15:53:54",
-      "stop": "2024-04-02 09:26:55",
-      "expName": "ES2",
-      "comment": "",
-      "source": "60Co",
+      "source": "152Eu",
       "distance": ""
    },
    {
-      "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
+      "runNumber": 156,
+      "start": "2024-10-11 11:48:15",
+      "stop": "2024-10-15 16:46:52",
       "expName": "ES2",
       "comment": "",
-      "source": null,
-      "distance": null
-   },
-   {
-      "runNumber": 137,
-      "start": "2024-04-01 15:46:52",
-      "stop": "2024-04-01 15:50:21",
-      "expName": "ES2",
-      "comment": "",
-      "source": "60Co",
+      "source": "152Eu",
       "distance": ""
    },
    {
-      "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
+      "runNumber": 155,
+      "start": "2024-10-09 17:15:52",
+      "stop": "1970-01-01 02:00:00",
       "expName": "ES2",
       "comment": "",
-      "source": null,
-      "distance": null
-   },
-   {
-      "runNumber": 136,
-      "start": "2024-04-01 15:43:55",
-      "stop": "2024-04-01 15:43:59",
-      "expName": "ES2",
-      "comment": "",
-      "source": "60Co",
+      "source": "152Eu",
       "distance": ""
    },
    {
-      "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
+      "runNumber": 154,
+      "start": "2024-10-08 12:02:52",
+      "stop": "2024-10-09 17:12:12",
       "expName": "ES2",
       "comment": "",
-      "source": null,
-      "distance": null
-   },
-   {
-      "runNumber": 135,
-      "start": "2024-04-01 15:43:24",
-      "stop": "2024-04-01 15:43:53",
-      "expName": "ES2",
-      "comment": "",
-      "source": "60Co",
+      "source": "152Eu",
       "distance": ""
    },
    {
-      "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
+      "runNumber": 153,
+      "start": "2024-10-08 11:52:05",
+      "stop": "2024-10-08 11:52:10",
       "expName": "ES2",
       "comment": "",
-      "source": null,
-      "distance": null
-   },
-   {
-      "runNumber": 134,
-      "start": "2024-03-29 11:35:03",
-      "stop": "2024-03-29 11:46:27",
-      "expName": "ES2",
-      "comment": "",
-      "source": "60Co",
+      "source": "152Eu",
       "distance": ""
    },
    {
-      "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
-      "expName": "ES2",
-      "comment": "",
-      "source": null,
-      "distance": null
-   },
-   {
-      "runNumber": 133,
-      "start": "2024-03-29 11:09:00",
-      "stop": "2024-03-29 11:15:03",
-      "expName": "ES2",
+      "runNumber": 38,
+      "start": "2023-05-15 15:13:30",
+      "stop": "2023-05-15 15:16:34",
+      "expName": "ES7",
       "comment": "",
       "source": "60Co",
-      "distance": ""
+      "distance": "99"
    },
    {
-      "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
-      "expName": "ES2",
+      "runNumber": 37,
+      "start": "2023-05-11 17:56:24",
+      "stop": "1970-01-01 02:00:00",
+      "expName": "ES7",
       "comment": "",
-      "source": null,
-      "distance": null
+      "source": "152Eu",
+      "distance": "99"
    },
    {
-      "runNumber": 132,
-      "start": "2024-03-29 10:18:52",
-      "stop": "2024-03-29 10:38:23",
-      "expName": "ES2",
+      "runNumber": 36,
+      "start": "2023-05-11 17:53:47",
+      "stop": "2023-05-11 17:54:21",
+      "expName": "ES7",
+      "comment": "",
+      "source": "152Eu",
+      "distance": "99"
+   },
+   {
+      "runNumber": 35,
+      "start": "2023-05-11 17:52:36",
+      "stop": "2023-05-11 17:52:59",
+      "expName": "ES7",
+      "comment": "",
+      "source": "152Eu",
+      "distance": "99"
+   },
+   {
+      "runNumber": 34,
+      "start": "2023-05-11 17:48:39",
+      "stop": "2023-05-11 17:49:39",
+      "expName": "ES7",
+      "comment": "",
+      "source": "152Eu",
+      "distance": "99"
+   },
+   {
+      "runNumber": 33,
+      "start": "2023-05-11 17:47:30",
+      "stop": "2023-05-11 17:47:38",
+      "expName": "ES7",
+      "comment": "",
+      "source": "152Eu",
+      "distance": "99"
+   },
+   {
+      "runNumber": 32,
+      "start": "2023-05-11 17:46:07",
+      "stop": "2023-05-11 17:46:15",
+      "expName": "ES7",
+      "comment": "",
+      "source": "152Eu",
+      "distance": "99"
+   },
+   {
+      "runNumber": 31,
+      "start": "2023-05-11 17:45:17",
+      "stop": "2023-05-11 17:46:04",
+      "expName": "ES7",
+      "comment": "",
+      "source": "152Eu",
+      "distance": "99"
+   },
+   {
+      "runNumber": 30,
+      "start": "2023-05-11 17:33:25",
+      "stop": "2023-05-11 17:43:56",
+      "expName": "ES7",
+      "comment": "",
+      "source": "152Eu",
+      "distance": "99"
+   },
+   {
+      "runNumber": 29,
+      "start": "2023-05-08 15:13:17",
+      "stop": "2023-05-08 15:17:15",
+      "expName": "ES7",
+      "comment": "",
+      "source": "152Eu",
+      "distance": "99"
+   },
+   {
+      "runNumber": 28,
+      "start": "2023-02-03 12:35:19",
+      "stop": "2023-02-03 12:35:25",
+      "expName": "ES7",
       "comment": "",
       "source": "60Co",
-      "distance": ""
+      "distance": "99"
    },
    {
-      "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
-      "expName": "ES2",
+      "runNumber": 27,
+      "start": "2022-09-05 11:45:14",
+      "stop": "2022-09-05 12:40:06",
+      "expName": "ES7",
+      "comment": "",
+      "source": "60Co",
+      "distance": "99"
+   },
+   {
+      "runNumber": 26,
+      "start": "2022-09-05 11:39:29",
+      "stop": "2022-09-05 11:44:30",
+      "expName": "ES7",
+      "comment": "",
+      "source": "60Co",
+      "distance": "99"
+   },
+   {
+      "runNumber": 25,
+      "start": "2022-09-05 11:15:49",
+      "stop": "2022-09-05 11:20:15",
+      "expName": "ES7",
+      "comment": "",
+      "source": "60Co",
+      "distance": "99"
+   },
+   {
+      "runNumber": 24,
+      "start": "2022-09-05 10:54:54",
+      "stop": "2022-09-05 11:12:05",
+      "expName": "ES7",
+      "comment": "",
+      "source": "60Co",
+      "distance": "99"
+   },
+   {
+      "runNumber": 23,
+      "start": "2022-09-05 09:50:45",
+      "stop": "2022-09-05 09:54:29",
+      "expName": "ES7",
+      "comment": "",
+      "source": "60Co",
+      "distance": "99"
+   },
+   {
+      "runNumber": 22,
+      "start": "2022-09-05 09:29:26",
+      "stop": "2022-09-05 09:29:44",
+      "expName": "ES7",
+      "comment": "",
+      "source": "60Co",
+      "distance": "99"
+   },
+   {
+      "runNumber": 21,
+      "start": "2022-09-05 09:24:57",
+      "stop": "2022-09-05 09:26:34",
+      "expName": "ES7",
+      "comment": "",
+      "source": "60Co",
+      "distance": "99"
+   },
+   {
+      "runNumber": 20,
+      "start": "2022-09-05 09:11:20",
+      "stop": "2022-09-05 09:12:10",
+      "expName": "ES7",
+      "comment": "",
+      "source": "60Co",
+      "distance": "99"
+   },
+   {
+      "runNumber": 19,
+      "start": "2022-09-05 09:10:03",
+      "stop": "2022-09-05 09:10:54",
+      "expName": "ES7",
+      "comment": "",
+      "source": "60Co",
+      "distance": "99"
+   },
+   {
+      "runNumber": 18,
+      "start": "2022-09-05 08:43:08",
+      "stop": "2022-09-05 08:52:43",
+      "expName": "ES7",
+      "comment": "",
+      "source": "60Co",
+      "distance": "99"
+   },
+   {
+      "runNumber": 17,
+      "start": "2022-09-05 08:06:53",
+      "stop": "2022-09-05 08:08:16",
+      "expName": "ES7",
+      "comment": "",
+      "source": "60Co",
+      "distance": "99"
+   },
+   {
+      "runNumber": 16,
+      "start": "2022-09-02 16:09:53",
+      "stop": "2022-09-02 16:12:56",
+      "expName": "ES7",
+      "comment": "",
+      "source": "60Co",
+      "distance": "99"
+   },
+   {
+      "runNumber": 15,
+      "start": "2022-09-02 13:37:39",
+      "stop": "1970-01-01 02:00:00",
+      "expName": "ES7",
+      "comment": "",
+      "source": null,
+      "distance": null
+   },
+   {
+      "runNumber": 14,
+      "start": "2022-09-02 11:57:26",
+      "stop": "1970-01-01 02:00:00",
+      "expName": "ES7",
+      "comment": "",
+      "source": null,
+      "distance": null
+   },
+   {
+      "runNumber": 13,
+      "start": "2022-09-02 11:16:44",
+      "stop": "2022-09-02 11:45:17",
+      "expName": "ES7",
+      "comment": "",
+      "source": null,
+      "distance": null
+   },
+   {
+      "runNumber": 12,
+      "start": "2022-09-02 11:16:33",
+      "stop": "2022-09-02 11:16:41",
+      "expName": "ES7",
+      "comment": "",
+      "source": null,
+      "distance": null
+   },
+   {
+      "runNumber": 11,
+      "start": "2022-08-31 14:03:04",
+      "stop": "2022-08-31 14:20:26",
+      "expName": "ES7",
+      "comment": "",
+      "source": null,
+      "distance": null
+   },
+   {
+      "runNumber": 10,
+      "start": "2022-08-31 13:09:24",
+      "stop": "2022-08-31 13:14:35",
+      "expName": "ES7",
+      "comment": "",
+      "source": null,
+      "distance": null
+   },
+   {
+      "runNumber": 9,
+      "start": "2022-08-30 14:38:15",
+      "stop": "2022-08-30 14:54:59",
+      "expName": "ES7",
+      "comment": "",
+      "source": null,
+      "distance": null
+   },
+   {
+      "runNumber": 8,
+      "start": "2022-08-30 13:21:19",
+      "stop": "2022-08-30 13:34:13",
+      "expName": "ES7",
+      "comment": "",
+      "source": null,
+      "distance": null
+   },
+   {
+      "runNumber": 7,
+      "start": "2022-08-30 12:47:16",
+      "stop": "2022-08-30 13:19:03",
+      "expName": "ES7",
+      "comment": "",
+      "source": null,
+      "distance": null
+   },
+   {
+      "runNumber": 6,
+      "start": "2022-08-30 12:36:19",
+      "stop": "1970-01-01 02:00:00",
+      "expName": "ES7",
       "comment": "",
       "source": null,
       "distance": null
    },
    {
       "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
-      "expName": "ES2",
+      "start": "2022-08-30 12:25:13",
+      "stop": "2022-08-30 12:26:03",
+      "expName": "ES7",
       "comment": "",
       "source": null,
       "distance": null
    },
    {
-      "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
-      "expName": "ES2",
+      "runNumber": 4,
+      "start": "2022-08-30 11:14:40",
+      "stop": "1970-01-01 02:00:00",
+      "expName": "ES7",
       "comment": "",
       "source": null,
       "distance": null
    },
    {
-      "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
-      "expName": "ES2",
+      "runNumber": 3,
+      "start": "2022-08-29 09:54:26",
+      "stop": "2022-08-29 10:00:44",
+      "expName": "ES7",
       "comment": "",
       "source": null,
       "distance": null
    },
    {
-      "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
-      "expName": "ES2",
+      "runNumber": 2,
+      "start": "2022-08-18 16:59:42",
+      "stop": "1970-01-01 02:00:00",
+      "expName": "ES7",
       "comment": "",
       "source": null,
       "distance": null
    },
    {
-      "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
-      "expName": "ES2",
+      "runNumber": 1,
+      "start": "2022-08-18 16:59:20",
+      "stop": "1970-01-01 02:00:00",
+      "expName": "ES7",
       "comment": "",
       "source": null,
       "distance": null
    },
    {
-      "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
-      "expName": "ES2",
-      "comment": "",
-      "source": null,
-      "distance": null
-   },
-   {
-      "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
-      "expName": "ES2",
-      "comment": "",
-      "source": null,
-      "distance": null
-   },
-   {
-      "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
-      "expName": "ES2",
-      "comment": "",
-      "source": null,
-      "distance": null
-   },
-   {
-      "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
-      "expName": "ES2",
-      "comment": "",
-      "source": null,
-      "distance": null
-   },
-   {
-      "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
-      "expName": "ES2",
-      "comment": "",
-      "source": null,
-      "distance": null
-   },
-   {
-      "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
-      "expName": "ES2",
-      "comment": "",
-      "source": null,
-      "distance": null
-   },
-   {
-      "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
-      "expName": "ES2",
-      "comment": "",
-      "source": null,
-      "distance": null
-   },
-   {
-      "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
-      "expName": "ES2",
-      "comment": "",
-      "source": null,
-      "distance": null
-   },
-   {
-      "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
-      "expName": "ES2",
-      "comment": "",
-      "source": null,
-      "distance": null
-   },
-   {
-      "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
-      "expName": "ES2",
-      "comment": "",
-      "source": null,
-      "distance": null
-   },
-   {
-      "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
-      "expName": "ES2",
-      "comment": "",
-      "source": null,
-      "distance": null
-   },
-   {
-      "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
-      "expName": "ES2",
-      "comment": "",
-      "source": null,
-      "distance": null
-   },
-   {
-      "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
-      "expName": "ES2",
-      "comment": "",
-      "source": null,
-      "distance": null
-   },
-   {
-      "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
-      "expName": "ES2",
-      "comment": "",
-      "source": null,
-      "distance": null
-   },
-   {
-      "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
-      "expName": "ES2",
-      "comment": "",
-      "source": null,
-      "distance": null
-   },
-   {
-      "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
-      "expName": "ES2",
-      "comment": "",
-      "source": null,
-      "distance": null
-   },
-   {
-      "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
-      "expName": "ES2",
-      "comment": "",
-      "source": null,
-      "distance": null
-   },
-   {
-      "runNumber": 5,
-      "start": "2021-09-07 12:18:20",
-      "stop": "2021-09-07 12:18:25",
-      "expName": "ES2",
+      "runNumber": 0,
+      "start": "1970-01-01 02:00:00",
+      "stop": "1970-01-01 02:00:00",
+      "expName": "ES7",
       "comment": "",
       "source": null,
       "distance": null

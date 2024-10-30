@@ -23,13 +23,8 @@ sys.path.insert(1, '{}/lib'.format(ourpath))
 
 from libCalib1 import TIsotope as TIso
 from libCalib1 import TMeasurement as Tmeas
-from libPlotEliade import PlotJsonFold as PlotFold
-# from libPlotEliade import PlotJsondom as PlotDomain
-# from libPlotEliade import PlotJsonclover as PlotClover
-# from libPlotEliade import PlotCeBr
-# from libPlotEliade import PlotJsoncore as PlotCore
-# from libPlotEliade import PlotCalibration
-# from libPlotEliade import PlotCalibrationCeBr
+# from libPlotEliade import PlotJsonFold as PlotFold
+from libPlotAddBack import PlotJsonFold as PlotFold
 from TRecallEner import TRecallEner
 from libSettings import SetUpRecallEner
 from libSettings import SetUpRecallEnerFromJson
@@ -286,19 +281,7 @@ def main():
     #j_data = load_json('json/run_table.json')
     j_data = load_json('{}/json/run_table_S{}.json'.format(ourpath, my_params.server))
     global j_lut
-    # j_lut = load_json('{}/{}'.format(ourpath, lutfile))
-    # global  j_lut_recall
-    # j_lut_recall = load_json('{}/{}'.format(ourpath, lutreallener))
 
-    # MakeSymLink('HPGe.spe','mDelila_raw_py_1.spe')
-    # MakeSymLink('SEG.spe','mDelila_raw_py_2.spe')
-    # MakeSymLink('LaBr.spe','mDelila_raw_py_3.spe')
-
-    # MakeSymLink('HPGe.spe','{}_py_1.spe'.format(prefix))
-    # MakeSymLink('SEG.spe', '{}_py_2.spe'.format(prefix))
-    # MakeSymLink('LaBr.spe','{}_py_3.spe'.format(prefix))
-
-    # print('Printing source table')
     print('my_params.run', my_params.runnbr)
 
     my_run = Tmeas(None,None,None,None,None,None)
@@ -317,15 +300,6 @@ def main():
     n_decays_int = my_source.GetNdecays(my_run.tstart, my_run.tstop)
     print(my_source.__str__())
     print('sum {}; err {}; int {}'.format(n_decays_sum, n_decays_err, n_decays_int))
-
-    # blBackGround = False
-    # print('!!!!!!',my_params.bg)
-    # if my_params.bg > 0:
-    #     blBackGround = True
-
-    # print('Gammas ', j_sources['Co60']['gammas'])
-    # global myCurrentSetting
-    # myCurrentSetting = TRecallEner(800,1200,100,4, 200, 1500)
 
     for domain in range (my_params.dom1, my_params.dom2+1):
         current_det = 0
@@ -353,11 +327,15 @@ def main():
             else:
                 src = my_source.name
 
+            fit_limits = [500,1600]
+
             if '60Co' in src:
                 src = '60Co'
+            if '152Eu' in src:
+                fit_limits = [50,1600]
 
             # command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly1 -v 2'.format(path, current_file, src, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
-            command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly1 -v 2'.format(path, current_file, src,500, 1600, 3, 1000)
+            command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly1 -v 2'.format(path, current_file, src,fit_limits[0], fit_limits[1], 3, 1000)
             print('{}'.format(command_line))
             if debug:
                 print('I am ready to do fit for domain {} : '.format(domain))
@@ -415,32 +393,12 @@ def main():
                 source = '60Co'
 
             # print(js_tab)
-            PlotFold(js_tab,j_sources,my_source.name,1,my_params.grType)
-
-            # print('my_source.name ', my_source.name, ' ', source)
-            # print(j_sources)
-            # PlotDomain(js_tab, j_sources, my_source.name, j_lut, my_params.grType)
-            #
-            #
-            # PlotClover(js_tab, j_sources, my_source.name, 1, j_lut, my_params.grType)
-            # PlotClover(js_tab, j_sources, source, 2, j_lut, my_params.grType)
-            #
-            # PlotCore(js_tab, j_sources, my_source.name, j_lut, 1, my_params.grType)
-            # PlotCalibration(js_tab, j_sources, my_source.name, j_lut, 1, my_params.grType)
-            # PlotCalibration(js_tab, j_sources, my_source.name, j_lut, 2, my_params.grType)
-            #
-            # PlotCeBr(js_tab, j_sources, my_source.name, 3, j_lut, my_params.grType)
-            # PlotCalibrationCeBr(js_tab, j_sources, my_source.name, j_lut, 3, my_params.grType)
-
-
-
-    # global j_res
-    # with open('{}calib_res_{}.json'.format(datapath, my_run.run), 'r') as ifile:
-        # j_res = json.load(ifile)
+            # PlotFold(js_tab,j_sources,my_source.name,1,my_params.grType)
+            PlotFold(js_tab,j_sources,my_source.name,my_params)
 
 if __name__ == "__main__":
-    dom1 = 100
-    dom2 = 109
+    dom1 = 1
+    dom2 = 4
     server = 9
     runnbr = 63
     det_type = 0
