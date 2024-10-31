@@ -1,3 +1,14 @@
+***** ***THIS PAGE IS OBSOLIT*** *****
+
+MANUALS WERE MOVER TO A SEPARATE REPOSITORY
+
+    https://github.com/barbes123/EliadeManual/wiki
+
+
+
+
+
+
 ELIADE DAQ&CALIBRATION 
 by Teodora Sebe (2024)
 
