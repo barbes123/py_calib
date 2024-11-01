@@ -17,7 +17,7 @@ def MakeDir(path):
         print("The new directory {} is created!".format(path))
 
 opt = 'jpg'
-# opt = 'eps'
+opt = 'eps'
 
 # ourpath = '/data10/live/IT/py_calib'
 ourpath = os.getenv('PY_CALIB')
@@ -41,8 +41,8 @@ list_of_cebr = {"CEBR1","CEBR2","CEBR3","CEBR4"}
 
 
 
-f60Co = '/data10/data/eliade/addback/addback_run_157_999_eliadeS2/addback_157.json'
-f152Eu = '/data10/data/eliade/addback/addback_run_158_999_eliadeS2/addback_158.json'
+f60Co = '/data10/data/eliade/addback/s2/addback_run_157_999_eliadeS2/addback_157.json'
+f152Eu = '/data10/data/eliade/addback/s2/addback_run_158_999_eliadeS2/addback_158.json'
 
 run60Co = f60Co.split('addback_run_')[1].split('_')[0]
 run152Eu = f152Eu.split('addback_run_')[1].split('_')[0]

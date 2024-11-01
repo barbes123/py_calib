@@ -40,10 +40,10 @@ sudo unlink /usr/local/bin/lut.add.zerota
 echo $PWD/time_calib_zero.py
 sudo ln -s $PWD/time_calib_zero.py /usr/local/bin/lut.add.zerota
 
-echo /usr/local/bin/lut.ab
-sudo unlink /usr/local/bin/lut.ab
+echo /usr/local/bin/ab
+sudo unlink /usr/local/bin/ab
 echo $PY_CALIB/py_addback.py
-sudo ln -s $PY_CALIB/py_addback.py /usr/local/bin/lut.ab
+sudo ln -s $PY_CALIB/py_addback.py /usr/local/bin/ab
 
 echo /usr/local/bin/lut.getdatafromserver
 sudo unlink /usr/local/bin/lut.getdatafromserver
