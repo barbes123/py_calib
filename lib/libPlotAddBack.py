@@ -23,9 +23,10 @@ global save_results_to
 # save_results_to = '/home/rmiron/Desktop/dir/python_exercises/calibrations/figures/'
 save_results_to = '{}figures/'.format(datapath)
 title_clover = ''
-list_of_clovers = {"CL29", "CL30", "CL31", "CL32", "CL33", "CL34", "CL35", "CL36", "HPGe", "SEG", "LaBr"}
-list_of_sources = {'60Co','60CoWeak', '152Eu','137Cs', '133Ba'}
-list_of_cebr = {"CEBR1","CEBR2","CEBR3","CEBR4"}
+# list_of_clovers = {"CL29", "CL30", "CL31", "CL32", "CL33", "CL34", "CL35", "CL36", "HPGe", "SEG", "LaBr"}
+# list_of_sources = {'60Co','60CoWeak', '152Eu','137Cs', '133Ba'}
+# list_of_cebr = {"CEBR1","CEBR2","CEBR3","CEBR4"}
+from libLists import list_of_sources
 
 #res and eff vs ener for each domain
 
@@ -90,6 +91,30 @@ def PlotJsonFold(data, gammatab, source, pars):
                         print('Fold addback Plot failed')
                         continue  # print("Energy {} missing from domain {}".format(key[source][element], key["domain"]))
 
+    plt.figure(1)
+    plt.title(f'Efficiency Fold Spectra')
+    plt.xlabel('Fold')
+    plt.ylabel('Efficiency, %')
+    file_name_eff = 'fold_{}_eff.{}'.format(key["fold"], opt)
+    plt.savefig(save_results_to + file_name_eff)
+    plt.close()
+
+    plt.figure(2)
+    plt.title(f'Resolution for Fold Spectra')
+    plt.xlabel('Fold')
+    plt.ylabel('Resolution, keV')
+    file_name_res = 'fold_{}_res.{}'.format(key["fold"], opt)
+    plt.savefig(save_results_to + file_name_res)
+    plt.close()
+
+    plt.figure(3)
+    plt.title(f'Add Back Factor')
+    plt.xlabel('Fold')
+    plt.ylabel('Add Back factor')
+    file_name_ab = 'fold_{}_ab.{}'.format(key["fold"], opt)
+    plt.savefig(save_results_to + file_name_ab)
+    plt.close()
+
     #Plot AB(Eg)
     palette_size = len(data)+1
     cmap = plt.cm.cividis  # You can use other colormaps like 'viridis', 'plasma', 'cividis', etc.
@@ -120,6 +145,12 @@ def PlotJsonFold(data, gammatab, source, pars):
                     except:
                         print('Resolution vs Energy Plot All failed')
                         continue
+                    plt.figure(6)
+                    try:
+                        plt.scatter(x=float(element), y=key[source][element]["eff"], color=cc)
+                    except:
+                        print('Eff vs Energy Plot All failed')
+                        continue
                     if key['fold'] == 1:
                         continue
                     plt.figure(5)
@@ -128,19 +159,13 @@ def PlotJsonFold(data, gammatab, source, pars):
                     except:
                         print('Addback vs Energy Plot All failed')
                         continue
-                    plt.figure(6)
-                    try:
-                        plt.scatter(x=float(element), y=key[source][element]["eff"], color=cc)
-                    except:
-                        print('Eff vs Energy Plot All failed')
-                        continue
         if key['fold'] > 1:
             plt.figure(5)
             plt.scatter(x=float(element), y=key[source][element]["addback"], color=cc, label='Fold {}'.format(key['fold']))
             plt.legend(loc='upper left', fontsize='medium', shadow=False)
-            plt.figure(6)
-            plt.scatter(x=float(element), y=key[source][element]["eff"], color=cc,label='Fold {}'.format(key['fold']))
-            plt.legend(loc='upper left', fontsize='medium', shadow=False)
+        plt.figure(6)
+        plt.scatter(x=float(element), y=key[source][element]["eff"], color=cc,label='Fold {}'.format(key['fold']))
+        plt.legend(loc='upper left', fontsize='medium', shadow=False)
         plt.figure(7)
         plt.scatter(x=float(element), y=key[source][element]["res"], color=cc, label='Fold {}'.format(key['fold']))
         plt.legend(loc='upper left', fontsize='medium', shadow=False)
@@ -151,31 +176,6 @@ def PlotJsonFold(data, gammatab, source, pars):
     plt.ylabel('PT')
     file_name_pt = 'fold_{}_peaktotal.{}'.format(key["fold"], opt)
     plt.savefig(save_results_to + file_name_pt)
-    plt.close()
-
-
-    plt.figure(1)
-    plt.title(f'Efficiency Fold Spectra')
-    plt.xlabel('Fold')
-    plt.ylabel('Efficiency, %')
-    file_name_eff = 'fold_{}_eff.{}'.format(key["fold"], opt)
-    plt.savefig(save_results_to + file_name_eff)
-    plt.close()
-
-    plt.figure(2)
-    plt.title(f'Resolution for Fold Spectra')
-    plt.xlabel('Fold')
-    plt.ylabel('Resolution, keV')
-    file_name_res = 'fold_{}_res.{}'.format(key["fold"], opt)
-    plt.savefig(save_results_to + file_name_res)
-    plt.close()
-
-    plt.figure(3)
-    plt.title(f'Add Back Factor')
-    plt.xlabel('Fold')
-    plt.ylabel('Add Back factor')
-    file_name_ab = 'fold_{}_ab.{}'.format(key["fold"], opt)
-    plt.savefig(save_results_to + file_name_ab)
     plt.close()
 
     plt.figure(5)

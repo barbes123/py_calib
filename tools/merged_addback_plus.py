@@ -34,19 +34,31 @@ MakeDir(save_results_to)
 
 
 list_of_clovers = {"CL29", "CL30", "CL31", "CL32", "CL33", "CL34", "CL35", "CL36", "HPGe", "SEG", "LaBr"}
-list_of_sources = {'60Co','60CoWeak', '152Eu','137Cs', '133Ba'}
+list_of_sources = {'60Co','60CoWeak', '152Eu','137Cs', '133Ba','22Na'}
+list_of_sources_presented = []
 list_of_cebr = {"CEBR1","CEBR2","CEBR3","CEBR4"}
 list_of_data = {}
+js_all =[]
 
-
-
-def MergeJsonData(js60Co, js152Eu, meta_data):
+def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, meta_data=''):
+# def MergeJsonData(js60Co, js152Eu, meta_data):
     js_new=[]
     for i in range(0,len(js152Eu)):
         js_element = {}
         js_element['fold'] = i+1
-        js_element['60Co'] = js60Co[i]['60Co']
-        js_element['152Eu'] = js152Eu[i]['152Eu']
+        try:
+            js_element['60Co'] = js60Co[i]['60Co']
+        except:
+            pass
+        try:
+            js_element['152Eu'] = js152Eu[i]['152Eu']
+        except:
+            pass
+        try:
+            js_element['22Na'] = js22Na[i]['22Na']
+        except:
+            print('22Na no file')
+            pass
         js_new.append(js_element)
 
     with open('merged.json','w') as ofile:
@@ -59,19 +71,26 @@ def MergeJsonData(js60Co, js152Eu, meta_data):
     cmap2 = plt.cm.cividis  # You can use other colormaps like 'viridis', 'plasma', 'cividis', etc.
     my_colors2 = [cmap2(i / palette_size) for i in range(palette_size)]
 
+    cmap3 = plt.cm.viridis  # You can use other colormaps like 'viridis', 'plasma', 'cividis', etc.
+    my_colors3 = [cmap3(i / palette_size) for i in range(palette_size)]
+
 
     color60Co = []
     color152Eu = []
+    color22Na = []
     colors = {}
 
     for i in range (1,5):
         color1 = my_colors1[i]
         color2 = my_colors2[i]
+        color3 = my_colors3[i]
         color60Co.append(color1)
         color152Eu.append(color2)
+        color22Na.append(color3)
 
     colors['152Eu'] = color152Eu
     colors['60Co'] = color60Co
+    colors['22Na'] = color22Na
 
     index = 0
     for index in range (0,len(js_new)):
@@ -131,6 +150,9 @@ def MergeJsonData(js60Co, js152Eu, meta_data):
 
 def main():
     meta = ''
+    js60Co = None
+    js152Eu = None
+    js22Na = None
     list_of_names = {}
     for el in list_of_data:
         # print(list_of_data[el])
@@ -138,21 +160,48 @@ def main():
         meta = meta + 'run_' + list_of_data[el][1]+'_S'+ list_of_data[el][0] + '_' + el + ' '
         list_of_names[el] = name
 
+        print('file name', name)
+
         if el == '60Co':
             with open(name, 'r') as file:
                 js60Co = json.load(file)
+                list_of_sources_presented.append(el)
+                js = {}
+                js[el] = js60Co
+                js_all.append(js)
         elif el == '152Eu':
             with open(name, 'r') as file:
                 js152Eu = json.load(file)
+                list_of_sources_presented.append(el)
+                js = {}
+                js[el] = js152Eu
+                js_all.append(js)
+        elif el == '22Na':
+            with open(name, 'r') as file:
+                js22Na = json.load(file)
+                list_of_sources_presented.append(el)
+                js = {}
+                js[el] = js22Na
+                js_all.append(js)
+        # print(js_all['152Eu'])
 
 
 
         print(list_of_data[el], name)
+
+    # sys.exit()
+    with open('temp.json', 'w') as ofile:
+        js_temp = json.dump(js_all, ofile, indent=3, default=str)
+    with open('temp.json', 'r') as ifile:
+        js_tab = json.load(ifile)
+    print(js_tab)
+    # print(js_tab['152Eu'])
+
     print(meta)
     print(list_of_names)
 
 
-    MergeJsonData(js60Co, js152Eu, meta)
+    MergeJsonData(js60Co, js152Eu, js22Na, meta)
 
 if __name__ == "__main__":
 
@@ -190,7 +239,7 @@ if __name__ == "__main__":
                 pass
         elif el == '22Na':
             try:
-                parsed22Na = config.data22Na
+                list_of_data[el] = config.data22Na
             except:
                 pass
     main()

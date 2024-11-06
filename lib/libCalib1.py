@@ -5,10 +5,11 @@ import numpy as np
 import math
 from scipy.integrate import quad
 import inspect
+from libLists import list_of_sources
 
 time_format = "%Y-%m-%d %H:%M:%S"
 
-list_of_sources = {'60Co','60CoWeak', '152Eu','137Cs', '133Ba', '252Cf'}
+# list_of_sources = {'60Co','60CoWeak', '152Eu','137Cs', '133Ba', '54Mn','22Na','252Cf'}
 
 class TIsotope:
     def __init__(self, name, t12, date0, a0):
@@ -119,6 +120,7 @@ class TMeasurement:
                     self.source = runnbr['source']
                 else:
                     self.source = "60Co"
+                    print('The source is not recognized, default 60Co will be used')
                 print('The source from data: ', runnbr['source'])
                 # self.source = '60Co'
             # if runnbr['source'] is None:

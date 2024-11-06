@@ -29,6 +29,9 @@ from TRecallEner import TRecallEner
 from libSettings import SetUpRecallEner
 from libSettings import SetUpRecallEnerFromJson
 from utilities import *
+from libLists import list_of_sources
+from libLists import lists_of_gamma_background
+
 
 current_directory = os.getcwd()
 
@@ -41,7 +44,7 @@ else:
 
 print('Path to RecalEnergy {}'.format(path))
 save_results_to = 'figures/'
-list_of_sources = {'60Co','60CoWeak', '152Eu','137Cs', '133Ba'}
+# list_of_sources = {'60Co','60CoWeak', '152Eu','137Cs', '133Ba', '54Mn','22Na'}
 
 
 print('Data path: ', datapath)
@@ -333,6 +336,22 @@ def main():
                 src = '60Co'
             if '152Eu' in src:
                 fit_limits = [50,1600]
+            if '22Na' in src:
+                fit_limits = [400,1400]
+                # print('Source 22Na')
+
+            source4Fit = my_source.name
+            if '60Co' in source4Fit:
+                source4Fit = '60Co'
+            src = source4Fit
+            if my_params.bg == 1:
+                src = '{}'.format(source4Fit)
+                for gamma in lists_of_gamma_background:
+                    src = src + ' -ener {}'.format(gamma)
+
+
+
+
 
             # command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly1 -v 2'.format(path, current_file, src, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
             command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly1 -v 2'.format(path, current_file, src,fit_limits[0], fit_limits[1], 3, 1000)
@@ -421,7 +440,7 @@ if __name__ == "__main__":
                         help="type of detector to be calibrated; default = 0".format(det_type))
     parser.add_argument("-b", "--background",
                         dest="bg", default=bg, type=int,
-                        help="to take in energy calib background lines; default = {}".format(bg))
+                        help="to take in energy calib background lines (1); default = {}".format(bg))
     parser.add_argument("-gr", "--graphic type: eps, jpg or none ",
                         dest="grType", default=grType, type=str, choices=('eps', 'jpeg', 'jpg', 'png', 'svg', 'svgz', 'tif', 'tiff', 'webp','none'),
                         # eps, jpeg, jpg, pdf, pgf, png, ps, raw, rgba, svg, svgz, tif, tiff, webp

@@ -33,6 +33,7 @@ from TRecallEner import TRecallEner
 from libSettings import SetUpRecallEner
 from libSettings import SetUpRecallEnerFromJson
 from utilities import *
+from libLists import lists_of_gamma_background
 
 current_directory = os.getcwd()
 
@@ -170,6 +171,17 @@ def ProcessFitDataStr(dom, my_source, lines, j_src, j_lut ):
                 peak.errIntensity = j_src[my_source]['gammas'][gamma][2] #absolute or relative ?
                 PeakList.append(peak)
                 # peak.__str__()
+        if my_params.bg == 1:
+            for gamma_bg in lists_of_gamma_background:
+                if gamma_bg in word:
+                    print('Found BG ', gamma_bg, ' ', word)
+                    numbers = [s for s in word.split(' ') if s]
+                    peak = TPeak(dom, numbers)
+                    # peak.Intensity = j_src[my_source]['gammas'][gamma][1]
+                    # peak.errIntensity = j_src[my_source]['gammas'][gamma][2]  # absolute or relative ?
+                    PeakList.append(peak)
+                    # print('peak',peak)
+                    # sys.exit()
 
     if len(PeakList) == 0:
         print('ProcessFitDataStr::: no peaks were found for dom {}'.format(dom))
@@ -183,6 +195,7 @@ def FillResults2json(dom, list, cal):
     jsondata = {}
     content = {}
     source = {}
+    source_bg = {}
     jsondata['domain'] = dom
 
 
@@ -193,6 +206,8 @@ def FillResults2json(dom, list, cal):
 
     peaksum = 0
     for peak in list:
+        if peak.Etable in lists_of_gamma_background:
+            continue
         content = {}
         content['eff'] = peak.area/(n_decays_int*peak.Intensity)  *100
         if peak.area and n_decays_int:
@@ -201,7 +216,7 @@ def FillResults2json(dom, list, cal):
             except: 
                 content['err_eff'] = 0
         #print(n_decays_sum, 'this is sum of decays')
-        content['res'] = peak.fwhm/peak.pos_ch*float(peak.  Etable)
+        content['res'] = peak.fwhm/peak.pos_ch*float(peak.Etable)
         content['err_res'] = 0.1
         content['pos_ch'] = peak.pos_ch
         # jsondata[peak.Etable] = content
@@ -211,10 +226,8 @@ def FillResults2json(dom, list, cal):
         # print(source)
         # print(source[peak.Etable])
         # print('Dump to json peak: {} {} {}'.format(source[peak.Etable].Etable, source[peak.Etable].pos_ch, source[peak.Etable].fwhm))
-
     if debug == True:
         print('source {}'.format(source))
-
 
     jsondata['PT'] = peaksum/total
     if peaksum and total:
@@ -226,18 +239,22 @@ def FillResults2json(dom, list, cal):
 
     jsondata[my_source.name] = source
 
+    if my_params.bg == 1:
+        for peak_bg in list:
+            # print('ffff',type(peak_bg.Etable),peak_bg.Etable)
+            if peak_bg.Etable in lists_of_gamma_background:
+                print('BACK', peak_bg.pos_ch, peak_bg.fwhm)
+                content = {}
+                content['res'] = peak_bg.fwhm / peak_bg.pos_ch * float(peak_bg.Etable)
+                content['err_res'] = 0.1
+                content['pos_ch'] = peak_bg.pos_ch
+                source_bg[str(peak_bg.Etable)] = content
+        jsondata['bg'] = source_bg
+
     list_results.append(jsondata)
     if debug == True:
         print(list_results)
     return True
-
-# def load_json(file):
-#     fname = '{}'.format(file)
-#     if not file_exists(fname):
-#         print('load_json:: file {} is not found as called from {}'.format(file, inspect.stack()[1].function))
-#         sys.exit()
-#     with open(fname,'r') as myfile:
-#         return json.load(myfile)
 
 def SumAsci(file):
     sum = 0
@@ -350,11 +367,16 @@ def main():
         # current_file = '{}mDelila_raw_py_{}.spe'.format(datapath, domain)
 
         if file_exists(current_file):
+            source4Fit = my_source.name
+            if '60Co' in source4Fit:
+                source4Fit = '60Co'
             # if blBackGround:
+
+            src = source4Fit
             if my_params.bg == 1:
-                src = '{} -ener 1460.82 -ener 2614.51'.format(my_source.name)
-            else:
-                src = my_source.name
+                src = '{}'.format(source4Fit)
+                for gamma in lists_of_gamma_background:
+                    src = src + ' -ener {}'.format(gamma)
 
             # print(prefix)
             # sys.exit()
@@ -362,8 +384,6 @@ def main():
             # command_line = '{} -spe {} -{} -ener {} -ener {} -lim {} {} -fmt A 16384 -dwa {} {} -poly2 -v 2'.format(path, current_file, my_source.name,'1460.82','2614.51', myCurrentSetting.limDown, myCurrentSetting.limUp, 2., myCurrentSetting.ampl)
             #command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly2 -v 2'.format(path, current_file, src, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
 
-            if '60Co' in src:
-                src = '60Co'
 
             command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly1 -v 2'.format(path, current_file, src, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
             print('{}'.format(command_line))
@@ -373,7 +393,7 @@ def main():
             result_scr = subprocess.run(['{}'.format(command_line)], shell=True, capture_output=True)
             # print(result_scr)
             fitdata = result_scr.stdout.decode()
-            # print(fitdata)
+            print(fitdata)
             global total
             #total = SumAsci(current_file)
             total = SumAsciLimits(current_file, myCurrentSetting.limStart, myCurrentSetting.limStop)
@@ -445,7 +465,7 @@ if __name__ == "__main__":
                         help="type of detector to be calibrated; default = 0".format(det_type))
     parser.add_argument("-b", "--background",
                         dest="bg", default=bg, type=int,
-                        help="to take in energy calib background lines; default = {}".format(bg))
+                        help="to take in energy calib background lines (1); default = {}".format(bg))
     parser.add_argument("-gr", "--graphic type: eps, jpg or none ",
                         dest="grType", default=grType, type=str, choices=('eps', 'jpeg', 'jpg', 'png', 'svg', 'svgz', 'tif', 'tiff', 'webp','none'),
                         # eps, jpeg, jpg, pdf, pgf, png, ps, raw, rgba, svg, svgz, tif, tiff, webp

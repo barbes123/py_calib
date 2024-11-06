@@ -54,3 +54,8 @@ echo /usr/local/bin/lut.adddata2json
 sudo unlink /usr/local/bin/lut.adddata2json
 echo $PWD/add_data_to_json.py
 sudo ln -s $PWD/add_data_to_json.py /usr/local/bin/lut.adddata2json
+
+echo /usr/local/bin/ab.merge
+sudo unlink /usr/local/bin/ab.merge
+echo $PWD/merged_addback_plus.py
+sudo ln -s $PWD/merged_addback_plus.py /usr/local/bin/ab.merge
