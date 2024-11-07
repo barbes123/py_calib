@@ -32,15 +32,17 @@ datapath = '{}/'.format(current_directory)
 save_results_to = '{}/figures/'.format(datapath)
 MakeDir(save_results_to)
 
+# from ../lib/libLists import list_of_sources
+
 
 list_of_clovers = {"CL29", "CL30", "CL31", "CL32", "CL33", "CL34", "CL35", "CL36", "HPGe", "SEG", "LaBr"}
-list_of_sources = {'60Co','60CoWeak', '152Eu','137Cs', '133Ba','22Na'}
+list_of_sources = {'60Co','60CoWeak', '152Eu','137Cs', '133Ba','22Na','54Mn'}
 list_of_sources_presented = []
 list_of_cebr = {"CEBR1","CEBR2","CEBR3","CEBR4"}
 list_of_data = {}
 js_all =[]
 
-def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, meta_data=''):
+def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=None, meta_data=''):
 # def MergeJsonData(js60Co, js152Eu, meta_data):
     js_new=[]
     for i in range(0,len(js152Eu)):
@@ -58,6 +60,15 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, meta_data=''):
             js_element['22Na'] = js22Na[i]['22Na']
         except:
             print('22Na no file')
+        try:
+            js_element['54Mn'] = js54Mn[i]['54Mn']
+        except:
+            print('54Mn no file')
+            pass
+        try:
+            js_element['137Cs'] = js137Cs[i]['137Cs']
+        except:
+            print('137Cs no file')
             pass
         js_new.append(js_element)
 
@@ -78,6 +89,8 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, meta_data=''):
     color60Co = []
     color152Eu = []
     color22Na = []
+    color54Mn = []
+    color137Cs = []
     colors = {}
 
     for i in range (1,5):
@@ -87,10 +100,14 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, meta_data=''):
         color60Co.append(color1)
         color152Eu.append(color2)
         color22Na.append(color3)
+        color54Mn.append(color1)
+        color137Cs.append(color1)
 
     colors['152Eu'] = color152Eu
     colors['60Co'] = color60Co
     colors['22Na'] = color22Na
+    colors['54Mn'] = color54Mn
+    colors['137Cs'] = color137Cs
 
     index = 0
     for index in range (0,len(js_new)):
@@ -153,6 +170,7 @@ def main():
     js60Co = None
     js152Eu = None
     js22Na = None
+    js137Cs = None
     list_of_names = {}
     for el in list_of_data:
         # print(list_of_data[el])
@@ -160,7 +178,7 @@ def main():
         meta = meta + 'run_' + list_of_data[el][1]+'_S'+ list_of_data[el][0] + '_' + el + ' '
         list_of_names[el] = name
 
-        print('file name', name)
+        print('{} file name: '.format(el), name)
 
         if el == '60Co':
             with open(name, 'r') as file:
@@ -183,25 +201,38 @@ def main():
                 js = {}
                 js[el] = js22Na
                 js_all.append(js)
+        elif el == '54Mn':
+            with open(name, 'r') as file:
+                js54Mn = json.load(file)
+                list_of_sources_presented.append(el)
+                js = {}
+                js[el] = js54Mn
+                js_all.append(js)
+        elif el == '137Cs':
+            with open(name, 'r') as file:
+                js137Cs = json.load(file)
+                list_of_sources_presented.append(el)
+                js = {}
+                js[el] = js137Cs
+                js_all.append(js)
         # print(js_all['152Eu'])
 
 
 
-        print(list_of_data[el], name)
+        # print(list_of_data[el], name)
 
     # sys.exit()
-    with open('temp.json', 'w') as ofile:
-        js_temp = json.dump(js_all, ofile, indent=3, default=str)
-    with open('temp.json', 'r') as ifile:
-        js_tab = json.load(ifile)
-    print(js_tab)
-    # print(js_tab['152Eu'])
-
-    print(meta)
-    print(list_of_names)
+    # with open('temp.json', 'w') as ofile:
+    #     js_temp = json.dump(js_all, ofile, indent=3, default=str)
+    # with open('temp.json', 'r') as ifile:
+    #     js_tab = json.load(ifile)
 
 
-    MergeJsonData(js60Co, js152Eu, js22Na, meta)
+    # print(meta)
+    # print(list_of_names)
+
+
+    MergeJsonData(js60Co, js152Eu, js22Na, js54Mn, js137Cs, meta)
 
 if __name__ == "__main__":
 
@@ -240,6 +271,16 @@ if __name__ == "__main__":
         elif el == '22Na':
             try:
                 list_of_data[el] = config.data22Na
+            except:
+                pass
+        elif el == '54Mn':
+            try:
+                list_of_data[el] = config.data54Mn
+            except:
+                pass
+        elif el == '137Cs':
+            try:
+                list_of_data[el] = config.data137Cs
             except:
                 pass
     main()

@@ -34,6 +34,7 @@ from libSettings import SetUpRecallEner
 from libSettings import SetUpRecallEnerFromJson
 from utilities import *
 from libLists import lists_of_gamma_background
+from libLists import lists_of_gamma_background_named
 
 current_directory = os.getcwd()
 
@@ -64,7 +65,7 @@ CalibDetType = 0
 j_sources = None
 blFirstElement = False
 
-
+lists_of_gamma_background_enabled = []
 
 
 global my_params
@@ -136,6 +137,8 @@ def ProcessFitDataStr(dom, my_source, lines, j_src, j_lut ):
     words = [s for s in lines.split('#2') if s]
     # del words[0]
     words.pop(0)
+
+    print('words', words)
 
     PeakList = []
     cal = []
@@ -239,7 +242,8 @@ def FillResults2json(dom, list, cal):
 
     jsondata[my_source.name] = source
 
-    if my_params.bg == 1:
+    # if my_params.bg == 1:
+    if len(lists_of_gamma_background_enabled) > 0:
         for peak_bg in list:
             # print('ffff',type(peak_bg.Etable),peak_bg.Etable)
             if peak_bg.Etable in lists_of_gamma_background:
@@ -370,12 +374,16 @@ def main():
             source4Fit = my_source.name
             if '60Co' in source4Fit:
                 source4Fit = '60Co'
+            elif '54Mn' in source4Fit:
+                source4Fit = 'ener 834.848 -ener 511.006'
+
             # if blBackGround:
 
             src = source4Fit
-            if my_params.bg == 1:
+            # if my_params.bg == 1:
+            if len(lists_of_gamma_background_enabled) > 0:
                 src = '{}'.format(source4Fit)
-                for gamma in lists_of_gamma_background:
+                for gamma in lists_of_gamma_background_enabled:
                     src = src + ' -ener {}'.format(gamma)
 
             # print(prefix)
@@ -449,6 +457,7 @@ if __name__ == "__main__":
     bg = 0
     grType = 'jpg'
     prefix = 'mDelila_raw'
+    bgK40 = 0
 
     parser = ArgumentParser()
 
@@ -463,20 +472,38 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--type",
                         dest="det_type", default=det_type,  type=int,
                         help="type of detector to be calibrated; default = 0".format(det_type))
-    parser.add_argument("-b", "--background",
-                        dest="bg", default=bg, type=int,
-                        help="to take in energy calib background lines (1); default = {}".format(bg))
+    # parser.add_argument("-b", "--background",
+    #                     dest="bg", default=bg, type=int,
+    #                     help="to take in energy calib all background lines; default = {}".format(bg))
     parser.add_argument("-gr", "--graphic type: eps, jpg or none ",
                         dest="grType", default=grType, type=str, choices=('eps', 'jpeg', 'jpg', 'png', 'svg', 'svgz', 'tif', 'tiff', 'webp','none'),
                         # eps, jpeg, jpg, pdf, pgf, png, ps, raw, rgba, svg, svgz, tif, tiff, webp
                         help="Available graphic output: eps, jpeg, jpg, png, svg, svgz, tif, tiff, webp or none (no graphs); default = {}".format(grType))
+    parser.add_argument('--bg', action='store_true', help="Enables all background lines")
+    parser.add_argument('--K40', action='store_true', help="Enables 1460.820 keV")
+    parser.add_argument('--anni', action='store_true', help="Enables 511.006 keV")
+    parser.add_argument('--Tl208', action='store_true', help="Enables 2614.510 keV")
     parser.add_argument("-prefix", "--prefix to the files to be analyzed",
                         dest="prefix", default=grType, type=str,
-                        help="Prefix for matrix (TH2) to be analyzed mDelila_raw or mDelila or ...".format(
-                            prefix))
-
+                        help="Prefix for matrix (TH2) to be analyzed mDelila_raw or mDelila or ...".format(prefix))
 
     config = parser.parse_args()
+
+    if config.bg:
+        bg = 1
+        for el in lists_of_gamma_background_named:
+            lists_of_gamma_background_enabled.append(lists_of_gamma_background_named[el])
+    else:
+        if config.K40:
+            lists_of_gamma_background_enabled.append(lists_of_gamma_background_named['40K'])
+        if config.Tl208:
+            lists_of_gamma_background_enabled.append(lists_of_gamma_background_named['208Tl'])
+        if config.anni:
+            lists_of_gamma_background_enabled.append(lists_of_gamma_background_named['anni'])
+
+    print('Lists of Gamma Background Enabled: ',lists_of_gamma_background_enabled)
+
+    # sys.exit()
 
     print(config)
 

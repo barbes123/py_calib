@@ -10,6 +10,11 @@ sudo unlink /usr/local/bin/pc
 echo $PY_CALIB/py_calib.py
 sudo ln -s $PY_CALIB/py_calib.py /usr/local/bin/pc
 
+echo /usr/local/bin/py_aa
+sudo unlink /usr/local/bin/py_aa
+echo $PY_CALIB/py_calib_aa.py
+sudo ln -s $PY_CALIB/py_calib_aa.py /usr/local/bin/py_aa
+
 echo /usr/local/bin/lut.print
 sudo unlink /usr/local/bin/lut.print
 echo $PWD/lut_print.py

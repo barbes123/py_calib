@@ -31,7 +31,9 @@ from libSettings import SetUpRecallEnerFromJson
 from utilities import *
 from libLists import list_of_sources
 from libLists import lists_of_gamma_background
+from libLists import lists_of_gamma_background_named
 
+lists_of_gamma_background_enabled = []
 
 current_directory = os.getcwd()
 
@@ -132,6 +134,12 @@ def ProcessFitDataStr(dom, my_source, lines, j_src):
     words = [s for s in lines.split('#2') if s]
     # del words[0]
     words.pop(0)
+    print('before',words)
+    # if my_source == '54Mn':
+    #     del words[0]
+    # print('after',words)
+    # sys.exit()
+
 
     PeakList = []
     cal = []
@@ -169,10 +177,11 @@ def ProcessFitDataStr(dom, my_source, lines, j_src):
                 # peak.__str__()
 
     if len(PeakList) == 0:
-        print('ProcessFitDataStr::: no peaks were found for dom {}'.format(dom))
+        print('ProcessFitDataStr::: no peaks were found for fold {}'.format(dom))
     else:
+        # print('ProcessFitDataStr::: Print PeakList {} elements'.format(len(PeakList)))
+        # print(PeakList)
         FillResults2json(dom, PeakList, cal)
-        # print('Print PeakList {} elements'.format(len(PeakList)))
         for p in PeakList:
             p.__str__()
 
@@ -180,6 +189,7 @@ def FillResults2json(dom, list, cal):
     jsondata = {}
     content = {}
     source = {}
+    source_bg = {}
     # jsondata['domain'] = dom
     jsondata['fold'] = dom
 
@@ -199,7 +209,9 @@ def FillResults2json(dom, list, cal):
             except: 
                 content['err_eff'] = 0
         #print(n_decays_sum, 'this is sum of decays')
-        content['res'] = peak.fwhm/peak.pos_ch*float(peak.  Etable)
+        # print(peak.fwhm, peak.pos_ch, (peak.Etable))
+        # print('position ', peak.pos_ch)
+        content['res'] = peak.fwhm/peak.pos_ch*float(peak.Etable)
         content['err_res'] = 0.1
         content['pos_ch'] = peak.pos_ch
         # jsondata[peak.Etable] = content
@@ -223,6 +235,19 @@ def FillResults2json(dom, list, cal):
     jsondata['pol_list'] = cal
 
     jsondata[my_source.name] = source
+
+    # if my_params.bg == 1:
+    if len(lists_of_gamma_background_enabled) > 0:
+        for peak_bg in list:
+            # print('ffff',type(peak_bg.Etable),peak_bg.Etable)
+            if peak_bg.Etable in lists_of_gamma_background:
+                print('BACK', peak_bg.pos_ch, peak_bg.fwhm)
+                content = {}
+                content['res'] = peak_bg.fwhm / peak_bg.pos_ch * float(peak_bg.Etable)
+                content['err_res'] = 0.1
+                content['pos_ch'] = peak_bg.pos_ch
+                source_bg[str(peak_bg.Etable)] = content
+        jsondata['bg'] = source_bg
 
     list_results.append(jsondata)
     if debug == True:
@@ -323,12 +348,27 @@ def main():
         current_file = '{}{}_{}.spe'.format(datapath,prefix,domain)
         # current_file = '{}mDelila_raw_py_{}.spe'.format(datapath, domain)
 
+        # source4Fit = ''
         if file_exists(current_file):
             # if blBackGround:
-            if my_params.bg == 1:
-                src = '{} -ener 1460.82 -ener 2614.51'.format(my_source.name)
-            else:
-                src = my_source.name
+            # if my_params.bg == 1:
+            #     src = '{} -ener 1460.82 -ener 2614.51'.format(my_source.name)
+            # else:
+            #     src = my_source.name
+            source4Fit = my_source.name
+            if '60Co' in source4Fit:
+                source4Fit = '60Co'
+            elif '54Mn' in source4Fit:
+                source4Fit = 'ener 834.848 -ener 511.006'
+
+            src = source4Fit
+            if len(lists_of_gamma_background_enabled) > 0:
+                src = '{}'.format(source4Fit)
+                for gamma in lists_of_gamma_background_enabled:
+                    src = src + ' -ener {}'.format(gamma)
+            #
+            # print(src)
+            # sys.exit()
 
             fit_limits = [500,1600]
 
@@ -338,20 +378,10 @@ def main():
                 fit_limits = [50,1600]
             if '22Na' in src:
                 fit_limits = [400,1400]
-                # print('Source 22Na')
-
-            source4Fit = my_source.name
-            if '60Co' in source4Fit:
-                source4Fit = '60Co'
-            src = source4Fit
-            if my_params.bg == 1:
-                src = '{}'.format(source4Fit)
-                for gamma in lists_of_gamma_background:
-                    src = src + ' -ener {}'.format(gamma)
-
-
-
-
+            if '54Mn' in src:
+                    fit_limits = [400, 2700]
+            if '137Cs' in src:
+                    fit_limits = [500, 1500]
 
             # command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly1 -v 2'.format(path, current_file, src, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
             command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly1 -v 2'.format(path, current_file, src,fit_limits[0], fit_limits[1], 3, 1000)
@@ -361,7 +391,6 @@ def main():
 
             result_scr = subprocess.run(['{}'.format(command_line)], shell=True, capture_output=True)
             print(result_scr)
-            # sys.exit()
             fitdata = result_scr.stdout.decode()
             print(fitdata)
             global total
@@ -411,6 +440,7 @@ def main():
             if '60Co' in my_source.name:
                 source = '60Co'
 
+
             # print(js_tab)
             # PlotFold(js_tab,j_sources,my_source.name,1,my_params.grType)
             PlotFold(js_tab,j_sources,my_source.name,my_params)
@@ -438,20 +468,34 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--type",
                         dest="det_type", default=det_type,  type=int,
                         help="type of detector to be calibrated; default = 0".format(det_type))
-    parser.add_argument("-b", "--background",
-                        dest="bg", default=bg, type=int,
-                        help="to take in energy calib background lines (1); default = {}".format(bg))
+    parser.add_argument('--bg', action='store_true', help="Enables all background lines")
+    parser.add_argument('--K40', action='store_true', help="Enables 1460.820 keV")
+    parser.add_argument('--anni', action='store_true', help="Enables 511.006 keV")
+    parser.add_argument('--Tl208', action='store_true', help="Enables 2614.510 keV")
     parser.add_argument("-gr", "--graphic type: eps, jpg or none ",
                         dest="grType", default=grType, type=str, choices=('eps', 'jpeg', 'jpg', 'png', 'svg', 'svgz', 'tif', 'tiff', 'webp','none'),
                         # eps, jpeg, jpg, pdf, pgf, png, ps, raw, rgba, svg, svgz, tif, tiff, webp
                         help="Available graphic output: eps, jpeg, jpg, png, svg, svgz, tif, tiff, webp or none (no graphs); default = {}".format(grType))
     parser.add_argument("-prefix", "--prefix to the files to be analyzed",
                         dest="prefix", default=grType, type=str,
-                        help="Prefix for matrix (TH2) to be analyzed mDelila_raw or mDelila or ...".format(
-                            prefix))
+                        help="Prefix for matrix (TH2) to be analyzed mDelila_raw or mDelila or ...".format(prefix))
 
 
     config = parser.parse_args()
+
+    if config.bg:
+        bg = 1
+        for el in lists_of_gamma_background_named:
+            lists_of_gamma_background_enabled.append(lists_of_gamma_background_named[el])
+    else:
+        if config.K40:
+            lists_of_gamma_background_enabled.append(lists_of_gamma_background_named['40K'])
+        if config.Tl208:
+            lists_of_gamma_background_enabled.append(lists_of_gamma_background_named['208Tl'])
+        if config.anni:
+            lists_of_gamma_background_enabled.append(lists_of_gamma_background_named['anni'])
+
+    print('Lists of Gamma Background Enabled: ', lists_of_gamma_background_enabled)
 
     print(config)
 
