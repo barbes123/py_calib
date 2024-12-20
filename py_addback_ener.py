@@ -21,17 +21,17 @@ except:
 sys.path.insert(1, 'lib')
 sys.path.insert(1, '{}/lib'.format(ourpath))
 
-from libCalib1 import TIsotope as TIso
-from libCalib1 import TMeasurement as Tmeas
+# from libCalib1 import TIsotope as TIso
+# from libCalib1 import TMeasurement as Tmeas
 # from libPlotEliade import PlotJsonFold as PlotFold
 from libPlotAddBack import PlotJsonFold as PlotFold
 from TRecallEner import TRecallEner
 from libSettings import SetUpRecallEner
 from libSettings import SetUpRecallEnerFromJson
 from utilities import *
-from libLists import list_of_sources
-from libLists import lists_of_gamma_background
-from libLists import lists_of_gamma_background_named
+# from libLists import list_of_sources
+# from libLists import lists_of_gamma_background
+# from libLists import lists_of_gamma_background_named
 
 lists_of_gamma_background_enabled = []
 
@@ -205,10 +205,8 @@ def FillResults2json(dom, list, cal):
         content['eff'] = peak.area/(n_decays_int*peak.Intensity)  *100
         if peak.area and n_decays_int:
             try:
-                # content['err_eff'] = np.sqrt((1/peak.area + 1/n_decays_int + peak.errIntensity/peak.Intensity**2)*100)*peak.area/(n_decays_int*peak.Intensity)*100
-                # content['err_eff'] = np.sqrt((1/peak.area + 1/n_decays_int + peak.errIntensity/peak.Intensity))*peak.area/(n_decays_int*peak.Intensity)
-                content['err_eff'] = np.sqrt((1/peak.area))
-            except:
+                content['err_eff'] = np.sqrt((1/peak.area + 1/n_decays_int + peak.errIntensity/peak.Intensity**2)*100)*peak.area/(n_decays_int*peak.Intensity)*100
+            except: 
                 content['err_eff'] = 0
         #print(n_decays_sum, 'this is sum of decays')
         # print(peak.fwhm, peak.pos_ch, (peak.Etable))
@@ -332,24 +330,8 @@ def main():
     print('sum {}; err {}; int {}'.format(n_decays_sum, n_decays_err, n_decays_int))
 
     for domain in range (my_params.dom1, my_params.dom2+1):
-        current_det = 0
-        if my_params.det_type != 0:
-            for entry in j_lut:
-                if entry['domain'] == domain:
-                    current_det = entry['detType']
-                    # print('~ ',domain  ,'!!!!!!!!!!!!!!!!!!!!!!!!!! ', entry['detType'], ' ' ,entry['channel'], ' ', entry['serial'], ' ', current_det, ' ',my_params.det_type)
-                    break
-
-        if my_params.det_type != current_det:
-            continue
-
-        # myCurrentSetting = SetUpRecallEner(j_lut, domain, my_source.name)
-        # myCurrentSetting = SetUpRecallEnerFromJson(domain, j_lut_recall)
-        # if debug:
-        #     print('I am trying to do fit for domain {}'.format(domain))
         current_file = '{}{}_{}.spe'.format(datapath,prefix,domain)
         # current_file = '{}mDelila_raw_py_{}.spe'.format(datapath, domain)
-
         # source4Fit = ''
         if file_exists(current_file):
             # if blBackGround:
@@ -420,8 +402,7 @@ def main():
             if my_source.name == gammakey:
                 for element in j_sources[my_source.name]["gammas"]:
                     key[my_source.name][element]['addback'] = key[my_source.name][element]["eff"] / fold1[my_source.name][element]["eff"]
-                    # key[my_source.name][element]['err_ab'] = key[my_source.name][element]['addback'] * (key[my_source.name][element]["err_eff"]/key[my_source.name][element]["eff"]  + fold1[my_source.name][element]["err_eff"]/key[my_source.name][element]["eff"])
-                    key[my_source.name][element]['err_ab'] = key[my_source.name][element]['addback'] * math.sqrt(key[my_source.name][element]["err_eff"]**2 + fold1[my_source.name][element]["err_eff"]**2)
+                    key[my_source.name][element]['err_ab'] = key[my_source.name][element]['addback'] * (key[my_source.name][element]["err_eff"]/key[my_source.name][element]["eff"]  + fold1[my_source.name][element]["err_eff"]/key[my_source.name][element]["eff"])
 
     with open('{}addback_{}.json'.format(datapath, my_run.run), 'w') as ofile:
         js_tab = json.dump(list_results, ofile, indent=3, default=str)
@@ -457,24 +438,28 @@ if __name__ == "__main__":
     bg = 0
     grType = 'jpg'
     prefix = 'sum_fold_1'
+    ener = 800
 
     parser = ArgumentParser()
 
-    parser.add_argument("-s", "--server", dest="server", default=server, type=int, choices=range(10),
-                        help="DAQ ELIADE server, default = {}".format(server))
-    parser.add_argument("-r", "--run", type=int,
-                        dest="runnbr", default=runnbr,
-                        help="Run number, default = {}".format(runnbr))
+    # parser.add_argument("-s", "--server", dest="server", default=server, type=int, choices=range(10),
+    #                     help="DAQ ELIADE server, default = {}".format(server))
+    # parser.add_argument("-r", "--run", type=int,
+    #                     dest="runnbr", default=runnbr,
+    #                     help="Run number, default = {}".format(runnbr))
+    parser.add_argument("-e", "--ener", type=int,
+                        dest="ener", default=runnbr,
+                        help="Energy = {}".format(ener))
     parser.add_argument("-d", "--folDs",  nargs=2,
                         dest="dom", default=[dom1, dom2],
                         help="from domain, default = {} {}".format(dom1, dom2))
-    parser.add_argument("-t", "--type",
-                        dest="det_type", default=det_type,  type=int,
-                        help="type of detector to be calibrated; default = 0".format(det_type))
-    parser.add_argument('--bg', action='store_true', help="Enables all background lines")
-    parser.add_argument('--K40', action='store_true', help="Enables 1460.820 keV")
-    parser.add_argument('--anni', action='store_true', help="Enables 511.006 keV")
-    parser.add_argument('--Tl208', action='store_true', help="Enables 2614.510 keV")
+    # parser.add_argument("-t", "--type",
+    #                     dest="det_type", default=det_type,  type=int,
+    #                     help="type of detector to be calibrated; default = 0".format(det_type))
+    # parser.add_argument('--bg', action='store_true', help="Enables all background lines")
+    # parser.add_argument('--K40', action='store_true', help="Enables 1460.820 keV")
+    # parser.add_argument('--anni', action='store_true', help="Enables 511.006 keV")
+    # parser.add_argument('--Tl208', action='store_true', help="Enables 2614.510 keV")
     parser.add_argument("-gr", "--graphic type: eps, jpg or none ",
                         dest="grType", default=grType, type=str, choices=('eps', 'jpeg', 'jpg', 'png', 'svg', 'svgz', 'tif', 'tiff', 'webp','none'),
                         # eps, jpeg, jpg, pdf, pgf, png, ps, raw, rgba, svg, svgz, tif, tiff, webp
@@ -486,19 +471,6 @@ if __name__ == "__main__":
 
     config = parser.parse_args()
 
-    if config.bg:
-        bg = 1
-        for el in lists_of_gamma_background_named:
-            lists_of_gamma_background_enabled.append(lists_of_gamma_background_named[el])
-    else:
-        if config.K40:
-            lists_of_gamma_background_enabled.append(lists_of_gamma_background_named['40K'])
-        if config.Tl208:
-            lists_of_gamma_background_enabled.append(lists_of_gamma_background_named['208Tl'])
-        if config.anni:
-            lists_of_gamma_background_enabled.append(lists_of_gamma_background_named['anni'])
-
-    print('Lists of Gamma Background Enabled: ', lists_of_gamma_background_enabled)
 
     print(config)
 
