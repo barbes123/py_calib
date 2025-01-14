@@ -407,8 +407,8 @@ def PlotCalibration(data, gammatab, source, lutfile, my_det_type=2, opt='eps'):
                             except:
                                 current_color = 'red'
 
-                            plt.plot([1, 2000], [float(key["pol_list"][0]) + float(key["pol_list"][1]) * 1,
-                                                 float(key["pol_list"][0]) + float(key["pol_list"][1]) * 2000],
+                            plt.plot([1, 3000], [float(key["pol_list"][0]) + float(key["pol_list"][1]) * 1,
+                                                 float(key["pol_list"][0]) + float(key["pol_list"][1]) * 3000],
                                      color=current_color, label=f"{dom}", linewidth=1)
 
                             for gammakey in list_of_sources:  # browse through the list of sources
@@ -419,7 +419,7 @@ def PlotCalibration(data, gammatab, source, lutfile, my_det_type=2, opt='eps'):
                                                         color=current_color)
                                         except:
                                             print(
-                                                'Warning skipping plot domain {} for gamma {} because not fitted'.format(
+                                                'In libPlotEliade.py Warning skipping plot domain {} for gamma {} because not fitted'.format(
                                                     key['domain'], element))
                                             # continue
                             max_energy = max([float(i) for i in list(gammatab[source]["gammas"].keys())])
@@ -427,8 +427,14 @@ def PlotCalibration(data, gammatab, source, lutfile, my_det_type=2, opt='eps'):
         if blCloverFound == True:
             delta = 200
             # print("calib")
+
             plt.xlim([0, 1200])
             plt.ylim([0, max_energy + delta])  # maximum energy from source + delta: [0; max+delta]
+
+            if source == '56Co':
+                plt.xlim([0, 3000])
+
+
             plt.xlabel('Channel')
             plt.ylabel('Energy (keV)')
             plt.title(f'Calibration for clover {cloverkey} {my_det_type}')

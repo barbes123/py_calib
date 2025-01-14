@@ -9,7 +9,7 @@ def load_json(file):
         with open(fname,'r') as myfile:
             return json.load(myfile)
     except:
-        print(f'\033[31m Error: I am not able to load json table from {fname}', '\033[0m')
+        print(f'\033[31m Error in unilities.py: I am not able to load json table from {fname}', '\033[0m')
         sys.exit()
 
 def file_exists(myfile):

@@ -374,6 +374,9 @@ def main():
 
             fit_limits = [500,1600]
 
+            ampl = 1000
+            fwhm = 3
+
             if '60Co' in src:
                 src = '60Co'
             if '152Eu' in src:
@@ -384,9 +387,12 @@ def main():
                     fit_limits = [400, 2700]
             if '137Cs' in src:
                     fit_limits = [500, 1500]
+            if '56Co' in src:
+                    fit_limits = [500, 4000]
+                    ampl = 100
 
             # command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly1 -v 2'.format(path, current_file, src, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
-            command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly1 -v 2'.format(path, current_file, src,fit_limits[0], fit_limits[1], 3, 1000)
+            command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly1 -v 2'.format(path, current_file, src,fit_limits[0], fit_limits[1], fwhm, ampl)
             print('{}'.format(command_line))
             if debug:
                 print('I am ready to do fit for domain {} : '.format(domain))
