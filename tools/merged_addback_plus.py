@@ -230,10 +230,10 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
             # print( float(el), js_new[index]['60Co'][el]['eff'])
                 plt.figure(0)
                 plt.scatter(x=float(el), y=js_new[index][source][el]['eff'], color = colors[source][index], label=f'Fold {index+1} {source}')
-                plt.legend(loc='upper right', fontsize='medium', shadow=False, ncol=2)
+                # plt.legend(loc='upper right', fontsize='medium', shadow=False, ncol=2)
                 plt.figure(1)
-                plt.scatter(x=float(el), y=js_new[index][source][el]['res'], color=colors[source][index], label='Fold {}'.format(index + 1))
-                plt.legend(loc='upper right', fontsize='medium', shadow=False, ncol=2)
+                plt.scatter(x=float(el), y=js_new[index][source][el]['res'], color=colors[source][index], label=f'Fold {(index + 1)} {source}')
+                # plt.legend(loc='upper right', fontsize='medium', shadow=False, ncol=2)
                 save_plot_data_to_ascii(js_new,index,source,f'data_fold_{ifold}.dat')
 
                 if index > 0:
@@ -251,15 +251,11 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
         # plt.scatter(x=1, y=key[source][element]["res"], color=cc, label='Fold {}'.format(key['fold']))
         # plt.legend(loc='upper left', fontsize='medium', shadow=False)
 
-    plt.figure(0)
-    # plt.xticks(np.arange(0, 1500, 100))
-    plt.title('Efficiency {}'.format(meta_data))
-    plt.xlabel('E$\gamma$')
-    plt.ylabel('Efficiency, %')
+
 
 
     if blFit:
-        ener, eff, res = fit_data_from_file('data_fold_3.dat')
+        ener, eff, res = fit_data_from_file(f'data_fold_{plotTheseFolds[0]}.dat')
         params, covariance = curve_fit(fitDebertin, ener, eff)
         a1f, a2f, a3f, a4f, a5f = params
         ener1 = np.linspace(min(ener), max(ener), 500)  # Generate 500 points for smoothness
@@ -267,8 +263,32 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
         plt.figure(0)
         plt.plot(ener1, smooth_fit, color='green', linestyle='--', label='Debertin Fit')
 
-    file_name_ab = 'fold_eff_all.{}'.format(opt)
-    plt.savefig(save_results_to + file_name_ab)
+        if blFitRes:
+            # ener, eff, res = fit_data_from_file('data_fold_3.dat')
+            init = (0.5, 5e-4, -8e-9)
+            params, covariance = curve_fit(fitResolution, ener, res, p0=init)
+            # print(params)
+            ener1 = np.linspace(min(ener), max(ener), 500)  # Generate 500 points for smoothness
+            smooth_fit_res = fitResolution(ener1, *params)  # Evaluate the fitted function
+            plt.figure(1)
+            plt.plot(ener1, smooth_fit_res, color='green', label='Fit Resolution')
+            # plt.legend(loc='upper right')
+
+
+    pltFold = plotTheseFolds[0] + 1 #images are done only for the first fold mentioned
+
+    plt.figure(0)
+    # plt.xticks(np.arange(0, 1500, 100))
+    plt.title('Efficiency {}'.format(meta_data))
+    plt.xlabel('E$\gamma$')
+    plt.ylabel('Efficiency, %')
+    plt.legend(loc='upper right', fontsize='medium', shadow=False, ncol=2)
+
+
+
+
+    file_name_eff = 'fold_eff_all_{}.{}'.format(pltFold, opt)
+    plt.savefig(save_results_to + file_name_eff)
     plt.close()
 
     plt.figure(1)
@@ -276,8 +296,10 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
     plt.title('Resolution {}' .format(meta_data))
     plt.xlabel('E$\gamma$')
     plt.ylabel('Resolution, keV')
-    file_name_ab = 'fold_res_all.{}'.format(opt)
-    plt.savefig(save_results_to + file_name_ab)
+    plt.legend(loc='upper left', fontsize='medium', shadow=False, ncol=2)
+    file_name_res = 'fold_res_all_{}.{}'.format(pltFold, opt)
+    # file_name_res = f'fold_res_all_{pltFold}.{opt}'
+    plt.savefig(save_results_to + file_name_res)
     plt.close()
 
     plt.figure(2)
@@ -291,7 +313,8 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
     plt.tick_params(axis='both', labelsize=12)  # Increase tick label size to 12
     # plt.ylabel('Add Back factor fold')
     plt.ylim(0.8,2)
-    file_name_ab = 'fold_ab_all.{}'.format(opt)
+    # file_name_ab = f'fold_ab_all_{pltFold}.{opt}'
+    file_name_ab = 'fold_eff_ab_{}.{}'.format(pltFold, opt)
     plt.savefig(save_results_to + file_name_ab)
     plt.close()
 
@@ -385,6 +408,8 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     runnbr = -1
     blFit = True
+    blFitRes = True
+    fitFunc = 'deb'
 
 
     for el in list_of_sources:
@@ -402,12 +427,19 @@ if __name__ == "__main__":
                         dest="grType", default=grType, type=str, choices=('eps', 'jpeg', 'jpg', 'png', 'svg', 'svgz', 'tif', 'tiff', 'webp','none'),
                         # eps, jpeg, jpg, pdf, pgf, png, ps, raw, rgba, svg, svgz, tif, tiff, webp
                         help="Available graphic output: eps, jpeg, jpg, png, svg, svgz, tif, tiff, webp or none (no graphs); default = {}".format(grType))
+
     parser.add_argument("-prefix", "--prefix to the files to be analyzed",
                         dest="prefix", default=grType, type=str, help="Prefix for matrix (TH2) to be analyzed mDelila_raw or mDelila or ...".format(prefix))
 
     parser.add_argument("-sim", "--run from simul", type=int,
                         dest="runnbr", default=runnbr,
                         help="Run number from simul, default = {}".format(runnbr))
+
+    parser.add_argument("-fit", "--fitting the efficiency",
+                        dest="fitFunc", default=fitFunc, type=str,
+                        choices=('deb','None'),
+                        # eps, jpeg, jpg, pdf, pgf, png, ps, raw, rgba, svg, svgz, tif, tiff, webp
+                        help="Available fit Debertin [deb], ...; default = {}".format(fitFunc))
 
     # parser.add_argument("-s", "--sim", dest="sim", action="store_true",
     #                     help="Activate simulation mode.")
@@ -416,25 +448,41 @@ if __name__ == "__main__":
 
     plotTheseFolds = config.plotFolds
     AddSimul = (config.runnbr > 0)
+    blFit = (config.fitFunc != 'None')
 
     if AddSimul:
         # energy, ab_sim = ReadSimData('simul/add_back_all_run4.txt',1,17)
         # energy_sim, ab_sim = ReadSimData(f'simul/add_back_all_run{config.runnbr}.txt', 1, 17)
-        energy_sim, ab_sim = ReadSimData(f'run_{config.runnbr}/add_back_all_run_{config.runnbr}.txt', 1, 17)
-        plt.figure(2)
+
+        ncol = 17
+        selected_fold = plotTheseFolds[0]+1
+
+        if selected_fold == 4:
+            ncol = 17
+        elif selected_fold == 3:
+            ncol = 13
+        elif selected_fold == 2:
+            ncol = 9
+        elif selected_fold == 1:
+            ncol = 5
+        # print(ncol, selected_fold)
+        # sys.exit()
+
+        energy_sim, ab_sim = ReadSimData(f'run_{config.runnbr}/add_back_all_run_{config.runnbr}.txt', 1, ncol)
+        plt.figure(2)#add sim to addback
         # plt.grid()
         # plt.plot(energy, ab_sim, marker='', linestyle='-', color='gray', linewidth=1)
         plt.plot(energy_sim, ab_sim, marker='', linestyle='-', color='red', linewidth=1)
         # plt.title('Energy vs Simulated Addback')
-        plt.savefig('figures/simulations.{}'.format('jpg'))
+        plt.savefig('figures/simulations_ab.{}'.format('jpg'))
         # plt.grid()
     if AddSimul:
         js_sim = ReadSimEffData(config.runnbr)
-        plt.figure(0)
+        plt.figure(0)#add sim to eff
         energy_levels = []
         efficiencies = []
 
-        selected_fold = 4
+        selected_fold = plotTheseFolds[0]+1
 
         # Loop through each energy level in the json_data
         for energy, folds in js_sim.items():
@@ -450,6 +498,7 @@ if __name__ == "__main__":
 
         # Plotting the efficiency vs energy for the selected fold
         plt.plot(energy_levels, efficiencies, label=f'Fold {selected_fold} Sim Run {config.runnbr}')
+        plt.savefig('figures/simulations_eff.{}'.format('jpg'))
 
         # Customize the plot
         plt.xlabel('Energy (keV)')
@@ -465,7 +514,7 @@ if __name__ == "__main__":
             os.remove(fname)
             print(f"The file {fname} has been deleted.")
         else:
-            print(f"The file {data_fold_3.dat} does not exist.")
+            print(f"The file {fname} does not exist.")
 
 
 
