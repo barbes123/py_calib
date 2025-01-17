@@ -55,6 +55,7 @@ lutfile = 'LUT_ELIADE.json'
 lutreallener = 'LUT_RECALL.json'
 j_results = {}
 list_results = []
+simID = 10
 
 
 # blPlot = True
@@ -225,10 +226,7 @@ def FillResults2json(dom, list, cal):
         # jsondata[peak.Etable] = content
         source[peak.Etable] = content
         peaksum = peaksum + peak.area
-        # print('Dump to json peak: {} {} {}'.format(peak.Etable, peak.pos_ch, peak.fwhm))
-        # print(source)
-        # print(source[peak.Etable])
-        # print('Dump to json peak: {} {} {}'.format(source[peak.Etable].Etable, source[peak.Etable].pos_ch, source[peak.Etable].fwhm))
+
     if debug == True:
         print('source {}'.format(source))
 
@@ -335,10 +333,18 @@ def main():
     if my_run.tstop < my_run.tstart:
         print("Check start and stop time of this run. Tstart must be bigger than Tstop")
         sys.exit()
+
+
     global n_decays_sum
-    n_decays_sum, n_decays_err= my_source.GetNdecaysIntegral(my_run.tstart, my_run.tstop)
     global n_decays_int
-    n_decays_int = my_source.GetNdecays(my_run.tstart, my_run.tstop)
+
+    if 'sim' in my_source.name:
+        n_decays_sum = GetNsimEvents(j_data, my_params.runnbr)
+        n_decays_int = n_decays_sum
+    else:
+        n_decays_sum, n_decays_err= my_source.GetNdecaysIntegral(my_run.tstart, my_run.tstop)
+        n_decays_int = my_source.GetNdecays(my_run.tstart, my_run.tstop)
+
     print(my_source.__str__())
     print('sum {}; err {}; int {}'.format(n_decays_sum, n_decays_err, n_decays_int))
 

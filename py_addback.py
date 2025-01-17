@@ -203,6 +203,7 @@ def FillResults2json(dom, list, cal):
     for peak in list:
         content = {}
         content['eff'] = peak.area/(n_decays_int*peak.Intensity)  *100
+        content['area'] = peak.area
         if peak.area and n_decays_int:
             try:
                 # content['err_eff'] = np.sqrt((1/peak.area + 1/n_decays_int + peak.errIntensity/peak.Intensity**2)*100)*peak.area/(n_decays_int*peak.Intensity)*100
@@ -248,6 +249,7 @@ def FillResults2json(dom, list, cal):
                 content['res'] = peak_bg.fwhm / peak_bg.pos_ch * float(peak_bg.Etable)
                 content['err_res'] = 0.1
                 content['pos_ch'] = peak_bg.pos_ch
+                content['area'] = peak.area
                 source_bg[str(peak_bg.Etable)] = content
         jsondata['bg'] = source_bg
 

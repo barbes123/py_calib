@@ -131,3 +131,18 @@ class TMeasurement:
 
     def __str__(self):
         return print('Run: {}, Server: {}, Source: {}, Time Start: {}, Time Stop: {}, Distance {}, Found {}'.format(self.run, self.server, self.source, self.tstart, self.tstop, self.distance, self.found))
+
+def GetNsimEvents(js, run):
+     nevents = 0
+     try:
+         for n in js:
+             if n['runNumber'] == run:
+                 nevents = n['nevents']
+                 break
+     except:
+         print('GetNsimEvents in libCalib1.py: No nevents simulates found for run ',n['runNumber'])
+         pass
+     return  nevents
+
+
+
