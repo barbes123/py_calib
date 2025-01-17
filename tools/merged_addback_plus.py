@@ -19,6 +19,7 @@ import sys
 sys.path.append(ourpath+'/lib')
 from libLists import list_of_sources
 from libLists import list_of_clovers
+from libFitFunc import *
 
 
 from sympy.printing.pretty.pretty_symbology import line_width
@@ -30,22 +31,11 @@ def MakeDir(path):
         os.makedirs(path)
         print("The new directory {} is created!".format(path))
 
-# opt = 'jpg'
-
-# meta_data = ''
-# opt = 'eps'
-
-# ourpath = '/data10/live/IT/py_calib'
-
-
 current_directory = os.getcwd()
 datapath = '{}/'.format(current_directory)
 
 save_results_to = '{}/figures/'.format(datapath)
 MakeDir(save_results_to)
-
-# from ../lib/libLists import list_of_sources
-
 
 # list_of_clovers = {"CL29", "CL30", "CL31", "CL32", "CL33", "CL34", "CL35", "CL36", "HPGe", "SEG", "LaBr"}
 # list_of_sources = {'60Co','60CoWeak', '152Eu','137Cs', '133Ba','22Na','54Mn'}
@@ -53,6 +43,53 @@ list_of_sources_presented = []
 list_of_cebr = {"CEBR1","CEBR2","CEBR3","CEBR4"}
 list_of_data = {}
 js_all =[]
+
+
+import os
+import json
+
+
+def ReadSimEffData(run, ener1=100, ener2=10000):
+    json_data = {}
+    for energy in range(ener1, ener2 + 1, 100):
+        file_path = f'run_{run}/fold_data_run_{run}_{energy}.txt'
+
+        # print(f"Processing file: {file_path}")
+
+        if os.path.exists(file_path):
+            with open(file_path, 'r') as file:
+                # Loop over each line in the file
+                if energy not in json_data:
+                    json_data[energy] = {}
+                for line in file:
+                    # Split the line into columns based on spaces (you may need to adjust if tabs are used)
+                    columns = line.split()
+
+                    # Get the first and 11th columns (index 0 and index 10 in a 0-indexed list)
+                    if len(columns) >= 12:  # Ensure there are enough columns
+                        foldID = int(columns[0])
+                        eff = float(columns[11])
+                        json_data[energy][foldID] = eff
+
+        else:
+            # print(f"File '{file_path}' does not exist for energy {energy}.")
+            pass
+
+    # Convert the dictionary to a JSON string after processing all energies
+    json_output = json.dumps(json_data, indent=4)
+
+    # Optionally, save the JSON data to a new file
+    with open(f'sim_run_{run}.json', 'w') as json_file:
+        json_file.write(json_output)
+
+    # Print the JSON to the console
+    # print(json_output)
+
+    # Return the final data
+    return json_data
+
+
+
 
 
 def ReadSimData(filename, colx, coly):
@@ -76,7 +113,12 @@ def ReadSimData(filename, colx, coly):
 def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=None, js56Co=None, meta_data=''):
 # def MergeJsonData(js60Co, js152Eu, meta_data):
     js_new=[]
-    for i in range(0,len(js152Eu)):
+    # print(len(js152Eu))
+    # print(js152Eu)
+    max_fold = 4
+
+    # for i in range(0,len(js152Eu)):
+    for i in range(0,max_fold):
         js_element = {}
         js_element['fold'] = i+1
         try:
@@ -90,21 +132,22 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
         try:
             js_element['22Na'] = js22Na[i]['22Na']
         except:
-            print('22Na no file')
+            # print('22Na no file')
+            pass
         try:
             js_element['54Mn'] = js54Mn[i]['54Mn']
         except:
-            print('54Mn no file')
+            # print('54Mn no file')
             pass
         try:
             js_element['137Cs'] = js137Cs[i]['137Cs']
         except:
-            print('137Cs no file')
+            # print('137Cs no file')
             pass
         try:
             js_element['56Co'] = js56Co[i]['56Co']
         except:
-            print('56Co no file')
+            # print('56Co no file')
             pass
         js_new.append(js_element)
 
@@ -161,10 +204,10 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
         # sys.exit()
         if len(plotTheseFolds) > 0:
             PlotThisFold = False
-            for el in plotTheseFolds:
-                if index == el:
+            for ifold in plotTheseFolds:
+                if index == ifold:
                     PlotThisFold = True
-                    # print(el, index, PlotThisFold)
+                    # print(ifold, index, PlotThisFold)
                     break
         if not PlotThisFold:
             continue
@@ -186,11 +229,12 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
                         plt.errorbar(x=float(el), y=js_new[index][source][el]['addback'], yerr=js_new[index][source][el]["err_ab"] , color='black')
             # print( float(el), js_new[index]['60Co'][el]['eff'])
                 plt.figure(0)
-                plt.scatter(x=float(el), y=js_new[index][source][el]['eff'], color = colors[source][index], label='Fold {}'.format(index+1))
+                plt.scatter(x=float(el), y=js_new[index][source][el]['eff'], color = colors[source][index], label=f'Fold {index+1} {source}')
                 plt.legend(loc='upper right', fontsize='medium', shadow=False, ncol=2)
                 plt.figure(1)
                 plt.scatter(x=float(el), y=js_new[index][source][el]['res'], color=colors[source][index], label='Fold {}'.format(index + 1))
                 plt.legend(loc='upper right', fontsize='medium', shadow=False, ncol=2)
+                save_plot_data_to_ascii(js_new,index,source,f'data_fold_{ifold}.dat')
 
                 if index > 0:
                     plt.figure(2)
@@ -212,6 +256,17 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
     plt.title('Efficiency {}'.format(meta_data))
     plt.xlabel('E$\gamma$')
     plt.ylabel('Efficiency, %')
+
+
+    if blFit:
+        ener, eff, res = fit_data_from_file('data_fold_3.dat')
+        params, covariance = curve_fit(fitDebertin, ener, eff)
+        a1f, a2f, a3f, a4f, a5f = params
+        ener1 = np.linspace(min(ener), max(ener), 500)  # Generate 500 points for smoothness
+        smooth_fit = fitDebertin(ener1, *params)  # Evaluate the fitted function on the generated points
+        plt.figure(0)
+        plt.plot(ener1, smooth_fit, color='green', linestyle='--', label='Debertin Fit')
+
     file_name_ab = 'fold_eff_all.{}'.format(opt)
     plt.savefig(save_results_to + file_name_ab)
     plt.close()
@@ -245,14 +300,21 @@ def main():
     js60Co = None
     js152Eu = None
     js22Na = None
+    js54Mn = None
     js137Cs = None
     js56Co = None
     list_of_names = {}
     for el in list_of_data:
         # print(list_of_data[el])
-        name = 'addback_run_{}_{}_eliadeS{}/addback_{}.json'.format(list_of_data[el][1],list_of_data[el][2],list_of_data[el][0],list_of_data[el][1])
-        meta = meta + 'run_' + list_of_data[el][1]+'_S'+ list_of_data[el][0] + '_' + el + ' '
-        list_of_names[el] = name
+
+        try:
+            name = 'addback_run_{}_{}_eliadeS{}/addback_{}.json'.format(list_of_data[el][1],list_of_data[el][2],list_of_data[el][0],list_of_data[el][1])
+            # meta = meta + 'run_' + list_of_data[el][1]+'_S'+ list_of_data[el][0] + '_' + el + ' '
+            meta = meta + el + ' '
+            list_of_names[el] = name
+        except:
+            continue
+
 
         print('{} file name: '.format(el), name)
 
@@ -301,6 +363,13 @@ def main():
 
     MergeJsonData(js60Co, js152Eu, js22Na, js54Mn, js137Cs, js56Co, meta)
 
+
+
+
+
+
+
+
 if __name__ == "__main__":
 
     server = -1
@@ -311,8 +380,12 @@ if __name__ == "__main__":
     plotTheseFolds = {}
     plotFolds = {}
     AddSimul = False
+    AddSimulEff = False
     list_of_data = {}
     parser = ArgumentParser()
+    runnbr = -1
+    blFit = True
+
 
     for el in list_of_sources:
         parser.add_argument('-{}'.format(el), '--data{}'.format(el), nargs='+', help='Data for {} server run vol'.format(el))
@@ -332,24 +405,67 @@ if __name__ == "__main__":
     parser.add_argument("-prefix", "--prefix to the files to be analyzed",
                         dest="prefix", default=grType, type=str, help="Prefix for matrix (TH2) to be analyzed mDelila_raw or mDelila or ...".format(prefix))
 
-    parser.add_argument("-s", "--sim", dest="sim", action="store_true",
-                        help="Activate simulation mode.")
+    parser.add_argument("-sim", "--run from simul", type=int,
+                        dest="runnbr", default=runnbr,
+                        help="Run number from simul, default = {}".format(runnbr))
+
+    # parser.add_argument("-s", "--sim", dest="sim", action="store_true",
+    #                     help="Activate simulation mode.")
 
     config = parser.parse_args()
 
     plotTheseFolds = config.plotFolds
-    AddSimul = config.sim
+    AddSimul = (config.runnbr > 0)
 
     if AddSimul:
-        energy, ab_sim = ReadSimData('simul/add_back_all_run4.txt',1,17)
-        energy5, ab_sim5 = ReadSimData('simul/add_back_all_run5.txt', 1, 17)
+        # energy, ab_sim = ReadSimData('simul/add_back_all_run4.txt',1,17)
+        # energy_sim, ab_sim = ReadSimData(f'simul/add_back_all_run{config.runnbr}.txt', 1, 17)
+        energy_sim, ab_sim = ReadSimData(f'run_{config.runnbr}/add_back_all_run_{config.runnbr}.txt', 1, 17)
         plt.figure(2)
         # plt.grid()
         # plt.plot(energy, ab_sim, marker='', linestyle='-', color='gray', linewidth=1)
-        plt.plot(energy5, ab_sim5, marker='', linestyle='-', color='red', linewidth=1)
+        plt.plot(energy_sim, ab_sim, marker='', linestyle='-', color='red', linewidth=1)
         # plt.title('Energy vs Simulated Addback')
         plt.savefig('figures/simulations.{}'.format('jpg'))
         # plt.grid()
+    if AddSimul:
+        js_sim = ReadSimEffData(config.runnbr)
+        plt.figure(0)
+        energy_levels = []
+        efficiencies = []
+
+        selected_fold = 4
+
+        # Loop through each energy level in the json_data
+        for energy, folds in js_sim.items():
+            # Check if the selected fold exists in the current energy level
+            if selected_fold in folds:
+                energy_levels.append(energy)  # Append the energy level
+                efficiencies.append(folds[selected_fold])  # Append the efficiency for the selected fold
+
+        # If no data for the selected fold, show a message
+            # if not energy_levels:
+            #     print(f"Fold {selected_fold} not found in the data.")
+            #     return
+
+        # Plotting the efficiency vs energy for the selected fold
+        plt.plot(energy_levels, efficiencies, label=f'Fold {selected_fold} Sim Run {config.runnbr}')
+
+        # Customize the plot
+        plt.xlabel('Energy (keV)')
+        plt.ylabel('Efficiency (%)')
+        plt.title(f'Efficiency for Fold {selected_fold} Across Different Energy Levels')
+        plt.legend(loc='upper right')
+        plt.grid(True)
+
+    if blFit:
+        fname = 'data_fold_3.dat'
+        if os.path.exists(fname):
+            # If it exists, delete the file
+            os.remove(fname)
+            print(f"The file {fname} has been deleted.")
+        else:
+            print(f"The file {data_fold_3.dat} does not exist.")
 
 
 
@@ -390,3 +506,5 @@ if __name__ == "__main__":
             except:
                 pass
     main()
+
+
