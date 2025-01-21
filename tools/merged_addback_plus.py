@@ -110,7 +110,7 @@ def ReadSimData(filename, colx, coly):
     return energy, ratio
 
 
-def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=None, js56Co=None, meta_data=''):
+def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=None, js56Co=None, js133Ba=None, meta_data=''):
 # def MergeJsonData(js60Co, js152Eu, meta_data):
     js_new=[]
     # print(len(js152Eu))
@@ -149,6 +149,11 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
         except:
             # print('56Co no file')
             pass
+        try:
+            js_element['133Ba'] = js133Ba[i]['133Ba']
+        except:
+            # print('56Co no file')
+            pass
         js_new.append(js_element)
 
     with open('merged.json','w') as ofile:
@@ -176,6 +181,7 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
     color54Mn = []
     color137Cs = []
     color56Co = []
+    color133Ba = []
     colors = {}
 
     for i in range (1,5):
@@ -188,6 +194,7 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
         color22Na.append(color3)
         color54Mn.append(color1)
         color137Cs.append(color1)
+        color133Ba.append(color1)
         color56Co.append(color4)
 
     colors['152Eu'] = color152Eu
@@ -195,6 +202,7 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
     colors['22Na'] = color22Na
     colors['54Mn'] = color54Mn
     colors['137Cs'] = color137Cs
+    colors['133Ba'] = color133Ba
     colors['56Co'] = color56Co
 
     index = 0
@@ -326,6 +334,7 @@ def main():
     js54Mn = None
     js137Cs = None
     js56Co = None
+    js133Ba = None
     list_of_names = {}
     for el in list_of_data:
         # print(list_of_data[el])
@@ -383,8 +392,15 @@ def main():
                 js = {}
                 js[el] = js56Co
                 js_all.append(js)
+        if el == '133Ba':
+            with open(name, 'r') as file:
+                js133Ba = json.load(file)
+                list_of_sources_presented.append(el)
+                js = {}
+                js[el] = js133Ba
+                js_all.append(js)
 
-    MergeJsonData(js60Co, js152Eu, js22Na, js54Mn, js137Cs, js56Co, meta)
+    MergeJsonData(js60Co, js152Eu, js22Na, js54Mn, js137Cs, js56Co, js133Ba, meta)
 
 
 
@@ -420,7 +436,7 @@ if __name__ == "__main__":
     #                     help="Folds to be plotted, default {} - all".format(0))
 
     parser.add_argument("-folds", "--plotFolds",
-                        dest="plotFolds", default=[], type=int, nargs='+',
+                        dest="plotFolds", default=[3], type=int, nargs='+',
                         help="Folds to be plotted, default is all (0), can provide a list like 1 2 3, mind that fold1 corresponds to 0")
 
     parser.add_argument("-gr", "--graphic type: eps, jpg or none ",
@@ -508,7 +524,7 @@ if __name__ == "__main__":
         plt.grid(True)
 
     if blFit:
-        fname = 'data_fold_3.dat'
+        fname = f'data_fold_{plotTheseFolds[0]+1}.dat'
         if os.path.exists(fname):
             # If it exists, delete the file
             os.remove(fname)
@@ -552,6 +568,11 @@ if __name__ == "__main__":
         elif el == '56Co':
             try:
                 list_of_data[el] = config.data56Co
+            except:
+                pass
+        elif el == '133Ba':
+            try:
+                list_of_data[el] = config.data133Ba
             except:
                 pass
     main()

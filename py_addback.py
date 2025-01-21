@@ -374,24 +374,32 @@ def main():
             # print(src)
             # sys.exit()
 
-            fit_limits = [500,1600]
+
 
             ampl = 1000
             fwhm = 3
+            fit_limits = [500, 1600]
 
-            if '60Co' in src:
+            if '60Co' in my_source.name:
                 src = '60Co'
-            if '152Eu' in src:
+            if '152Eu' in my_source.name:
                 fit_limits = [50,1600]
-            if '22Na' in src:
+            if '22Na' in my_source.name:
                 fit_limits = [400,1400]
-            if '54Mn' in src:
-                    fit_limits = [400, 2700]
-            if '137Cs' in src:
+            if '54Mn' in my_source.name:
+                    fit_limits = [400, 1000]
+                    # print(my_source.name)
+                    # sys.exit()
+            if '137Cs' in my_source.name:
                     fit_limits = [500, 1500]
-            if '56Co' in src:
+            if '56Co' in my_source.name:
                     fit_limits = [500, 4000]
                     ampl = 100
+            if '133Ba' in my_source.name:
+                    fit_limits = [50, 500]
+
+
+
 
             # command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly1 -v 2'.format(path, current_file, src, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
             command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly1 -v 2'.format(path, current_file, src,fit_limits[0], fit_limits[1], fwhm, ampl)
@@ -427,17 +435,19 @@ def main():
         for gammakey in list_of_sources:
             if my_source.name == gammakey:
                 for element in j_sources[my_source.name]["gammas"]:
-                    key[my_source.name][element]['addback'] = key[my_source.name][element]["eff"] / fold1[my_source.name][element]["eff"]
+                    try:
+                        key[my_source.name][element]['addback'] = key[my_source.name][element]["eff"] / fold1[my_source.name][element]["eff"]
                     # key[my_source.name][element]['err_ab'] = key[my_source.name][element]['addback'] * (key[my_source.name][element]["err_eff"]/key[my_source.name][element]["eff"]  + fold1[my_source.name][element]["err_eff"]/key[my_source.name][element]["eff"])
-                    key[my_source.name][element]['err_ab'] = key[my_source.name][element]['addback'] * math.sqrt(key[my_source.name][element]["err_eff"]**2 + fold1[my_source.name][element]["err_eff"]**2)
+                        key[my_source.name][element]['err_ab'] = key[my_source.name][element]['addback'] * math.sqrt(key[my_source.name][element]["err_eff"]**2 + fold1[my_source.name][element]["err_eff"]**2)
+                    except:
+                        print(f'skiping {element} keV line, not fitted')
+                        pass
 
     with open('{}addback_{}.json'.format(datapath, my_run.run), 'w') as ofile:
         js_tab = json.dump(list_results, ofile, indent=3, default=str)
 
     with open('{}addback_{}.json'.format(datapath, my_run.run), 'r') as ifile:
         js_tab = json.load(ifile)
-
-
 
     with open('{}addback_{}.json'.format(datapath, my_run.run), 'w') as ofile:
         js_tab = json.dump(list_results, ofile, indent=3, default=str)
@@ -473,7 +483,7 @@ if __name__ == "__main__":
     parser.add_argument("-r", "--run", type=int,
                         dest="runnbr", default=runnbr,
                         help="Run number, default = {}".format(runnbr))
-    parser.add_argument("-d", "--folDs",  nargs=2,
+    parser.add_argument("-folds", "--folds",  nargs=2,
                         dest="dom", default=[dom1, dom2],
                         help="from domain, default = {} {}".format(dom1, dom2))
     parser.add_argument("-t", "--type",
