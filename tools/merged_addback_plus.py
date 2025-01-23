@@ -170,7 +170,17 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
     my_colors3 = [cmap3(i / palette_size) for i in range(palette_size)]
 
     cmap4 = plt.cm.inferno  # You can use other colormaps like 'viridis', 'plasma', 'cividis', 'inferno', 'magma', etc.
-    my_colors4 = [cmap3(i / palette_size) for i in range(palette_size)]
+    my_colors4 = [cmap4(i / palette_size) for i in range(palette_size)]
+
+    cmap5 = plt.cm.magma  # You can use other colormaps like 'viridis', 'plasma', 'cividis', 'inferno', 'magma', etc.
+    my_colors5 = [cmap5(i / palette_size) for i in range(palette_size)]
+
+    cmap6 = plt.cm.Greens  # You can use other colormaps like 'viridis', 'plasma', 'cividis', 'inferno', 'magma', etc.
+    my_colors6 = [cmap6(i / palette_size) for i in range(palette_size)]
+
+
+    cmap7 = plt.cm.Blues  # You can use other colormaps like 'viridis', 'plasma', 'cividis', 'inferno', 'magma', etc.
+    my_colors7 = [cmap7(i / palette_size) for i in range(palette_size)]
 
 
 
@@ -184,18 +194,21 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
     color133Ba = []
     colors = {}
 
-    for i in range (1,5):
+    for i in range (1,palette_size):
         color1 = my_colors1[i]
         color2 = my_colors2[i]
         color3 = my_colors3[i]
         color4 = my_colors4[i]
+        color5 = my_colors5[i]
+        color6 = my_colors6[i]
+        color7 = my_colors7[i]
         color60Co.append(color1)
         color152Eu.append(color2)
         color22Na.append(color3)
-        color54Mn.append(color1)
-        color137Cs.append(color1)
-        color133Ba.append(color1)
-        color56Co.append(color4)
+        color54Mn.append(color4)
+        color137Cs.append(color5)
+        color133Ba.append(color6)
+        color56Co.append(color7)
 
     colors['152Eu'] = color152Eu
     colors['60Co'] = color60Co
@@ -224,8 +237,9 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
         for source in list_of_sources:
             if source in js_new[index]:
                 for el in js_new[index][source]:
-                    plt.figure(0)
-                    plt.scatter(x=float(el), y=js_new[index][source][el]['eff'], color = colors[source][index])
+                    if source!='56Co':
+                        plt.figure(0)
+                        plt.scatter(x=float(el), y=js_new[index][source][el]['eff'], color = colors[source][index])
                     plt.figure(1)
                     plt.scatter(x=float(el), y=js_new[index][source][el]['res'], color=colors[source][index])
                     if index > 0:
@@ -236,8 +250,10 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
                         plt.scatter(x=float(el), y=js_new[index][source][el]['addback'], color='black')
                         plt.errorbar(x=float(el), y=js_new[index][source][el]['addback'], yerr=js_new[index][source][el]["err_ab"] , color='black')
             # print( float(el), js_new[index]['60Co'][el]['eff'])
-                plt.figure(0)
-                plt.scatter(x=float(el), y=js_new[index][source][el]['eff'], color = colors[source][index], label=f'Fold {index+1} {source}')
+                if source != '56Co':
+                    plt.figure(0)
+                    plt.scatter(x=float(el), y=js_new[index][source][el]['eff'], color = colors[source][index], label=f'Fold {index+1} {source}')
+
                 # plt.legend(loc='upper right', fontsize='medium', shadow=False, ncol=2)
                 plt.figure(1)
                 plt.scatter(x=float(el), y=js_new[index][source][el]['res'], color=colors[source][index], label=f'Fold {(index + 1)} {source}')
@@ -263,10 +279,15 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
 
 
     if blFit:
-        ener, eff, res = fit_data_from_file(f'data_fold_{plotTheseFolds[0]}.dat')
-        params, covariance = curve_fit(fitDebertin, ener, eff)
+        dataFull = read_data_for_fit(f'data_fold_{plotTheseFolds[0]}.dat')
+        ener_short  = [value[1] for value in dataFull.values() if value[0] != '56Co']
+        eff_short = [value[2] for value in dataFull.values() if value[0] != '56Co']
+        ener_full = [value[1] for value in dataFull.values()]
+        res_full = [value[3] for value in dataFull.values()]
+
+        params, covariance = curve_fit(fitDebertin, ener_short, eff_short)
         a1f, a2f, a3f, a4f, a5f = params
-        ener1 = np.linspace(min(ener), max(ener), 500)  # Generate 500 points for smoothness
+        ener1 = np.linspace(min(ener_short), max(ener_short), 500)  # Generate 500 points for smoothness
         smooth_fit = fitDebertin(ener1, *params)  # Evaluate the fitted function on the generated points
         plt.figure(0)
         plt.plot(ener1, smooth_fit, color='green', linestyle='--', label='Debertin Fit')
@@ -274,9 +295,9 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
         if blFitRes:
             # ener, eff, res = fit_data_from_file('data_fold_3.dat')
             init = (0.5, 5e-4, -8e-9)
-            params, covariance = curve_fit(fitResolution, ener, res, p0=init)
+            params, covariance = curve_fit(fitResolution, ener_full, res_full, p0=init)
             # print(params)
-            ener1 = np.linspace(min(ener), max(ener), 500)  # Generate 500 points for smoothness
+            ener1 = np.linspace(min(ener_full), max(ener_full), 500)  # Generate 500 points for smoothness
             smooth_fit_res = fitResolution(ener1, *params)  # Evaluate the fitted function
             plt.figure(1)
             plt.plot(ener1, smooth_fit_res, color='green', label='Fit Resolution')
@@ -296,7 +317,7 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
 
 
     file_name_eff = 'fold_eff_all_{}.{}'.format(pltFold, opt)
-    plt.savefig(save_results_to + file_name_eff)
+    plt.savefig(save_results_to + file_name_eff,dpi=300)
     plt.close()
 
     plt.figure(1)
@@ -307,7 +328,7 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
     plt.legend(loc='upper left', fontsize='medium', shadow=False, ncol=2)
     file_name_res = 'fold_res_all_{}.{}'.format(pltFold, opt)
     # file_name_res = f'fold_res_all_{pltFold}.{opt}'
-    plt.savefig(save_results_to + file_name_res)
+    plt.savefig(save_results_to + file_name_res, dpi=300)
     plt.close()
 
     plt.figure(2)
@@ -323,7 +344,7 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
     plt.ylim(0.8,2)
     # file_name_ab = f'fold_ab_all_{pltFold}.{opt}'
     file_name_ab = 'fold_eff_ab_{}.{}'.format(pltFold, opt)
-    plt.savefig(save_results_to + file_name_ab)
+    plt.savefig(save_results_to + file_name_ab, dpi=300)
     plt.close()
 
 def main():
@@ -490,7 +511,7 @@ if __name__ == "__main__":
         # plt.plot(energy, ab_sim, marker='', linestyle='-', color='gray', linewidth=1)
         plt.plot(energy_sim, ab_sim, marker='', linestyle='-', color='red', linewidth=1)
         # plt.title('Energy vs Simulated Addback')
-        plt.savefig('figures/simulations_ab.{}'.format('jpg'))
+        plt.savefig('figures/simulations_ab.{}'.format('jpg'), dpi=300)
         # plt.grid()
     if AddSimul:
         js_sim = ReadSimEffData(config.runnbr)
@@ -514,7 +535,7 @@ if __name__ == "__main__":
 
         # Plotting the efficiency vs energy for the selected fold
         plt.plot(energy_levels, efficiencies, label=f'Fold {selected_fold} Sim Run {config.runnbr}')
-        plt.savefig('figures/simulations_eff.{}'.format('jpg'))
+        plt.savefig('figures/simulations_eff.{}'.format('jpg'),dpi=300)
 
         # Customize the plot
         plt.xlabel('Energy (keV)')
@@ -524,7 +545,8 @@ if __name__ == "__main__":
         plt.grid(True)
 
     if blFit:
-        fname = f'data_fold_{plotTheseFolds[0]+1}.dat'
+        # fname = f'data_fold_{plotTheseFolds[0]+1}.dat'
+        fname = f'data_fold_{plotTheseFolds[0]}.dat'
         if os.path.exists(fname):
             # If it exists, delete the file
             os.remove(fname)
