@@ -202,13 +202,14 @@ def FillResults2json(dom, list, cal):
     peaksum = 0
     for peak in list:
         content = {}
-        content['eff'] = peak.area/(n_decays_int*peak.Intensity)  *100
+        content['eff'] = peak.area/(decays_int[0] *peak.Intensity)  *100
         content['area'] = peak.area
-        if peak.area and n_decays_int:
+        if peak.area and decays_int[0]:
             try:
                 # content['err_eff'] = np.sqrt((1/peak.area + 1/n_decays_int + peak.errIntensity/peak.Intensity**2)*100)*peak.area/(n_decays_int*peak.Intensity)*100
                 # content['err_eff'] = np.sqrt((1/peak.area + 1/n_decays_int + peak.errIntensity/peak.Intensity))*peak.area/(n_decays_int*peak.Intensity)
-                content['err_eff'] = np.sqrt((1/peak.area))
+                # content['err_eff'] = np.sqrt((1/peak.area))
+                content['err_eff'] = np.sqrt(1/peak.area + decays_int[1]**2 + peak.errIntensity/peak.Intensity**2)* content['eff']#no error on source activity
             except:
                 content['err_eff'] = 0
         #print(n_decays_sum, 'this is sum of decays')
@@ -321,17 +322,30 @@ def main():
     print(my_run.__str__())
 
     global my_source
-    my_source = TIso(None, None, None, None)
+    my_source = TIso(None, None, None, None, None)
     my_source.setup_source_from_json(j_sources, my_run.source)
     # if my_run.tstop < my_run.tstart:
     #     print("Check start and stop time of this run. Tstart must be bigger than Tstop")
     #     sys.exit()
-    global n_decays_sum
-    n_decays_sum, n_decays_err= my_source.GetNdecaysIntegral(my_run.tstart, my_run.tstop)
-    global n_decays_int
-    n_decays_int = my_source.GetNdecays(my_run.tstart, my_run.tstop)
+
+    global decays_int
+    global decays_sum
+    decays_int = []
+    decays_sum = []
+
+
+    val, err = my_source.GetNdecays(my_run.tstart, my_run.tstop)
+    decays_sum.append(val)
+    decays_sum.append(err)
+
+    val, err = my_source.GetNdecaysIntegral(my_run.tstart, my_run.tstop)
+    decays_int.append(val)
+    decays_int.append(err)
+
     print(my_source.__str__())
-    print('sum {}; err {}; int {}'.format(n_decays_sum, n_decays_err, n_decays_int))
+    print('Integral {}; err {}'.format(decays_int[0], decays_int[1]))
+    print('Sum {}; err {}'.format(decays_sum[0], decays_sum[1]))
+
 
     for domain in range (my_params.dom1, my_params.dom2+1):
         current_det = 0
@@ -436,9 +450,13 @@ def main():
             if my_source.name == gammakey:
                 for element in j_sources[my_source.name]["gammas"]:
                     try:
+                        #In general we may take areas instead efficiencies
                         key[my_source.name][element]['addback'] = key[my_source.name][element]["eff"] / fold1[my_source.name][element]["eff"]
-                    # key[my_source.name][element]['err_ab'] = key[my_source.name][element]['addback'] * (key[my_source.name][element]["err_eff"]/key[my_source.name][element]["eff"]  + fold1[my_source.name][element]["err_eff"]/key[my_source.name][element]["eff"])
-                        key[my_source.name][element]['err_ab'] = key[my_source.name][element]['addback'] * math.sqrt(key[my_source.name][element]["err_eff"]**2 + fold1[my_source.name][element]["err_eff"]**2)
+                        # But for add_back error I take only errors in peak area because other contities are cancelled
+                        # key[my_source.name][element]['err_ab'] = key[my_source.name][element]['addback'] * math.sqrt(key[my_source.name][element]["err_eff"]**2 + fold1[my_source.name][element]["err_eff"]**2)
+                        key[my_source.name][element]['err_ab'] = key[my_source.name][element]['addback'] * math.sqrt(
+                            1/key[my_source.name][element]["area"] + 1/fold1[my_source.name][element][
+                                "area"] ** 2)
                     except:
                         print(f'skiping {element} keV line, not fitted')
                         pass
