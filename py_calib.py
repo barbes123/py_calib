@@ -72,7 +72,7 @@ lists_of_gamma_background_enabled = []
 global my_params
 
 class TStartParams:
-    def __init__(self, server, runnbr, dom1, dom2, det_type, bg, grType, prefix):
+    def __init__(self, server, runnbr, dom1, dom2, det_type, bg, grType, prefix, dpi):
         self.server = int(server)
         self.runnbr = runnbr
         self.dom1 = int(dom1)
@@ -81,6 +81,7 @@ class TStartParams:
         self.bg = bg
         self.grType = grType
         self.prefix = prefix
+        self.dpi = dpi
 
     def __repr__(self):
         print('=========================================')
@@ -218,7 +219,7 @@ def FillResults2json(dom, list, cal):
             try:
                 # content['err_eff'] = np.sqrt((1/peak.area + 1/n_decays_int + peak.errIntensity/peak.Intensity**2)*100)*peak.area/(n_decays_int*peak.Intensity)*100#strange formula
                 # content['err_eff'] = np.sqrt(1/peak.area + 1/n_decays_int + peak.errIntensity/peak.Intensity**2)* content['eff']#no error on source activity
-                content['err_eff'] = np.sqrt(1/peak.area + decays_int[1]**2 + peak.errIntensity/peak.Intensity**2)* content['eff']#no error on source activity
+                content['err_eff'] = np.sqrt(1/peak.area + decays_int[1]**2 + (peak.errIntensity/peak.Intensity)**2)* content['eff']#no error on source activity
             except:
                 content['err_eff'] = 0
         #print(n_decays_sum, 'this is sum of decays')
@@ -486,6 +487,7 @@ if __name__ == "__main__":
     grType = 'jpg'
     prefix = 'mDelila_raw'
     bgK40 = 0
+    dpi = 100
 
     parser = ArgumentParser()
 
@@ -500,6 +502,9 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--type",
                         dest="det_type", default=det_type,  type=int,
                         help="type of detector to be calibrated; default = 0".format(det_type))
+    parser.add_argument("-dpi", "--dpi",
+                        dest="dpi", default=dpi, type=int,
+                        help="resolution for figures; default = 100".format(dpi))
     # parser.add_argument("-b", "--background",
     #                     dest="bg", default=bg, type=int,
     #                     help="to take in energy calib all background lines; default = {}".format(bg))
@@ -543,7 +548,7 @@ if __name__ == "__main__":
         print('No LUT_RECALL.json is given: {}. Cannot continue.'.format(lutreallener))
         sys.exit()
 
-    my_params = TStartParams(config.server, config.runnbr, config.dom[0], config.dom[1], config.det_type, config.bg, config.grType, config.prefix)
+    my_params = TStartParams(config.server, config.runnbr, config.dom[0], config.dom[1], config.det_type, config.bg, config.grType, config.prefix, config.dpi)
 
 
 #     print('Input Parameters: server, run, domDown, domUp, detType')

@@ -35,8 +35,8 @@ def save_plot_data_to_ascii(js_new, index, source, output_filename="plotted_data
         for el in js_new[index][source]:
             # Extract x (el) and y (eff) values
             x = float(el)
-            eff = js_new[index][source][el]['eff']
-            res = js_new[index][source][el]['res']
+            eff = js_new[index][source][el]['eff'][0]
+            res = js_new[index][source][el]['res'][0]
             try:
                 area = js_new[index][source][el]['area']
             except:

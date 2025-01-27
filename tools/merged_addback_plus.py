@@ -239,24 +239,26 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
                 for el in js_new[index][source]:
                     if source!='56Co':
                         plt.figure(0)
-                        plt.scatter(x=float(el), y=js_new[index][source][el]['eff'], color = colors[source][index])
+                        plt.scatter(x=float(el), y=js_new[index][source][el]['eff'][0], color = colors[source][index])
+                        plt.errorbar(x=float(el), y=js_new[index][source][el]['eff'][0], yerr=js_new[index][source][el]['eff'][1], color=colors[source][index])
                     plt.figure(1)
-                    plt.scatter(x=float(el), y=js_new[index][source][el]['res'], color=colors[source][index])
+                    plt.scatter(x=float(el), y=js_new[index][source][el]['res'][0], color=colors[source][index])
+                    plt.errorbar(x=float(el), y=js_new[index][source][el]['res'][0],yerr=js_new[index][source][el]['res'][1], color=colors[source][index])
                     if index > 0:
                         plt.figure(2)
                         # uncomment for color dots
                         # plt.scatter(x=float(el), y=js_new[index][source][el]['addback'], color=colors[source][index])
                         # plt.errorbar(x=float(el), y=js_new[index][source][el]['addback'], yerr=js_new[index][source][el]["err_ab"], color=colors[source][index])
-                        plt.scatter(x=float(el), y=js_new[index][source][el]['addback'], color='black')
-                        plt.errorbar(x=float(el), y=js_new[index][source][el]['addback'], yerr=js_new[index][source][el]["err_ab"] , color='black')
+                        plt.scatter(x=float(el), y=js_new[index][source][el]['addback'][0], color='black')
+                        plt.errorbar(x=float(el), y=js_new[index][source][el]['addback'][0], yerr=js_new[index][source][el]["addback"][1] , color='black')
             # print( float(el), js_new[index]['60Co'][el]['eff'])
                 if source != '56Co':
                     plt.figure(0)
-                    plt.scatter(x=float(el), y=js_new[index][source][el]['eff'], color = colors[source][index], label=f'Fold {index+1} {source}')
+                    plt.scatter(x=float(el), y=js_new[index][source][el]['eff'][0], color = colors[source][index], label=f'Fold {index+1} {source}')
 
                 # plt.legend(loc='upper right', fontsize='medium', shadow=False, ncol=2)
                 plt.figure(1)
-                plt.scatter(x=float(el), y=js_new[index][source][el]['res'], color=colors[source][index], label=f'Fold {(index + 1)} {source}')
+                plt.scatter(x=float(el), y=js_new[index][source][el]['res'][0], color=colors[source][index], label=f'Fold {(index + 1)} {source}')
                 # plt.legend(loc='upper right', fontsize='medium', shadow=False, ncol=2)
                 save_plot_data_to_ascii(js_new,index,source,f'data_fold_{ifold}.dat')
 
@@ -264,7 +266,7 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
                     plt.figure(2)
                     #uncomment for color dots
                     # plt.scatter(x=float(el), y=js_new[index][source][el]['addback'], color=colors[source][index], label='Fold {}'.format(index + 1))
-                    plt.scatter(x=float(el), y=js_new[index][source][el]['addback'], color='black',
+                    plt.scatter(x=float(el), y=js_new[index][source][el]['addback'][0], color='black',
                                 label='Fold {}'.format(index + 1))
                 # if index == 3:
                 #     plt.figure(2)

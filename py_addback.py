@@ -1,7 +1,6 @@
 #! /usr/bin/python3
 
 from os.path import exists #check if file exists
-
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -9,7 +8,6 @@ import math, sys, os, json, subprocess
 from pathlib import Path
 from argparse import ArgumentParser
 import inspect
-
 try:
     ourpath = os.getenv('PY_CALIB')
     path='{}{}'.format(Path.home(),'/EliadeSorting/EliadeTools/RecalEnergy')
@@ -23,8 +21,7 @@ sys.path.insert(1, '{}/lib'.format(ourpath))
 
 from libCalib1 import TIsotope as TIso
 from libCalib1 import TMeasurement as Tmeas
-# from libPlotEliade import PlotJsonFold as PlotFold
-from libPlotAddBack import PlotJsonFold as PlotFold
+from libPlotAddBack import PlotJsonFold #as PlotFold
 from TRecallEner import TRecallEner
 from libSettings import SetUpRecallEner
 from libSettings import SetUpRecallEnerFromJson
@@ -32,6 +29,7 @@ from utilities import *
 from libLists import list_of_sources
 from libLists import lists_of_gamma_background
 from libLists import lists_of_gamma_background_named
+from libColorsAnsi import *
 
 lists_of_gamma_background_enabled = []
 
@@ -47,7 +45,6 @@ else:
 print('Path to RecalEnergy {}'.format(path))
 save_results_to = 'figures/'
 # list_of_sources = {'60Co','60CoWeak', '152Eu','137Cs', '133Ba', '54Mn','22Na'}
-
 
 print('Data path: ', datapath)
 
@@ -68,7 +65,7 @@ blFirstElement = False
 global my_params
 
 class TStartParams:
-    def __init__(self, server, runnbr, dom1, dom2, det_type, bg, grType, prefix):
+    def __init__(self, server, runnbr, dom1, dom2, det_type, bg, grType, prefix, dpi):
         self.server = int(server)
         self.runnbr = runnbr
         self.dom1 = int(dom1)
@@ -77,6 +74,7 @@ class TStartParams:
         self.bg = bg
         self.grType = grType
         self.prefix = prefix
+        self.dpi = dpi
 
     def __repr__(self):
         print('=========================================')
@@ -202,21 +200,23 @@ def FillResults2json(dom, list, cal):
     peaksum = 0
     for peak in list:
         content = {}
-        content['eff'] = peak.area/(decays_int[0] *peak.Intensity)  *100
+        # content['eff'] = peak.area/(decays_int[0] *peak.Intensity)*100
+        eff_val = peak.area/(decays_int[0] *peak.Intensity)*100
         content['area'] = peak.area
         if peak.area and decays_int[0]:
             try:
                 # content['err_eff'] = np.sqrt((1/peak.area + 1/n_decays_int + peak.errIntensity/peak.Intensity**2)*100)*peak.area/(n_decays_int*peak.Intensity)*100
                 # content['err_eff'] = np.sqrt((1/peak.area + 1/n_decays_int + peak.errIntensity/peak.Intensity))*peak.area/(n_decays_int*peak.Intensity)
                 # content['err_eff'] = np.sqrt((1/peak.area))
-                content['err_eff'] = np.sqrt(1/peak.area + decays_int[1]**2 + peak.errIntensity/peak.Intensity**2)* content['eff']#no error on source activity
+                eff_err = np.sqrt(1/peak.area + decays_int[1]**2 + peak.errIntensity/peak.Intensity**2)* eff_val#no error on source activity
+                content['eff'] = [round(eff_val,4), round(eff_err,4)]
             except:
-                content['err_eff'] = 0
+                content['eff'] = [0, 0]
         #print(n_decays_sum, 'this is sum of decays')
         # print(peak.fwhm, peak.pos_ch, (peak.Etable))
         # print('position ', peak.pos_ch)
-        content['res'] = peak.fwhm/peak.pos_ch*float(peak.Etable)
-        content['err_res'] = 0.1
+        content['res'] = [round(peak.fwhm/peak.pos_ch*float(peak.Etable), 4), 0.1]
+        # content['err_res'] = 0.1
         content['pos_ch'] = peak.pos_ch
         # jsondata[peak.Etable] = content
         source[peak.Etable] = content
@@ -230,12 +230,20 @@ def FillResults2json(dom, list, cal):
         print('source {}'.format(source))
 
 
-    jsondata['PT'] = peaksum/total
+    # jsondata['PT'] = peaksum/total
+
+    pt_val = peaksum/total
+    pt_err = 0
     if peaksum and total:
         try:
-            jsondata['err_PT'] = np.sqrt(1/peaksum+1/total)*peaksum/total
+            # jsondata['err_PT'] = np.sqrt(1/peaksum+1/total)*peaksum/total * pt
+            pt_err = np.sqrt(1/peaksum+1/total)*peaksum/total * pt_val
         except:
-            jsondata['err_PT'] = 0
+            pass
+
+    jsondata['PT'] = [round(pt_val, 4), round(pt_err,4)]
+
+
     jsondata['pol_list'] = cal
 
     jsondata[my_source.name] = source
@@ -247,8 +255,9 @@ def FillResults2json(dom, list, cal):
             if peak_bg.Etable in lists_of_gamma_background:
                 print('BACK', peak_bg.pos_ch, peak_bg.fwhm)
                 content = {}
-                content['res'] = peak_bg.fwhm / peak_bg.pos_ch * float(peak_bg.Etable)
-                content['err_res'] = 0.1
+                # content['res'] = peak_bg.fwhm / peak_bg.pos_ch * float(peak_bg.Etable)
+                # content['err_res'] = 0.1
+                content['res'] = [peak.fwhm / peak.pos_ch * float(peak.Etable), 0.1]
                 content['pos_ch'] = peak_bg.pos_ch
                 content['area'] = peak.area
                 source_bg[str(peak_bg.Etable)] = content
@@ -343,8 +352,8 @@ def main():
     decays_int.append(err)
 
     print(my_source.__str__())
-    print('Integral {}; err {}'.format(decays_int[0], decays_int[1]))
-    print('Sum {}; err {}'.format(decays_sum[0], decays_sum[1]))
+    print('{}Integral {}; err {} %'.format(BLUE, decays_int[0], decays_int[1]))
+    print('Sum {}; err {}  % {}'.format(decays_sum[0], decays_sum[1], RESET))
 
 
     for domain in range (my_params.dom1, my_params.dom2+1):
@@ -428,14 +437,8 @@ def main():
             global total
             total = SumAsci(current_file)
             # total = SumAsciLimits(current_file, myCurrentSetting.limStart, myCurrentSetting.limStop)
-            total = SumAsciLimits(current_file, 100, 3000)
+            total = SumAsciLimits(current_file, 100, 4000)
             ProcessFitDataStr(domain, my_source.name, fitdata, j_sources)
-
-    # with open('new_{}'.format(lutfile), 'w') as ofile:
-    #     js_tab = json.dump(j_lut, ofile, indent=3, default=str)
-
-    # with open('calib_res_{}.json'.format(my_run.run), 'w') as ofile:
-    #     ofile.write(j_results)
 
     #Calculate AddBackFactor
     for key in list_results:
@@ -451,24 +454,28 @@ def main():
                 for element in j_sources[my_source.name]["gammas"]:
                     try:
                         #In general we may take areas instead efficiencies
-                        key[my_source.name][element]['addback'] = key[my_source.name][element]["eff"] / fold1[my_source.name][element]["eff"]
+                        # key[my_source.name][element]['addback'] = key[my_source.name][element]["eff"][0] / fold1[my_source.name][element]["eff"][0]
+                        ab_val = key[my_source.name][element]["eff"][0] / fold1[my_source.name][element]["eff"][0]
+                        ab_err = ab_val * math.sqrt(1 / key[my_source.name][element]["area"] + 1 / fold1[my_source.name][element]["area"] ** 2)
+                        key[my_source.name][element]['addback'] = [round(ab_val, 4), round(ab_err,4)]
                         # But for add_back error I take only errors in peak area because other contities are cancelled
                         # key[my_source.name][element]['err_ab'] = key[my_source.name][element]['addback'] * math.sqrt(key[my_source.name][element]["err_eff"]**2 + fold1[my_source.name][element]["err_eff"]**2)
-                        key[my_source.name][element]['err_ab'] = key[my_source.name][element]['addback'] * math.sqrt(
-                            1/key[my_source.name][element]["area"] + 1/fold1[my_source.name][element][
-                                "area"] ** 2)
+                        # key[my_source.name][element]['err_ab'] = key[my_source.name][element]['addback'] * math.sqrt(1/key[my_source.name][element]["area"] + 1/fold1[my_source.name][element][                                "area"] ** 2)
                     except:
-                        print(f'skiping {element} keV line, not fitted')
+                        print(f'{YELLOW}skiping {element} keV line, not fitted {RESET}')
                         pass
 
-    with open('{}addback_{}.json'.format(datapath, my_run.run), 'w') as ofile:
-        js_tab = json.dump(list_results, ofile, indent=3, default=str)
+    blCompactJSON = True
 
-    with open('{}addback_{}.json'.format(datapath, my_run.run), 'r') as ifile:
-        js_tab = json.load(ifile)
+    if blCompactJSON:
+        js_compact = json_oneline_lists(list_results, 4)
+        with open('{}addback_{}.json'.format(datapath, my_run.run), 'w') as ofile:
+            ofile.write(js_compact)
+    else:
+        with open('{}addback_{}.json'.format(datapath, my_run.run), 'w') as ofile:
+            js_tab = json.dump(list_results, ofile, indent=3, default=str)
 
-    with open('{}addback_{}.json'.format(datapath, my_run.run), 'w') as ofile:
-        js_tab = json.dump(list_results, ofile, indent=3, default=str)
+
 
     with open('{}addback_{}.json'.format(datapath, my_run.run), 'r') as ifile:
         js_tab = json.load(ifile)
@@ -478,11 +485,7 @@ def main():
             source = my_source.name
             if '60Co' in my_source.name:
                 source = '60Co'
-
-
-            # print(js_tab)
-            # PlotFold(js_tab,j_sources,my_source.name,1,my_params.grType)
-            PlotFold(js_tab,j_sources,my_source.name,my_params)
+            PlotJsonFold(js_tab,j_sources,my_source.name,my_params)
 
 if __name__ == "__main__":
     dom1 = 1
@@ -493,6 +496,7 @@ if __name__ == "__main__":
     bg = 0
     grType = 'jpg'
     prefix = 'sum_fold_1'
+    dpi = 100
 
     parser = ArgumentParser()
 
@@ -518,6 +522,9 @@ if __name__ == "__main__":
     parser.add_argument("-prefix", "--prefix to the files to be analyzed",
                         dest="prefix", default=grType, type=str,
                         help="Prefix for matrix (TH2) to be analyzed mDelila_raw or mDelila or ...".format(prefix))
+    parser.add_argument("-dpi", "--dpi",
+                        dest="dpi", default=dpi, type=int,
+                        help="resolution for figures; default = 100".format(dpi))
 
 
     config = parser.parse_args()
@@ -546,6 +553,6 @@ if __name__ == "__main__":
     #     print('No LUT_RECALL.json is given: {}. Cannot continue.'.format(lutreallener))
     #     sys.exit()
 
-    my_params = TStartParams(config.server, config.runnbr, config.dom[0], config.dom[1], config.det_type, config.bg, config.grType, config.prefix)
+    my_params = TStartParams(config.server, config.runnbr, config.dom[0], config.dom[1], config.det_type, config.bg, config.grType, config.prefix, config.dpi)
 
     main()

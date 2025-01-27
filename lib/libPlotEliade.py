@@ -10,7 +10,7 @@ import matplotlib.colors as mcolors
 from random import choice
 
 opt = 'jpg'
-# opt = 'eps'
+# dpi = 300
 
 ##################################################################
 # This library contains functions to plot results from data analysis.
@@ -87,7 +87,7 @@ def find_domain(domain, lutfile):
     return False
 
 
-def PlotJsondom(data, gammatab, source, lutfile, opt='eps'):
+def PlotJsondom(data, gammatab, source, lutfile, opt='eps', dpi=100):
     MakeDir(save_results_to)
 
     for i in data:
@@ -171,7 +171,7 @@ def legend_without_duplicate_labels(figure):
     figure.legend(by_label.values(), by_label.keys(), loc='upper right')
 
 
-def PlotJsonclover(data, gammatab, source, my_det_type, lutfile, opt='eps'):
+def PlotJsonclover(data, gammatab, source, my_det_type, lutfile, opt='eps', dpi=100):
     print('<<<<< I am in PlotJsonclover >>>>>')
     MakeDir(save_results_to)
 
@@ -282,7 +282,7 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile, opt='eps'):
     return True
 
 
-def PlotJsoncore(data, gammatab, source, lutfile, detKey=1, opt='eps'):
+def PlotJsoncore(data, gammatab, source, lutfile, detKey=1, opt='eps', dpi=100):
     debugPlotJsoncore = False
 
     MakeDir(save_results_to)
@@ -344,6 +344,7 @@ def PlotJsoncore(data, gammatab, source, lutfile, detKey=1, opt='eps'):
     # title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
     # CloverName = key["serial"][:len(key["serial"])-1]
     plt.title('Efficiency for core {} {}'.format(CloverName, detKey))
+    plt.title('Efficiency for core {} {}'.format(CloverName, detKey))
     # print('CloverName',CloverName, key['detType'])
     plt.xlabel('Domain')
     plt.ylabel('Efficiency (%)')
@@ -376,7 +377,7 @@ def PlotJsoncore(data, gammatab, source, lutfile, detKey=1, opt='eps'):
     return True
 
 
-def PlotCalibration(data, gammatab, source, lutfile, my_det_type=2, opt='eps'):
+def PlotCalibration(data, gammatab, source, lutfile, my_det_type=2, opt='eps', dpi=100):
     if my_det_type == 3:
         # To plot CeBr calib please use PlotCalibrationCeBr instead of PlotCalibration
         return True
@@ -443,13 +444,13 @@ def PlotCalibration(data, gammatab, source, lutfile, my_det_type=2, opt='eps'):
             # plt.show()
             file_name = 'eliade_{}_{}_calibration.{}'.format(cloverkey, my_det_type, opt)
             file_name = 'eliade_{}_{}_calibration.{}'.format(cloverkey, my_det_type, opt)
-            plt.savefig(save_results_to + file_name)
+            plt.savefig(save_results_to + file_name,  dpi = dpi)
             plt.close()
             blCloverFound = False
     return True
 
 
-def PlotCalibrationCeBr(data, gammatab, source, lutfile, my_det_type=3, opt='eps'):
+def PlotCalibrationCeBr(data, gammatab, source, lutfile, my_det_type=3, opt='eps', dpi=100):
     print('<<<<< I am in PlotCalibrationCeBr >>>>>')
     MakeDir(save_results_to)
     number_of_our_colors = 30
@@ -515,13 +516,13 @@ def PlotCalibrationCeBr(data, gammatab, source, lutfile, my_det_type=3, opt='eps
         # plt.show()
         file_name = 'eliade_{}_calibration.{}'.format(my_det_type, opt)
         file_name = 'eliade_{}_calibration.{}'.format(my_det_type, opt)
-        plt.savefig(save_results_to + file_name)
+        plt.savefig(save_results_to + file_name,  dpi = dpi)
         plt.close()
         blCloverFound = False
     return True
 
 
-def PlotCeBr(data, gammatab, source, my_det_type, lutfile, opt='eps'):
+def PlotCeBr(data, gammatab, source, my_det_type, lutfile, opt='eps', dpi=100):
     print('<<<<< I am in PlotCeBr >>>>>')
     MakeDir(save_results_to)
 
@@ -617,7 +618,7 @@ def PlotCeBr(data, gammatab, source, my_det_type, lutfile, opt='eps'):
 
 
 # def PlotJsonFold(data, gammatab, source, my_det_type, lutfile, opt='eps'):
-def PlotJsonFold(data, gammatab, source, my_det_type, opt='eps'):
+def PlotJsonFold(data, gammatab, source, my_det_type, opt='eps', dpi=100):
     print('<<<<< I am in PlotJsonFold >>>>>')
     MakeDir(save_results_to)
 
@@ -717,7 +718,7 @@ def PlotJsonFold(data, gammatab, source, my_det_type, opt='eps'):
     plt.xlabel('Fold')
     plt.ylabel('Efficiency, %')
     file_name_eff = 'fold_{}_eff.{}'.format(key["fold"], opt)
-    plt.savefig(save_results_to + file_name_eff)
+    plt.savefig(save_results_to + file_name_eff, dpi = dpi)
     plt.close()
 
     plt.figure(2)
@@ -725,7 +726,7 @@ def PlotJsonFold(data, gammatab, source, my_det_type, opt='eps'):
     plt.xlabel('Fold')
     plt.ylabel('Resolution, keV')
     file_name_res = 'fold_{}_res.{}'.format(key["fold"], opt)
-    plt.savefig(save_results_to + file_name_res)
+    plt.savefig(save_results_to + file_name_res, dpi = dpi)
     plt.close()
 
     plt.figure(3)
@@ -733,7 +734,7 @@ def PlotJsonFold(data, gammatab, source, my_det_type, opt='eps'):
     plt.xlabel('Fold')
     plt.ylabel('Add Back factor')
     file_name_ab = 'fold_{}_ab.{}'.format(key["fold"], opt)
-    plt.savefig(save_results_to + file_name_ab)
+    plt.savefig(save_results_to + file_name_ab, dpi = dpi)
     plt.close()
 
     plt.figure(5)
@@ -742,7 +743,7 @@ def PlotJsonFold(data, gammatab, source, my_det_type, opt='eps'):
     plt.xlabel('E$\gamma$')
     plt.ylabel('Add Back factor fold')
     file_name_ab = 'fold_ab_all.{}'.format(opt)
-    plt.savefig(save_results_to + file_name_ab)
+    plt.savefig(save_results_to + file_name_ab, dpi = dpi)
     plt.close()
 
     for fold in range(11, Nfold + 1):
@@ -752,7 +753,7 @@ def PlotJsonFold(data, gammatab, source, my_det_type, opt='eps'):
         plt.xlabel('Eg')
         plt.ylabel('Add Back factor fold')
         file_name_ab = 'fold_{}_ab.{}'.format(fold, opt)
-        plt.savefig(save_results_to + file_name_ab)
+        plt.savefig(save_results_to + file_name_ab, dpi = dpi)
         plt.close()
 
     print('Finished Fold graphs')

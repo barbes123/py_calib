@@ -12,12 +12,13 @@ time_format = "%Y-%m-%d %H:%M:%S"
 # list_of_sources = {'60Co','60CoWeak', '152Eu','137Cs', '133Ba', '54Mn','22Na','252Cf'}
 
 class TIsotope:
-    def __init__(self, name, t12, date0, a0):
+    def __init__(self, name, t12, date0, a0, a0_err):
         self.name = name
         # self.t12 = t12*365*24*3600
         self.t12 = t12
         self.date0 = date0
         self.a0 = a0
+        self.a0_err = a0_err
 
     def __post_init__(self):
         if self.name is None:
@@ -29,13 +30,15 @@ class TIsotope:
             print('The source None; I will use 60Co as default')
         if self.a0 is None:
             self.a0 = a0
+            self.a0_err = a0_err
 
     def setup_source_from_json(self, data, source_name):
         self.found = False
         if source_name in data:
             self.name = source_name
             self.date0 = datetime.strptime(data[source_name]['t0'], time_format)
-            self.a0 = data[source_name]['a0']
+            self.a0 = data[source_name]['a0'][0]
+            self.a0_err = data[source_name]['a0'][1]
             self.t12 = data[source_name]['t12']
             self.found = True
         else:
@@ -57,15 +60,20 @@ class TIsotope:
         return self.a0 * np.exp(-1 * self.decay_constant() * t.total_seconds())
 
     def GetNdecays(self, start, stop):
-        return(1 / 2 * (self.Activity(start) + self.Activity(stop)) * (stop - start).total_seconds())
+        sum = 1 / 2 * (self.Activity(start) + self.Activity(stop)) * (stop - start).total_seconds()
+        err_sum = self.a0_err
+        return sum, err_sum
 
     def GetNdecaysIntegral(self, start, stop):
         t1 = (start - self.date0).total_seconds()
         t2 = (stop - self.date0).total_seconds()
         ndecays = lambda t, a0, decay_constant: a0 * np.exp(-1 * decay_constant * t)
         nn, err = quad(ndecays, t1, t2, args=(self.a0, self.decay_constant()))
+        err_my = self.a0_err
+
         # print("Error from the quad integral is {}".format(err))
-        return nn, err
+        # return nn, err
+        return nn, err_my
 
 class TMeasurement:
     def __init__(self, server, run, source, tstart, tstop, distance):
