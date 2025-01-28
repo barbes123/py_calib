@@ -20,6 +20,8 @@ sys.path.append(ourpath+'/lib')
 from libLists import list_of_sources
 from libLists import list_of_clovers
 from libFitFunc import *
+from libColorsAnsi import *
+from utilities import json_oneline_lists
 
 
 from sympy.printing.pretty.pretty_symbology import line_width
@@ -40,7 +42,7 @@ MakeDir(save_results_to)
 # list_of_clovers = {"CL29", "CL30", "CL31", "CL32", "CL33", "CL34", "CL35", "CL36", "HPGe", "SEG", "LaBr"}
 # list_of_sources = {'60Co','60CoWeak', '152Eu','137Cs', '133Ba','22Na','54Mn'}
 list_of_sources_presented = []
-list_of_cebr = {"CEBR1","CEBR2","CEBR3","CEBR4"}
+# list_of_cebr = {"CEBR1","CEBR2","CEBR3","CEBR4"}
 list_of_data = {}
 js_all =[]
 
@@ -132,32 +134,40 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
         try:
             js_element['22Na'] = js22Na[i]['22Na']
         except:
-            # print('22Na no file')
             pass
         try:
             js_element['54Mn'] = js54Mn[i]['54Mn']
         except:
-            # print('54Mn no file')
             pass
         try:
             js_element['137Cs'] = js137Cs[i]['137Cs']
         except:
-            # print('137Cs no file')
+            print(f'{RED}Data for 137Cs are not found that addback_* folder and addback_run.json is okay {RESET}')
             pass
         try:
             js_element['56Co'] = js56Co[i]['56Co']
         except:
-            # print('56Co no file')
+            print(f'{RED}Data for 56Co are not found that addback_* folder and addback_run.json is okay {RESET}')
             pass
         try:
             js_element['133Ba'] = js133Ba[i]['133Ba']
         except:
-            # print('56Co no file')
             pass
         js_new.append(js_element)
 
-    with open('merged.json','w') as ofile:
-        js_tab = json.dump(js_new, ofile, indent=3, default=str)
+
+    blCompactJSON = True
+    if blCompactJSON:
+        js_compact = json_oneline_lists(js_new, 4)
+        with open('merged.json', 'w') as ofile:
+            ofile.write(js_compact)
+    else:
+        with open('merged.json', 'w') as ofile:
+            js_tab = json.dump(js_new, ofile, indent=3, default=str)
+
+
+    # with open(f'merged.json','w') as ofile:
+    #     js_tab = json.dump(js_new, ofile, indent=3, default=str)
 
     palette_size = len(js_new)+2
     cmap1 = plt.cm.plasma  # You can use other colormaps like 'viridis', 'plasma', 'cividis', etc.
@@ -166,16 +176,16 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
     cmap2 = plt.cm.cividis  # You can use other colormaps like 'viridis', 'plasma', 'cividis', etc.
     my_colors2 = [cmap2(i / palette_size) for i in range(palette_size)]
 
-    cmap3 = plt.cm.viridis  # You can use other colormaps like 'viridis', 'plasma', 'cividis', etc.
+    cmap3 = plt.cm.Greys  # You can use other colormaps like 'viridis', 'plasma', 'cividis', etc.
     my_colors3 = [cmap3(i / palette_size) for i in range(palette_size)]
 
-    cmap4 = plt.cm.inferno  # You can use other colormaps like 'viridis', 'plasma', 'cividis', 'inferno', 'magma', etc.
+    cmap4 = plt.cm.Purples  # You can use other colormaps like 'viridis', 'plasma', 'cividis', 'inferno', 'magma', etc.
     my_colors4 = [cmap4(i / palette_size) for i in range(palette_size)]
 
-    cmap5 = plt.cm.magma  # You can use other colormaps like 'viridis', 'plasma', 'cividis', 'inferno', 'magma', etc.
+    cmap5 = plt.cm.Oranges  # You can use other colormaps like 'viridis', 'plasma', 'cividis', 'inferno', 'magma', etc.
     my_colors5 = [cmap5(i / palette_size) for i in range(palette_size)]
 
-    cmap6 = plt.cm.Greens  # You can use other colormaps like 'viridis', 'plasma', 'cividis', 'inferno', 'magma', etc.
+    cmap6 = plt.cm.Reds  # You can use other colormaps like 'viridis', 'plasma', 'cividis', 'inferno', 'magma', etc.
     my_colors6 = [cmap6(i / palette_size) for i in range(palette_size)]
 
 
@@ -218,6 +228,7 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
     colors['133Ba'] = color133Ba
     colors['56Co'] = color56Co
 
+    # print(js_new)
     index = 0
     for index in range (0,len(js_new)):
         PlotThisFold = True
@@ -232,10 +243,11 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
                     break
         if not PlotThisFold:
             continue
-        # if index <= 2:
-        #     continue
-        for source in list_of_sources:
+        for source in list_of_sources_presented:
             if source in js_new[index]:
+                print(f'{BLUE} {source} {RESET}')
+
+
                 for el in js_new[index][source]:
                     if source!='56Co':
                         plt.figure(0)
@@ -250,7 +262,7 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
                         # plt.scatter(x=float(el), y=js_new[index][source][el]['addback'], color=colors[source][index])
                         # plt.errorbar(x=float(el), y=js_new[index][source][el]['addback'], yerr=js_new[index][source][el]["err_ab"], color=colors[source][index])
                         plt.scatter(x=float(el), y=js_new[index][source][el]['addback'][0], color='black')
-                        plt.errorbar(x=float(el), y=js_new[index][source][el]['addback'][0], yerr=js_new[index][source][el]["addback"][1] , color='black')
+                        plt.errorbar(x=float(el), y=js_new[index][source][el]['addback'][0], yerr=js_new[index][source][el]["addback"][1], color='black')
             # print( float(el), js_new[index]['60Co'][el]['eff'])
                 if source != '56Co':
                     plt.figure(0)
@@ -266,8 +278,7 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
                     plt.figure(2)
                     #uncomment for color dots
                     # plt.scatter(x=float(el), y=js_new[index][source][el]['addback'], color=colors[source][index], label='Fold {}'.format(index + 1))
-                    plt.scatter(x=float(el), y=js_new[index][source][el]['addback'][0], color='black',
-                                label='Fold {}'.format(index + 1))
+                    plt.scatter(x=float(el), y=js_new[index][source][el]['addback'][0], color='black', label='Fold {}'.format(index + 1))
                 # if index == 3:
                 #     plt.figure(2)
                 #     plt.scatter(x=energy, y=ab_sim, color='black', label='Fold {} simulations'.format(index + 1))
@@ -309,7 +320,15 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
     pltFold = plotTheseFolds[0] + 1 #images are done only for the first fold mentioned
 
     plt.figure(0)
-    # plt.xticks(np.arange(0, 1500, 100))
+    ax = plt.gca()
+    line = ax.get_lines()[0]  # Get the first line in the plot
+    max_y = max(line.get_ydata())
+    plt.ylim(0, 1.5*max_y)
+
+
+
+
+
     plt.title('Efficiency {}'.format(meta_data))
     plt.xlabel('E$\gamma$')
     plt.ylabel('Efficiency, %')

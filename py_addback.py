@@ -44,7 +44,6 @@ else:
 
 print('Path to RecalEnergy {}'.format(path))
 save_results_to = 'figures/'
-# list_of_sources = {'60Co','60CoWeak', '152Eu','137Cs', '133Ba', '54Mn','22Na'}
 
 print('Data path: ', datapath)
 
@@ -166,19 +165,29 @@ def ProcessFitDataStr(dom, my_source, lines, j_src):
 
         for gamma in j_src[my_source]['gammas']:
             if gamma in word:
-                print('Found ',gamma,' ', word)
+                print(f'{GREEN}Found {RESET}',gamma,' ', word)
                 numbers = [s for s in word.split(' ') if s]
                 peak = TPeak(dom, numbers)
+                print('number',numbers)
+                if my_source == '137Cs':
+                    peak.pos_ch = float(numbers[12])
+                    peak.area = float(numbers[11])
+                    peak.fwhm = float(numbers[9])
+                    peak.Etable = numbers[8]
+
+
                 peak.Intensity = j_src[my_source]['gammas'][gamma][1]
                 peak.errIntensity = j_src[my_source]['gammas'][gamma][2] #absolute or relative ?
                 PeakList.append(peak)
+                # print('peak',peak)
                 # peak.__str__()
 
     if len(PeakList) == 0:
-        print('ProcessFitDataStr::: no peaks were found for fold {}'.format(dom))
+        print(f'{RED}ProcessFitDataStr::: no peaks were found for fold {dom}{RESET}')
     else:
         # print('ProcessFitDataStr::: Print PeakList {} elements'.format(len(PeakList)))
-        # print(PeakList)
+        # print('PeakList')
+        # print('PeakList\n', PeakList)
         FillResults2json(dom, PeakList, cal)
         for p in PeakList:
             p.__str__()
@@ -203,18 +212,22 @@ def FillResults2json(dom, list, cal):
         # content['eff'] = peak.area/(decays_int[0] *peak.Intensity)*100
         eff_val = peak.area/(decays_int[0] *peak.Intensity)*100
         content['area'] = peak.area
+
         if peak.area and decays_int[0]:
             try:
                 # content['err_eff'] = np.sqrt((1/peak.area + 1/n_decays_int + peak.errIntensity/peak.Intensity**2)*100)*peak.area/(n_decays_int*peak.Intensity)*100
                 # content['err_eff'] = np.sqrt((1/peak.area + 1/n_decays_int + peak.errIntensity/peak.Intensity))*peak.area/(n_decays_int*peak.Intensity)
                 # content['err_eff'] = np.sqrt((1/peak.area))
-                eff_err = np.sqrt(1/peak.area + decays_int[1]**2 + peak.errIntensity/peak.Intensity**2)* eff_val#no error on source activity
+                eff_err = np.sqrt(1/peak.area + decays_int[1]**2 + (peak.errIntensity/peak.Intensity)**2)* eff_val#no error on source activity
                 content['eff'] = [round(eff_val,4), round(eff_err,4)]
             except:
                 content['eff'] = [0, 0]
         #print(n_decays_sum, 'this is sum of decays')
-        # print(peak.fwhm, peak.pos_ch, (peak.Etable))
-        # print('position ', peak.pos_ch)
+        # print(f'{RED}Checking... {RESET}')
+        # print(peak.fwhm, peak.pos_ch, peak.Etable, content['eff'])
+
+        if  peak.pos_ch == 0:
+            print(f'{RED}peak position is  {peak.pos_ch} {RESET}' )
         content['res'] = [round(peak.fwhm/peak.pos_ch*float(peak.Etable), 4), 0.1]
         # content['err_res'] = 0.1
         content['pos_ch'] = peak.pos_ch
@@ -267,14 +280,6 @@ def FillResults2json(dom, list, cal):
     if debug == True:
         print(list_results)
     return True
-
-# def load_json(file):
-#     fname = '{}'.format(file)
-#     if not file_exists(fname):
-#         print('load_json:: file {} is not found as called from {}'.format(file, inspect.stack()[1].function))
-#         sys.exit()
-#     with open(fname,'r') as myfile:
-#         return json.load(myfile)
 
 def SumAsci(file):
     sum = 0
@@ -368,14 +373,8 @@ def main():
         if my_params.det_type != current_det:
             continue
 
-        # myCurrentSetting = SetUpRecallEner(j_lut, domain, my_source.name)
-        # myCurrentSetting = SetUpRecallEnerFromJson(domain, j_lut_recall)
-        # if debug:
-        #     print('I am trying to do fit for domain {}'.format(domain))
         current_file = '{}{}_{}.spe'.format(datapath,prefix,domain)
-        # current_file = '{}mDelila_raw_py_{}.spe'.format(datapath, domain)
 
-        # source4Fit = ''
         if file_exists(current_file):
             # if blBackGround:
             # if my_params.bg == 1:
@@ -414,7 +413,7 @@ def main():
                     # print(my_source.name)
                     # sys.exit()
             if '137Cs' in my_source.name:
-                    fit_limits = [500, 1500]
+                    fit_limits = [500, 900]
             if '56Co' in my_source.name:
                     fit_limits = [500, 4000]
                     ampl = 100
@@ -453,16 +452,18 @@ def main():
             if my_source.name == gammakey:
                 for element in j_sources[my_source.name]["gammas"]:
                     try:
-                        #In general we may take areas instead efficiencies
-                        # key[my_source.name][element]['addback'] = key[my_source.name][element]["eff"][0] / fold1[my_source.name][element]["eff"][0]
-                        ab_val = key[my_source.name][element]["eff"][0] / fold1[my_source.name][element]["eff"][0]
+                        if my_source.name == '56Co':
+                            ab_val = key[my_source.name][element]["area"] / fold1[my_source.name][element]["area"]
+                            # print(f'{RED} Checking {RESET}', key[my_source.name][element]["area"], fold1[my_source.name][element]["area"])
+                        else:
+                            ab_val = key[my_source.name][element]["eff"][0] / fold1[my_source.name][element]["eff"][0]
+                        # But for add_back error I take only errors in peak area because other contities are cancelled
                         ab_err = ab_val * math.sqrt(1 / key[my_source.name][element]["area"] + 1 / fold1[my_source.name][element]["area"] ** 2)
                         key[my_source.name][element]['addback'] = [round(ab_val, 4), round(ab_err,4)]
-                        # But for add_back error I take only errors in peak area because other contities are cancelled
-                        # key[my_source.name][element]['err_ab'] = key[my_source.name][element]['addback'] * math.sqrt(key[my_source.name][element]["err_eff"]**2 + fold1[my_source.name][element]["err_eff"]**2)
-                        # key[my_source.name][element]['err_ab'] = key[my_source.name][element]['addback'] * math.sqrt(1/key[my_source.name][element]["area"] + 1/fold1[my_source.name][element][                                "area"] ** 2)
                     except:
-                        print(f'{YELLOW}skiping {element} keV line, not fitted {RESET}')
+
+                        if (my_params.dom1 != 1 and my_params.dom2 > 1):
+                            print(f'{YELLOW}addback is impossible to calculate for {element} keV line because fold1 data are missing {RESET}')
                         pass
 
     blCompactJSON = True

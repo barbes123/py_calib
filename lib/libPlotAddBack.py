@@ -67,7 +67,7 @@ def PlotJsonFold(data, gammatab, source, pars):
                         plt.scatter(x=key["fold"], y=key[source][element]["eff"][0], color=plot_color, label=f"{element}")
                         plt.errorbar(x=key["fold"], y=key[source][element]["eff"][0], yerr=key[source][element]["eff"][1], fmt='o', color=plot_color, ecolor=plot_color, capsize=5)
                     except:
-                        print(f'{RED}Fold efficiency Plot failed{RESET}')
+                        print(f'{RED}Fold efficiency Plot for {element} keV FAILED{RESET}')
                         pass
                         # continue  # print("Energy {} missing from domain {}".format(key[source][element], key["domain"]))
                     plt.figure(2)  # resolution plot
@@ -75,7 +75,7 @@ def PlotJsonFold(data, gammatab, source, pars):
                         plt.scatter(x=key["fold"], y=key[source][element]["res"][0], color=plot_color, label=f"{element}")
                         plt.errorbar(x=key["fold"], y=key[source][element]["res"][0],yerr=key[source][element]["res"][1], fmt='o', color=plot_color, ecolor=plot_color, capsize=5)
                     except:
-                        print(f'{RED}Fold resolution Plot failed{RESET}')
+                        print(f'{RED}Fold resolution Plot for {element} keV line FAILED {RESET}')
                         pass
                         # continue  # print("Energy {} missing from domain {}".format(key[source][element], key["domain"]))
 
@@ -84,7 +84,7 @@ def PlotJsonFold(data, gammatab, source, pars):
                         plt.scatter(x=key["fold"], y=key[source][element]["addback"][0], color=plot_color, label=f"{element}")
                         plt.errorbar(x=key["fold"], y=key[source][element]["addback"][0], yerr=key[source][element]["addback"][1], fmt='o', color=plot_color, ecolor=plot_color, capsize=5)
                     except:
-                        print(f'{RED}Fold vs addback FAILED{RESET}')
+                        print(f'{RED}Fold addback Plot for {element} keV FAILED{RESET}')
                         pass
                     #     # continue  # print("Energy {} missing from domain {}".format(key[source][element], key["domain"]))
 
@@ -117,7 +117,7 @@ def PlotJsonFold(data, gammatab, source, pars):
                         plt.scatter(x=float(element), y=key[source][element]["res"][0], color=cc)
                         plt.errorbar(x=float(element), y=key[source][element]["res"][0], yerr=key[source][element]["res"][1], color=cc, fmt='o', capsize=5)
                     except:
-                        print('Resolution vs Energy Plot All failed')
+                        print(f'{RED}Resolution vs Energy Plot All for {element} keV FAILED {RESET}')
                         continue
                     plt.figure(6)
                     try:
@@ -136,9 +136,13 @@ def PlotJsonFold(data, gammatab, source, pars):
                         print('Addback vs Energy Plot All failed')
                         continue
         if key['fold'] > 1:
-            plt.figure(5)
-            plt.scatter(x=float(element), y=key[source][element]["addback"][0], color=cc, label='Fold {}'.format(key['fold']))
-            plt.legend(loc='upper left', fontsize='medium', shadow=False)
+            try:
+                plt.figure(5)
+                plt.scatter(x=float(element), y=key[source][element]["addback"][0], color=cc, label='Fold {}'.format(key['fold']))
+                plt.legend(loc='upper left', fontsize='medium', shadow=False)
+            except:
+                print(f'{RED}AddBack plot is not updated. Probably becase fold1 data are missing.{RESET}')
+                pass
         plt.figure(6)
         plt.scatter(x=float(element), y=key[source][element]["eff"][0], color=cc,label='Fold {}'.format(key['fold']))
         plt.legend(loc='upper left', fontsize='medium', shadow=False)
