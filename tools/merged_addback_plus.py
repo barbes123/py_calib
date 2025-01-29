@@ -1,5 +1,5 @@
 #! /usr/bin/python3
-
+from cProfile import label
 from os.path import exists #check if file exists
 
 import os
@@ -39,10 +39,7 @@ datapath = '{}/'.format(current_directory)
 save_results_to = '{}/figures/'.format(datapath)
 MakeDir(save_results_to)
 
-# list_of_clovers = {"CL29", "CL30", "CL31", "CL32", "CL33", "CL34", "CL35", "CL36", "HPGe", "SEG", "LaBr"}
-# list_of_sources = {'60Co','60CoWeak', '152Eu','137Cs', '133Ba','22Na','54Mn'}
 list_of_sources_presented = []
-# list_of_cebr = {"CEBR1","CEBR2","CEBR3","CEBR4"}
 list_of_data = {}
 js_all =[]
 
@@ -90,10 +87,6 @@ def ReadSimEffData(run, ener1=100, ener2=10000):
     # Return the final data
     return json_data
 
-
-
-
-
 def ReadSimData(filename, colx, coly):
     energy = []
     ratio = []
@@ -112,11 +105,37 @@ def ReadSimData(filename, colx, coly):
     return energy, ratio
 
 
+def PlotPT(my_data, meta_data=''):
+    index = 0
+    for dataset in my_data:
+        # Extract fold and PT for each dataset
+        fold = [int(entry["fold"]) for entry in dataset]
+        pt = [entry["PT"][0] for entry in dataset]  # Get the first value in the PT list for plotting
+        pt_err = [entry["PT"][1] for entry in dataset]  # Extract PT errors (y-error)
+
+        colors = ['r', 'g', 'b', 'c', 'm', 'y', 'k', 'orange', 'purple', 'brown']
+        markers = ['o', 's', '^', 'v', 'x', '+', '*', 'D', 'p', ',']
+
+        for source in list_of_sources_presented:
+            if source in dataset[0]:
+                if index > len(colors):
+                    index = 0
+                label, color, marker = source, colors[index], markers[index]
+                plt.errorbar(fold, pt, yerr=pt_err, fmt=marker, color=color, label=label, capsize=5)
+                index+=1
+    plt.xticks(range(1, 4))
+    plt.title(f'PT vs Fold {cloverName}')
+    plt.xlabel("Fold")
+    plt.ylabel("PT")
+    plt.legend()
+    fname = 'fold_pt_all.{}'.format(opt)
+    plt.savefig(save_results_to + fname, dpi=dpi)
+    plt.close()
+
+
+
 def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=None, js56Co=None, js133Ba=None, meta_data=''):
-# def MergeJsonData(js60Co, js152Eu, meta_data):
     js_new=[]
-    # print(len(js152Eu))
-    # print(js152Eu)
     max_fold = 4
 
     # for i in range(0,len(js152Eu)):
@@ -243,6 +262,7 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
                     break
         if not PlotThisFold:
             continue
+
         for source in list_of_sources_presented:
             if source in js_new[index]:
                 print(f'{BLUE} {source} {RESET}')
@@ -305,16 +325,28 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
         plt.figure(0)
         plt.plot(ener1, smooth_fit, color='green', linestyle='--', label='Debertin Fit')
 
+        with open("fit_parameters.txt", "w") as file:
+            file.write("Fitting Parameters for Efficiency Plot:\n")
+            file.write(f"Parameters: {params}\n")
+            file.write("\nCovariance Matrix:\n")
+            file.write(f"Covariance: {covariance}\n")
+            file.write("\n \n")
+
         if blFitRes:
             # ener, eff, res = fit_data_from_file('data_fold_3.dat')
             init = (0.5, 5e-4, -8e-9)
             params, covariance = curve_fit(fitResolution, ener_full, res_full, p0=init)
-            # print(params)
+            print(f'{BLUE}Parameters of Resolution Fit {params} {RESET}')
             ener1 = np.linspace(min(ener_full), max(ener_full), 500)  # Generate 500 points for smoothness
             smooth_fit_res = fitResolution(ener1, *params)  # Evaluate the fitted function
             plt.figure(1)
             plt.plot(ener1, smooth_fit_res, color='green', label='Fit Resolution')
             # plt.legend(loc='upper right')
+            with open("fit_parameters.txt", "a") as file:
+                file.write("Fitting Parameters for Resolution Plot:\n")
+                file.write(f"Parameters: {params}\n")
+                file.write("\nCovariance Matrix:\n")
+                file.write(f"Covariance: {covariance}\n")
 
 
     pltFold = plotTheseFolds[0] + 1 #images are done only for the first fold mentioned
@@ -325,37 +357,34 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
     max_y = max(line.get_ydata())
     plt.ylim(0, 1.5*max_y)
 
-
-
-
-
-    plt.title('Efficiency {}'.format(meta_data))
+    # plt.title('Efficiency {}'.format(meta_data))
+    plt.title('Efficiency {}' .format(cloverName))
     plt.xlabel('E$\gamma$')
     plt.ylabel('Efficiency, %')
     plt.legend(loc='upper right', fontsize='medium', shadow=False, ncol=2)
 
 
-
-
     file_name_eff = 'fold_eff_all_{}.{}'.format(pltFold, opt)
-    plt.savefig(save_results_to + file_name_eff,dpi=300)
+    plt.savefig(save_results_to + file_name_eff,dpi=dpi)
     plt.close()
 
     plt.figure(1)
     # plt.xticks(np.arange(0, 1500, 100))
-    plt.title('Resolution {}' .format(meta_data))
+    # plt.title('Resolution {}' .format(meta_data))
+    plt.title('Resolution {}' .format(cloverName))
     plt.xlabel('E$\gamma$')
     plt.ylabel('Resolution, keV')
     plt.legend(loc='upper left', fontsize='medium', shadow=False, ncol=2)
     file_name_res = 'fold_res_all_{}.{}'.format(pltFold, opt)
     # file_name_res = f'fold_res_all_{pltFold}.{opt}'
-    plt.savefig(save_results_to + file_name_res, dpi=300)
+    plt.savefig(save_results_to + file_name_res, dpi=dpi)
     plt.close()
 
     plt.figure(2)
     # plt.xticks(np.arange(0, 1500, 100))
     # plt.title('Add Back Factor Fold {} '.format(meta_data))
     # plt.title('Add Back Factor Fold')#remove to allow automatic title
+    plt.title('Addback {}' .format(cloverName))
     plt.grid()
     plt.xlabel('E$\gamma$',fontsize=14)
 
@@ -365,8 +394,11 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
     plt.ylim(0.8,2)
     # file_name_ab = f'fold_ab_all_{pltFold}.{opt}'
     file_name_ab = 'fold_eff_ab_{}.{}'.format(pltFold, opt)
-    plt.savefig(save_results_to + file_name_ab, dpi=300)
+    plt.savefig(save_results_to + file_name_ab, dpi=dpi)
     plt.close()
+
+
+
 
 def main():
     meta = ''
@@ -444,11 +476,7 @@ def main():
 
     MergeJsonData(js60Co, js152Eu, js22Na, js54Mn, js137Cs, js56Co, js133Ba, meta)
 
-
-
-
-
-
+    PlotPT([js60Co, js152Eu, js22Na, js54Mn, js137Cs, js56Co, js133Ba], meta_data='')
 
 
 if __name__ == "__main__":
@@ -468,6 +496,9 @@ if __name__ == "__main__":
     blFit = True
     blFitRes = True
     fitFunc = 'deb'
+    dpi = 100
+    cloverName = "Clover"
+
 
 
     for el in list_of_sources:
@@ -489,6 +520,10 @@ if __name__ == "__main__":
     parser.add_argument("-prefix", "--prefix to the files to be analyzed",
                         dest="prefix", default=grType, type=str, help="Prefix for matrix (TH2) to be analyzed mDelila_raw or mDelila or ...".format(prefix))
 
+    parser.add_argument("-name", "--name of the clover to appear on plots",
+                        dest="cloverName", default=cloverName, type=str,
+                        help="Name of the clover how it appears on plots")
+
     parser.add_argument("-sim", "--run from simul", type=int,
                         dest="runnbr", default=runnbr,
                         help="Run number from simul, default = {}".format(runnbr))
@@ -499,6 +534,8 @@ if __name__ == "__main__":
                         # eps, jpeg, jpg, pdf, pgf, png, ps, raw, rgba, svg, svgz, tif, tiff, webp
                         help="Available fit Debertin [deb], ...; default = {}".format(fitFunc))
 
+    parser.add_argument("-dpi", "--dpi", dest="dpi", default=dpi, type=int, help="resolution for figures; default = 100".format(dpi))
+
     # parser.add_argument("-s", "--sim", dest="sim", action="store_true",
     #                     help="Activate simulation mode.")
 
@@ -507,6 +544,10 @@ if __name__ == "__main__":
     plotTheseFolds = config.plotFolds
     AddSimul = (config.runnbr > 0)
     blFit = (config.fitFunc != 'None')
+    dpi = config.dpi
+    cloverName = config.cloverName
+
+    print(f'{GREEN}{cloverName}{RESET}')
 
     if AddSimul:
         # energy, ab_sim = ReadSimData('simul/add_back_all_run4.txt',1,17)

@@ -246,16 +246,9 @@ def FillResults2json(dom, list, cal):
     # jsondata['PT'] = peaksum/total
 
     pt_val = peaksum/total
-    pt_err = 0
-    if peaksum and total:
-        try:
-            # jsondata['err_PT'] = np.sqrt(1/peaksum+1/total)*peaksum/total * pt
-            pt_err = np.sqrt(1/peaksum+1/total)*peaksum/total * pt_val
-        except:
-            pass
-
-    jsondata['PT'] = [round(pt_val, 4), round(pt_err,4)]
-
+    pt_err = np.sqrt(1/peaksum+1/total) * pt_val
+    jsondata['PT'] = [round(pt_val, 4), round(pt_err, 4)]
+    # print(f'{BLUE} PAEK to TOTAL {pt_val} {pt_err} {RESET}')
 
     jsondata['pol_list'] = cal
 
@@ -417,6 +410,7 @@ def main():
             if '56Co' in my_source.name:
                     fit_limits = [500, 4000]
                     ampl = 100
+                    fwhm = 4
             if '133Ba' in my_source.name:
                     fit_limits = [50, 500]
 
