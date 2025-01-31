@@ -17,14 +17,17 @@ ourpath = os.getenv('PY_CALIB')
 
 import sys
 sys.path.append(ourpath+'/lib')
-from libLists import list_of_sources
-from libLists import list_of_clovers
+from libLists import lists_of_gamma_background as lists_of_gamma_background
+from libLists import list_of_clovers as list_of_clovers
+from libLists import list_of_sources as list_of_sources
 from libFitFunc import *
 from libColorsAnsi import *
 from utilities import json_oneline_lists
 
 
 from sympy.printing.pretty.pretty_symbology import line_width
+
+list_of_bad_lines = ['79.623', '160.609']
 
 
 def MakeDir(path):
@@ -113,14 +116,14 @@ def PlotPT(my_data, meta_data=''):
         pt = [entry["PT"][0] for entry in dataset]  # Get the first value in the PT list for plotting
         pt_err = [entry["PT"][1] for entry in dataset]  # Extract PT errors (y-error)
 
-        colors = ['r', 'g', 'b', 'c', 'm', 'y', 'k', 'orange', 'purple', 'brown']
-        markers = ['o', 's', '^', 'v', 'x', '+', '*', 'D', 'p', ',']
+        # colors = ['r', 'g', 'b', 'c', 'm', 'y', 'k', 'orange', 'purple', 'brown']
+        # markers = ['o', 's', '^', 'v', 'x', '+', '*', 'D', 'p', ',']
 
         for source in list_of_sources_presented:
             if source in dataset[0]:
-                if index > len(colors):
+                if index > len(my_colors):
                     index = 0
-                label, color, marker = source, colors[index], markers[index]
+                label, color, marker = source, my_colors[index], my_markers[index]
                 plt.errorbar(fold, pt, yerr=pt_err, fmt=marker, color=color, label=label, capsize=5)
                 index+=1
     plt.xticks(range(1, 4))
@@ -266,13 +269,23 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
         for source in list_of_sources_presented:
             if source in js_new[index]:
                 print(f'{BLUE} {source} {RESET}')
-
-
                 for el in js_new[index][source]:
                     if source!='56Co':
                         plt.figure(0)
-                        plt.scatter(x=float(el), y=js_new[index][source][el]['eff'][0], color = colors[source][index])
-                        plt.errorbar(x=float(el), y=js_new[index][source][el]['eff'][0], yerr=js_new[index][source][el]['eff'][1], color=colors[source][index])
+                        if el not in lists_of_gamma_background and el not in list_of_bad_lines:
+                            plt.scatter(
+                                x=float(el),
+                                y=js_new[index][source][el]['eff'][0],
+                                color=colors[source][index]
+                            )
+                            plt.errorbar(
+                                x=float(el),
+                                y=js_new[index][source][el]['eff'][0],
+                                yerr=js_new[index][source][el]['eff'][1],
+                                color=colors[source][index]
+                            )
+                        # plt.scatter(x=float(el), y=js_new[index][source][el]['eff'][0], color = colors[source][index])
+                        # plt.errorbar(x=float(el), y=js_new[index][source][el]['eff'][0], yerr=js_new[index][source][el]['eff'][1], color=colors[source][index] )
                     plt.figure(1)
                     plt.scatter(x=float(el), y=js_new[index][source][el]['res'][0], color=colors[source][index])
                     plt.errorbar(x=float(el), y=js_new[index][source][el]['res'][0],yerr=js_new[index][source][el]['res'][1], color=colors[source][index])
@@ -281,24 +294,39 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
                         # uncomment for color dots
                         # plt.scatter(x=float(el), y=js_new[index][source][el]['addback'], color=colors[source][index])
                         # plt.errorbar(x=float(el), y=js_new[index][source][el]['addback'], yerr=js_new[index][source][el]["err_ab"], color=colors[source][index])
-                        plt.scatter(x=float(el), y=js_new[index][source][el]['addback'][0], color='black')
-                        plt.errorbar(x=float(el), y=js_new[index][source][el]['addback'][0], yerr=js_new[index][source][el]["addback"][1], color='black')
-            # print( float(el), js_new[index]['60Co'][el]['eff'])
+                        if el not in lists_of_gamma_background and el not in list_of_bad_lines:
+                            plt.scatter(
+                                x=float(el),
+                                y=js_new[index][source][el]['addback'][0],
+                                color='black'
+                            )
+                            plt.errorbar(
+                                x=float(el),
+                                y=js_new[index][source][el]['addback'][0],
+                                yerr=js_new[index][source][el]['addback'][1],
+                                color='black'
+                            )
+                        # plt.scatter(x=float(el), y=js_new[index][source][el]['addback'][0], color='black')
+                        # plt.errorbar(x=float(el), y=js_new[index][source][el]['addback'][0], yerr=js_new[index][source][el]["addback"][1], color='black')
+
                 if source != '56Co':
                     plt.figure(0)
-                    plt.scatter(x=float(el), y=js_new[index][source][el]['eff'][0], color = colors[source][index], label=f'Fold {index+1} {source}')
+                    if el not in lists_of_gamma_background:
+                        plt.scatter(x=float(el), y=js_new[index][source][el]['eff'][0], color = colors[source][index], label=f'Fold {index+1} {source}')
 
                 # plt.legend(loc='upper right', fontsize='medium', shadow=False, ncol=2)
                 plt.figure(1)
                 plt.scatter(x=float(el), y=js_new[index][source][el]['res'][0], color=colors[source][index], label=f'Fold {(index + 1)} {source}')
                 # plt.legend(loc='upper right', fontsize='medium', shadow=False, ncol=2)
+
                 save_plot_data_to_ascii(js_new,index,source,f'data_fold_{ifold}.dat')
 
                 if index > 0:
                     plt.figure(2)
                     #uncomment for color dots
                     # plt.scatter(x=float(el), y=js_new[index][source][el]['addback'], color=colors[source][index], label='Fold {}'.format(index + 1))
-                    plt.scatter(x=float(el), y=js_new[index][source][el]['addback'][0], color='black', label='Fold {}'.format(index + 1))
+                    if el not in lists_of_gamma_background:
+                        plt.scatter(x=float(el), y=js_new[index][source][el]['addback'][0], color='black', label='Fold {}'.format(index + 1))
                 # if index == 3:
                 #     plt.figure(2)
                 #     plt.scatter(x=energy, y=ab_sim, color='black', label='Fold {} simulations'.format(index + 1))
@@ -313,10 +341,17 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
 
     if blFit:
         dataFull = read_data_for_fit(f'data_fold_{plotTheseFolds[0]}.dat')
-        ener_short  = [value[1] for value in dataFull.values() if value[0] != '56Co']
-        eff_short = [value[2] for value in dataFull.values() if value[0] != '56Co']
+        # ener_short  = [value[1] for value in dataFull.values() if not (value[0] == '56Co' or ('79.623' in str(value[1])))]
+        # eff_short = [value[2] for value in dataFull.values() if not (value[0] == '56Co' or ('71.623' in str(value[1])))]
+        ener_short  = [value[1] for value in dataFull.values() if not (value[0] == '56Co' or (str(value[1]) in list_of_bad_lines ))]
+        eff_short = [value[2] for value in dataFull.values() if not (value[0] == '56Co' or (str(value[1]) in list_of_bad_lines ))]
         ener_full = [value[1] for value in dataFull.values()]
         res_full = [value[3] for value in dataFull.values()]
+
+        print(f'{RED}{ener_short}{RESET}')
+
+        # print([value[1] for value in dataFull.values()])
+        # sys.exit()
 
         params, covariance = curve_fit(fitDebertin, ener_short, eff_short)
         a1f, a2f, a3f, a4f, a5f = params
@@ -352,10 +387,13 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
     pltFold = plotTheseFolds[0] + 1 #images are done only for the first fold mentioned
 
     plt.figure(0)
-    ax = plt.gca()
-    line = ax.get_lines()[0]  # Get the first line in the plot
-    max_y = max(line.get_ydata())
+    # ax = plt.gca()
+    # line = ax.get_lines()[0]  # Get the first line in the plot
+    # max_y = max(line.get_ydata())
+    max_y = max([line.get_ydata().max() for line in plt.gca().get_lines()])
     plt.ylim(0, 1.5*max_y)
+    # print(line)
+    # print(f'{RED} MAX {max_y} {RESET}')
 
     # plt.title('Efficiency {}'.format(meta_data))
     plt.title('Efficiency {}' .format(cloverName))
@@ -493,6 +531,7 @@ if __name__ == "__main__":
     list_of_data = {}
     parser = ArgumentParser()
     runnbr = -1
+    simRuns = {}
     blFit = True
     blFitRes = True
     fitFunc = 'deb'
@@ -512,6 +551,11 @@ if __name__ == "__main__":
                         dest="plotFolds", default=[3], type=int, nargs='+',
                         help="Folds to be plotted, default is all (0), can provide a list like 1 2 3, mind that fold1 corresponds to 0")
 
+    parser.add_argument("-sim", "--runs from simul", type=int, nargs='+',
+                        dest="simRuns", default=[],
+                        help="Run number from simul, default is empty")
+
+
     parser.add_argument("-gr", "--graphic type: eps, jpg or none ",
                         dest="grType", default=grType, type=str, choices=('eps', 'jpeg', 'jpg', 'png', 'svg', 'svgz', 'tif', 'tiff', 'webp','none'),
                         # eps, jpeg, jpg, pdf, pgf, png, ps, raw, rgba, svg, svgz, tif, tiff, webp
@@ -524,9 +568,9 @@ if __name__ == "__main__":
                         dest="cloverName", default=cloverName, type=str,
                         help="Name of the clover how it appears on plots")
 
-    parser.add_argument("-sim", "--run from simul", type=int,
-                        dest="runnbr", default=runnbr,
-                        help="Run number from simul, default = {}".format(runnbr))
+    # parser.add_argument("-sim", "--run from simul", type=int,
+    #                     dest="runnbr", default=runnbr,
+    #                     help="Run number from simul, default = {}".format(runnbr))
 
     parser.add_argument("-fit", "--fitting the efficiency",
                         dest="fitFunc", default=fitFunc, type=str,
@@ -542,7 +586,10 @@ if __name__ == "__main__":
     config = parser.parse_args()
 
     plotTheseFolds = config.plotFolds
-    AddSimul = (config.runnbr > 0)
+    # AddSimul = (config.runnbr > 0)
+    print(config.simRuns)
+    AddSimul =(config.simRuns != 'None')
+    # AddSimul = (len(config.simRuns) > 0)
     blFit = (config.fitFunc != 'None')
     dpi = config.dpi
     cloverName = config.cloverName
@@ -550,54 +597,74 @@ if __name__ == "__main__":
     print(f'{GREEN}{cloverName}{RESET}')
 
     if AddSimul:
+        pass
         # energy, ab_sim = ReadSimData('simul/add_back_all_run4.txt',1,17)
         # energy_sim, ab_sim = ReadSimData(f'simul/add_back_all_run{config.runnbr}.txt', 1, 17)
 
-        ncol = 17
-        selected_fold = plotTheseFolds[0]+1
-
-        if selected_fold == 4:
-            ncol = 17
-        elif selected_fold == 3:
-            ncol = 13
-        elif selected_fold == 2:
-            ncol = 9
-        elif selected_fold == 1:
-            ncol = 5
+        # ncol = 17
+        # selected_fold = plotTheseFolds[0]+1
+        #
+        # if selected_fold == 4:
+        #     ncol = 17
+        # elif selected_fold == 3:
+        #     ncol = 13
+        # elif selected_fold == 2:
+        #     ncol = 9
+        # elif selected_fold == 1:
+        #     ncol = 5
         # print(ncol, selected_fold)
         # sys.exit()
 
-        energy_sim, ab_sim = ReadSimData(f'run_{config.runnbr}/add_back_all_run_{config.runnbr}.txt', 1, ncol)
-        plt.figure(2)#add sim to addback
+        # energy_sim, ab_sim = ReadSimData(f'run_{config.runnbr}/add_back_all_run_{config.runnbr}.txt', 1, ncol)
+        ####energy_sim, ab_sim = ReadSimData(f'run_{config.simRuns[0]}/add_back_all_run_{config.simRuns[0]}.txt', 1, ncol)
+        ####plt.figure(2)#add sim to addback
         # plt.grid()
         # plt.plot(energy, ab_sim, marker='', linestyle='-', color='gray', linewidth=1)
-        plt.plot(energy_sim, ab_sim, marker='', linestyle='-', color='red', linewidth=1)
+        ####plt.plot(energy_sim, ab_sim, marker='', linestyle='-', color='red', linewidth=1)
         # plt.title('Energy vs Simulated Addback')
-        plt.savefig('figures/simulations_ab.{}'.format('jpg'), dpi=300)
+        # plt.savefig('figures/simulations_ab.{}'.format('jpg'), dpi=300)
         # plt.grid()
+
     if AddSimul:
-        js_sim = ReadSimEffData(config.runnbr)
-        plt.figure(0)#add sim to eff
-        energy_levels = []
-        efficiencies = []
+        color_index = 0
+        for run in config.simRuns:
+            js_sim = ReadSimEffData(run)
+            plt.figure(0)#add sim to eff
+            energy_levels = []
+            efficiencies = []
+            addback = []
+            if color_index > 9:
+                color_index = 0
 
-        selected_fold = plotTheseFolds[0]+1
+            selected_fold = plotTheseFolds[0]+1
 
-        # Loop through each energy level in the json_data
-        for energy, folds in js_sim.items():
-            # Check if the selected fold exists in the current energy level
-            if selected_fold in folds:
-                energy_levels.append(energy)  # Append the energy level
-                efficiencies.append(folds[selected_fold])  # Append the efficiency for the selected fold
+            # Loop through each energy level in the json_data
+            for energy, folds in js_sim.items():
+                # Check if the selected fold exists in the current energy level
+                if selected_fold in folds:
+                    energy_levels.append(energy)  # Append the energy level
+                    efficiencies.append(folds[selected_fold])  # Append the efficiency for the selected fold
 
-        # If no data for the selected fold, show a message
-            # if not energy_levels:
-            #     print(f"Fold {selected_fold} not found in the data.")
-            #     return
 
-        # Plotting the efficiency vs energy for the selected fold
-        plt.plot(energy_levels, efficiencies, label=f'Fold {selected_fold} Sim Run {config.runnbr}')
-        plt.savefig('figures/simulations_eff.{}'.format('jpg'),dpi=300)
+            # Plotting the efficiency vs energy for the selected fold
+            plt.plot(energy_levels, efficiencies, label=f'Fold {selected_fold} Sim Run {run}', color = my_colors[color_index])
+            plt.savefig('figures/simulations_eff.{}'.format('jpg'),dpi=300)
+            color_index+=1
+
+            ncol = 17
+            selected_fold = plotTheseFolds[0] + 1
+
+            if selected_fold == 4:
+                ncol = 17
+            elif selected_fold == 3:
+                ncol = 13
+            elif selected_fold == 2:
+                ncol = 9
+            elif selected_fold == 1:
+                ncol = 5
+            energy_sim, ab_sim = ReadSimData(f'run_{run}/add_back_all_run_{run}.txt', 1, ncol)
+            plt.figure(2)  # add sim to addback
+            plt.plot(energy_sim, ab_sim, marker='', linestyle='-', color=my_colors[color_index], linewidth=1)
 
         # Customize the plot
         plt.xlabel('Energy (keV)')

@@ -163,9 +163,10 @@ def ProcessFitDataStr(dom, my_source, lines, j_src):
                     # item['pol_list'] = cal
                     # print('New calibration {}'.format(item['pol_list']))
 
+
         for gamma in j_src[my_source]['gammas']:
             if gamma in word:
-                print(f'{GREEN}Found {RESET}',gamma,' ', word)
+                # print(f'{GREEN}Found {RESET}',gamma,' ', word)
                 numbers = [s for s in word.split(' ') if s]
                 peak = TPeak(dom, numbers)
                 print('number',numbers)
@@ -175,12 +176,29 @@ def ProcessFitDataStr(dom, my_source, lines, j_src):
                     peak.fwhm = float(numbers[9])
                     peak.Etable = numbers[8]
 
-
                 peak.Intensity = j_src[my_source]['gammas'][gamma][1]
                 peak.errIntensity = j_src[my_source]['gammas'][gamma][2] #absolute or relative ?
                 PeakList.append(peak)
                 # print('peak',peak)
-                # peak.__str__()
+                peak.__repr__()
+
+        for gamma in j_src['bg']['gammas']:
+            if gamma in word:
+                print(f'{RED}Found {RESET}', gamma, ' ', word)
+                numbers = [s for s in word.split(' ') if s]
+                peak = TPeak(dom, numbers)
+                print('number', numbers)
+
+                peak.pos_ch = float(numbers[7])
+                peak.area = float(numbers[3])
+                peak.fwhm = float(numbers[5])
+                peak.Etable = numbers[7]
+
+                peak.Intensity = j_src['bg']['gammas'][gamma][1]
+                peak.errIntensity = j_src['bg']['gammas'][gamma][2]  # absolute or relative ?
+                PeakList.append(peak)
+                # print('peak',peak)
+                peak.__repr__()
 
     if len(PeakList) == 0:
         print(f'{RED}ProcessFitDataStr::: no peaks were found for fold {dom}{RESET}')
@@ -189,8 +207,10 @@ def ProcessFitDataStr(dom, my_source, lines, j_src):
         # print('PeakList')
         # print('PeakList\n', PeakList)
         FillResults2json(dom, PeakList, cal)
+        print(f'{BLUE}')
         for p in PeakList:
             p.__str__()
+        print(f'{RESET}')
 
 def FillResults2json(dom, list, cal):
     jsondata = {}
@@ -200,31 +220,25 @@ def FillResults2json(dom, list, cal):
     # jsondata['domain'] = dom
     jsondata['fold'] = dom
 
-
-    # for item in j_lut:
-    #     if item['domain'] == dom:
-    #         jsondata['serial'] = item['serial']
-    #         jsondata['detType'] = item['detType']
-
     peaksum = 0
     for peak in list:
         content = {}
         # content['eff'] = peak.area/(decays_int[0] *peak.Intensity)*100
-        eff_val = peak.area/(decays_int[0] *peak.Intensity)*100
         content['area'] = peak.area
 
-        if peak.area and decays_int[0]:
-            try:
-                # content['err_eff'] = np.sqrt((1/peak.area + 1/n_decays_int + peak.errIntensity/peak.Intensity**2)*100)*peak.area/(n_decays_int*peak.Intensity)*100
-                # content['err_eff'] = np.sqrt((1/peak.area + 1/n_decays_int + peak.errIntensity/peak.Intensity))*peak.area/(n_decays_int*peak.Intensity)
-                # content['err_eff'] = np.sqrt((1/peak.area))
-                eff_err = np.sqrt(1/peak.area + decays_int[1]**2 + (peak.errIntensity/peak.Intensity)**2)* eff_val#no error on source activity
-                content['eff'] = [round(eff_val,4), round(eff_err,4)]
-            except:
-                content['eff'] = [0, 0]
-        #print(n_decays_sum, 'this is sum of decays')
-        # print(f'{RED}Checking... {RESET}')
-        # print(peak.fwhm, peak.pos_ch, peak.Etable, content['eff'])
+        if peak.Etable not in lists_of_gamma_background_enabled:
+            #Calculate efficiency for non-bg gamma-lines
+            eff_val = peak.area/(decays_int[0] *peak.Intensity)*100
+
+            if peak.area and decays_int[0]:
+                try:
+                    # content['err_eff'] = np.sqrt((1/peak.area + 1/n_decays_int + peak.errIntensity/peak.Intensity**2)*100)*peak.area/(n_decays_int*peak.Intensity)*100
+                    # content['err_eff'] = np.sqrt((1/peak.area + 1/n_decays_int + peak.errIntensity/peak.Intensity))*peak.area/(n_decays_int*peak.Intensity)
+                    # content['err_eff'] = np.sqrt((1/peak.area))
+                    eff_err = np.sqrt(1/peak.area + decays_int[1]**2 + (peak.errIntensity/peak.Intensity)**2)* eff_val#no error on source activity
+                    content['eff'] = [round(eff_val,4), round(eff_err,4)]
+                except:
+                    content['eff'] = [0, 0]
 
         if  peak.pos_ch == 0:
             print(f'{RED}peak position is  {peak.pos_ch} {RESET}' )
@@ -234,10 +248,7 @@ def FillResults2json(dom, list, cal):
         # jsondata[peak.Etable] = content
         source[peak.Etable] = content
         peaksum = peaksum + peak.area
-        # print('Dump to json peak: {} {} {}'.format(peak.Etable, peak.pos_ch, peak.fwhm))
-        # print(source)
-        # print(source[peak.Etable])
-        # print('Dump to json peak: {} {} {}'.format(source[peak.Etable].Etable, source[peak.Etable].pos_ch, source[peak.Etable].fwhm))
+        # print(f'{MAGENTA }{source[peak.Etable]} {RESET}')
 
     if debug == True:
         print('source {}'.format(source))
@@ -267,7 +278,7 @@ def FillResults2json(dom, list, cal):
                 content['pos_ch'] = peak_bg.pos_ch
                 content['area'] = peak.area
                 source_bg[str(peak_bg.Etable)] = content
-        jsondata['bg'] = source_bg
+        # jsondata['bg'] = source_bg
 
     list_results.append(jsondata)
     if debug == True:
@@ -385,41 +396,43 @@ def main():
                 src = '{}'.format(source4Fit)
                 for gamma in lists_of_gamma_background_enabled:
                     src = src + ' -ener {}'.format(gamma)
-            #
-            # print(src)
-            # sys.exit()
-
-
 
             ampl = 1000
             fwhm = 3
             fit_limits = [500, 1600]
+            pt_limits = [50,4000]
 
             if '60Co' in my_source.name:
                 src = '60Co'
+                pt_limits = [50, 4000]
+                pt_limits = [50, 4000]
             if '152Eu' in my_source.name:
                 fit_limits = [50,1600]
+                pt_limits = [50, 4000]
             if '22Na' in my_source.name:
-                fit_limits = [400,1400]
+                fit_limits = [400,1600]
+                pt_limits = [50, 4000]
             if '54Mn' in my_source.name:
-                    fit_limits = [400, 1000]
+                    fit_limits = [400, 2000]
+                    pt_limits = [50, 4000]
                     # print(my_source.name)
                     # sys.exit()
             if '137Cs' in my_source.name:
                     fit_limits = [500, 900]
+                    pt_limits = [50, 4000]
             if '56Co' in my_source.name:
                     fit_limits = [500, 4000]
+                    pt_limits = [50, 4000]
                     ampl = 100
                     fwhm = 4
             if '133Ba' in my_source.name:
                     fit_limits = [50, 500]
+                    pt_limits = [50, 4000]
 
+            print(f'{BLUE} PT limits {my_source.name} {pt_limits} {RESET}')
+            command_line = f'{path} -spe {current_file} -{src} -lim {fit_limits[0]} {fit_limits[1]} -fmt A 16384 -dwa {fwhm} {ampl} -poly1 -v 2'
 
-
-
-            # command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly1 -v 2'.format(path, current_file, src, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
-            command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly1 -v 2'.format(path, current_file, src,fit_limits[0], fit_limits[1], fwhm, ampl)
-            print('{}'.format(command_line))
+            print(f'{YELLOW} {command_line} {RESET}')
             if debug:
                 print('I am ready to do fit for domain {} : '.format(domain))
 
@@ -430,8 +443,12 @@ def main():
             global total
             total = SumAsci(current_file)
             # total = SumAsciLimits(current_file, myCurrentSetting.limStart, myCurrentSetting.limStop)
-            total = SumAsciLimits(current_file, 100, 4000)
+            # total = SumAsciLimits(current_file, 100, 4000)
+            total = SumAsciLimits(current_file, pt_limits[0], pt_limits[1])
+            # print(pt_limits[0], pt_limits[1])
+            # sys.exit()
             ProcessFitDataStr(domain, my_source.name, fitdata, j_sources)
+            # ProcessFitDataStr(domain, 'bg', fitdata, j_sources)
 
     #Calculate AddBackFactor
     for key in list_results:
@@ -507,9 +524,9 @@ if __name__ == "__main__":
                         dest="det_type", default=det_type,  type=int,
                         help="type of detector to be calibrated; default = 0".format(det_type))
     parser.add_argument('--bg', action='store_true', help="Enables all background lines")
-    parser.add_argument('--K40', action='store_true', help="Enables 1460.820 keV")
-    parser.add_argument('--anni', action='store_true', help="Enables 511.006 keV")
-    parser.add_argument('--Tl208', action='store_true', help="Enables 2614.510 keV")
+    parser.add_argument('-K40', action='store_true', help="Enables 1460.820 keV")
+    parser.add_argument('-anni', action='store_true', help="Enables 511.006 keV")
+    parser.add_argument('-Tl208', action='store_true', help="Enables 2614.510 keV")
     parser.add_argument("-gr", "--graphic type: eps, jpg or none ",
                         dest="grType", default=grType, type=str, choices=('eps', 'jpeg', 'jpg', 'png', 'svg', 'svgz', 'tif', 'tiff', 'webp','none'),
                         # eps, jpeg, jpg, pdf, pgf, png, ps, raw, rgba, svg, svgz, tif, tiff, webp
@@ -536,7 +553,7 @@ if __name__ == "__main__":
         if config.anni:
             lists_of_gamma_background_enabled.append(lists_of_gamma_background_named['anni'])
 
-    print('Lists of Gamma Background Enabled: ', lists_of_gamma_background_enabled)
+    print(f'{BLUE}Lists of Gamma Background Enabled: {lists_of_gamma_background_enabled} {RESET}')
 
     print(config)
 

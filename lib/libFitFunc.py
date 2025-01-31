@@ -1,8 +1,11 @@
-import sys
+import sys, os
 
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
+ourpath = os.getenv('PY_CALIB')
+sys.path.append(ourpath+'/lib')
+from libLists import lists_of_gamma_background as lists_of_gamma_background
 
 def fitResolution(E, a1, b1, c1):
     return np.sqrt(a1+b1*E+c1*E*E)
@@ -33,6 +36,8 @@ def save_plot_data_to_ascii(js_new, index, source, output_filename="plotted_data
         # Iterate through the elements in js_new and extract el, eff data
         # f.write("# energy efficiency area resolution \n")
         for el in js_new[index][source]:
+            if el in lists_of_gamma_background:
+                continue
             # Extract x (el) and y (eff) values
             x = float(el)
             eff = js_new[index][source][el]['eff'][0]
