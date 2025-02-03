@@ -358,7 +358,7 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
         ener1 = np.linspace(min(ener_short), max(ener_short), 500)  # Generate 500 points for smoothness
         smooth_fit = fitDebertin(ener1, *params)  # Evaluate the fitted function on the generated points
         plt.figure(0)
-        plt.plot(ener1, smooth_fit, color='green', linestyle='--', label='Debertin Fit')
+        plt.plot(ener1, smooth_fit, color='black', linestyle='--', label='Debertin Fit')
 
         with open("fit_parameters.txt", "w") as file:
             file.write("Fitting Parameters for Efficiency Plot:\n")
@@ -594,39 +594,10 @@ if __name__ == "__main__":
     dpi = config.dpi
     cloverName = config.cloverName
 
-    print(f'{GREEN}{cloverName}{RESET}')
+    # print(f'{GREEN}{cloverName}{RESET}')
 
     if AddSimul:
-        pass
-        # energy, ab_sim = ReadSimData('simul/add_back_all_run4.txt',1,17)
-        # energy_sim, ab_sim = ReadSimData(f'simul/add_back_all_run{config.runnbr}.txt', 1, 17)
-
-        # ncol = 17
-        # selected_fold = plotTheseFolds[0]+1
-        #
-        # if selected_fold == 4:
-        #     ncol = 17
-        # elif selected_fold == 3:
-        #     ncol = 13
-        # elif selected_fold == 2:
-        #     ncol = 9
-        # elif selected_fold == 1:
-        #     ncol = 5
-        # print(ncol, selected_fold)
-        # sys.exit()
-
-        # energy_sim, ab_sim = ReadSimData(f'run_{config.runnbr}/add_back_all_run_{config.runnbr}.txt', 1, ncol)
-        ####energy_sim, ab_sim = ReadSimData(f'run_{config.simRuns[0]}/add_back_all_run_{config.simRuns[0]}.txt', 1, ncol)
-        ####plt.figure(2)#add sim to addback
-        # plt.grid()
-        # plt.plot(energy, ab_sim, marker='', linestyle='-', color='gray', linewidth=1)
-        ####plt.plot(energy_sim, ab_sim, marker='', linestyle='-', color='red', linewidth=1)
-        # plt.title('Energy vs Simulated Addback')
-        # plt.savefig('figures/simulations_ab.{}'.format('jpg'), dpi=300)
-        # plt.grid()
-
-    if AddSimul:
-        color_index = 0
+        color_index = 2
         for run in config.simRuns:
             js_sim = ReadSimEffData(run)
             plt.figure(0)#add sim to eff
