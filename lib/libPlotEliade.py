@@ -87,7 +87,7 @@ def find_domain(domain, lutfile):
     return False
 
 
-def PlotJsondom(data, gammatab, source, lutfile, opt='eps', dpi=100):
+def PlotJsondom(data, gammatab, source, lutfile, opt='eps', dpi=300):
     MakeDir(save_results_to)
 
     for i in data:
@@ -120,9 +120,12 @@ def PlotJsondom(data, gammatab, source, lutfile, opt='eps', dpi=100):
             plt.grid(color='black', linestyle='--', linewidth=0.5)
             # plt.legend()
             interactive(True)
-            # plt.show()
+
+            max_y = max([line.get_ydata().max() for line in plt.gca().get_lines()])
+            plt.ylim(0, 1.5 * max_y)
+
             file_name1 = 'dom_{}_res.{}'.format(dom, opt)
-            plt.savefig(save_results_to + file_name1)
+            plt.savefig(save_results_to + file_name1,  dpi = dpi)
             plt.close()
             plt.figure(2)
             for key in i[source].keys():
@@ -136,17 +139,21 @@ def PlotJsondom(data, gammatab, source, lutfile, opt='eps', dpi=100):
             elif source == "152Eu":
                 plt.xlim([100, 1500])
 
-            if (i["detType"] == 1 or i["detType"] == 10):
-                if (int(i["domain"]) == 1):
-                    # plt.ylim([0,2.5])
-                    plt.ylim([0, 1])
-                else:
-                    plt.ylim([0, 0.1])
-            elif i["detType"] == 2:
-                if i["domain"] == 2:
-                    plt.ylim([0.0, .5])
-                else:
-                    plt.ylim([0, 0.01])
+            max_y = max([line.get_ydata().max() for line in plt.gca().get_lines()])
+            plt.ylim(0, 1.5 * max_y)
+
+            # if (i["detType"] == 1 or i["detType"] == 10):
+            #     if (int(i["domain"]) == 1):
+            #         # plt.ylim([0,2.5])
+            #         plt.ylim([0, 1])
+            #     else:
+            #         plt.ylim([0, 0.4])
+            # elif i["detType"] == 2:
+            #     if i["domain"] == 2:
+            #         plt.ylim([0.0, .5])
+            #     else:
+            #         plt.ylim([0, 0.01])
+
             # if (i["domain"==1] or i["domain"]==2):
             #     plt.ylim([0.5, 2])
             # plt.ylim([0.0001,0.00015])
@@ -156,9 +163,9 @@ def PlotJsondom(data, gammatab, source, lutfile, opt='eps', dpi=100):
             plt.grid(color='black', linestyle='--', linewidth=0.5)
             # plt.legend()
 
-            plt.show()
+            # plt.show()
             file_name2 = 'dom_{}_eff.{}'.format(dom, opt)
-            plt.savefig(save_results_to + file_name2)
+            plt.savefig(save_results_to + file_name2,  dpi = dpi)
             interactive(False)
             plt.close()
     print("Finished domain graphs")
@@ -231,10 +238,15 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile, opt='eps', dpi=
             plt.figure(1)
             plt.xlim(xmin, xmax)
             # FindXlim(cloverkey)  # efficiency #dt commented
-            if my_det_type == 1 or my_det_type == 10:
-                plt.ylim([0, 0.1])
-            elif my_det_type == 2:  # (segments)
-                plt.ylim([0, 0.01])
+            # if my_det_type == 1 or my_det_type == 10:
+            #     plt.ylim([0, 0.1])
+            # elif my_det_type == 2:  # (segments)
+            #     plt.ylim([0, 0.01])
+            max_y = max([line.get_ydata().max() for line in plt.gca().get_lines()])
+            plt.ylim(0, 1.5 * max_y)
+
+
+
             plt.title(f'Efficiency for clover {cloverkey}')
             plt.xlabel('Domain')
             plt.ylabel('Efficiency (%)')
@@ -242,13 +254,14 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile, opt='eps', dpi=
             legend_without_duplicate_labels(plt)
 
             file_name1 = 'eliade_{}_efficiency.{}'.format(cloverkey, opt)
-            plt.savefig(save_results_to + file_name1)
+            plt.savefig(save_results_to + file_name1,  dpi = dpi)
             plt.close()
 
             plt.figure(2)
-            # FindXlim(cloverkey) #resolution
             plt.xlim(xmin, xmax)
-            plt.ylim([1, 5])
+            # plt.ylim([1, 5])
+            max_y = max([line.get_ydata().max() for line in plt.gca().get_lines()])
+            plt.ylim(0, 1.5 * max_y)
             plt.title(f'Resolution for clover {cloverkey}')
             plt.xlabel('Domain')
             plt.ylabel('Resolution (keV)')
@@ -256,24 +269,26 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile, opt='eps', dpi=
             legend_without_duplicate_labels(plt)
 
             file_name2 = 'eliade_{}_{}_resolution.{}'.format(cloverkey, my_det_type, opt)
-            plt.savefig(save_results_to + file_name2)
+            plt.savefig(save_results_to + file_name2,  dpi = dpi)
             plt.close()
 
             plt.figure(0)
             # FindXlim(cloverkey)  # Peak to Total
             plt.xlim(xmin, xmax)
             # plt.ylim([0.05,0.1])
-            if my_det_type == 1 or my_det_type == 10:
-                plt.ylim([0.05, 0.3])
-            elif my_det_type == 2:  # (segments)
-                plt.ylim([0, 0.2])
+            # if my_det_type == 1 or my_det_type == 10:
+            #     plt.ylim([0.05, 0.3])
+            # elif my_det_type == 2:  # (segments)
+            #     plt.ylim([0, 0.2])
+            max_y = max([line.get_ydata().max() for line in plt.gca().get_lines()])
+            plt.ylim(0, 1.5 * max_y)
             plt.title(f'Peak to Total ratio for clover {cloverkey} {my_det_type}')
             plt.xlabel('Domain')
             plt.ylabel('Peak-to-total ratio')
             plt.grid(color='black', linestyle='--', linewidth=0.5)
 
             file_name3 = 'eliade_{}_{}_peaktotal.{}'.format(cloverkey, my_det_type, opt)
-            plt.savefig(save_results_to + file_name3)
+            plt.savefig(save_results_to + file_name3,  dpi = dpi)
             plt.close()
 
             blCloverFound = False
@@ -282,7 +297,7 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile, opt='eps', dpi=
     return True
 
 
-def PlotJsoncore(data, gammatab, source, lutfile, detKey=1, opt='eps', dpi=100):
+def PlotJsoncore(data, gammatab, source, lutfile, detKey=1, opt='eps', dpi=300):
     debugPlotJsoncore = False
 
     MakeDir(save_results_to)
@@ -340,7 +355,13 @@ def PlotJsoncore(data, gammatab, source, lutfile, detKey=1, opt='eps', dpi=100):
     # xmax += 1
     plt.xlim(100, 841)
     # plt.xlim(xmin, xmax)
-    plt.ylim([0, 0.1])
+    # plt.ylim([0, 0.1])
+    max_y = max([line.get_ydata().max() for line in plt.gca().get_lines()])
+    plt.ylim(0, 1.5 * max_y)
+
+    max_x = max([line.get_xdata().max() for line in plt.gca().get_lines()])
+    plt.xlim(0, 1.5 * max_x)
+
     # title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
     # CloverName = key["serial"][:len(key["serial"])-1]
     plt.title('Efficiency for core {} {}'.format(CloverName, detKey))
@@ -352,10 +373,13 @@ def PlotJsoncore(data, gammatab, source, lutfile, detKey=1, opt='eps', dpi=100):
     legend_without_duplicate_labels(plt)
 
     plt.figure(2)
-    # FindXlim(clover)
-    # plt.xlim(xmin, xmax)
     plt.xlim(100, 841)
-    plt.ylim([1, 5])
+    # plt.ylim([1, 5])
+    max_y = max([line.get_ydata().max() for line in plt.gca().get_lines()])
+    plt.ylim(0, 1.5 * max_y)
+
+    max_x = max([line.get_xdata().max() for line in plt.gca().get_lines()])
+    plt.xlim(0, 1.5 * max_x)
     # title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
     plt.title('Resolution for core {} det key {}'.format(CloverName, detKey))
     plt.xlabel('Domain')
@@ -365,19 +389,19 @@ def PlotJsoncore(data, gammatab, source, lutfile, detKey=1, opt='eps', dpi=100):
 
     plt.figure(1)
     file_name5 = 'eliade_efficiency_{}_core{}.{}'.format(CloverName, detKey, opt)
-    plt.savefig(save_results_to + file_name5)
+    plt.savefig(save_results_to + file_name5,  dpi = dpi)
     plt.close()
 
     plt.figure(2)
     file_name6 = 'eliade_resolution_{}_core{}.{}'.format(CloverName, detKey, opt)
-    plt.savefig(save_results_to + file_name6)
+    plt.savefig(save_results_to + file_name6,  dpi = dpi)
     plt.close()
 
     print("PlotJsoncore: Finished graphs for all core{} {}".format(CloverName, detKey))
     return True
 
 
-def PlotCalibration(data, gammatab, source, lutfile, my_det_type=2, opt='eps', dpi=100):
+def PlotCalibration(data, gammatab, source, lutfile, my_det_type=2, opt='eps', dpi=300):
     if my_det_type == 3:
         # To plot CeBr calib please use PlotCalibrationCeBr instead of PlotCalibration
         return True
@@ -450,7 +474,7 @@ def PlotCalibration(data, gammatab, source, lutfile, my_det_type=2, opt='eps', d
     return True
 
 
-def PlotCalibrationCeBr(data, gammatab, source, lutfile, my_det_type=3, opt='eps', dpi=100):
+def PlotCalibrationCeBr(data, gammatab, source, lutfile, my_det_type=3, opt='eps', dpi=300):
     print('<<<<< I am in PlotCalibrationCeBr >>>>>')
     MakeDir(save_results_to)
     number_of_our_colors = 30
@@ -522,7 +546,7 @@ def PlotCalibrationCeBr(data, gammatab, source, lutfile, my_det_type=3, opt='eps
     return True
 
 
-def PlotCeBr(data, gammatab, source, my_det_type, lutfile, opt='eps', dpi=100):
+def PlotCeBr(data, gammatab, source, my_det_type, lutfile, opt='eps', dpi=300):
     print('<<<<< I am in PlotCeBr >>>>>')
     MakeDir(save_results_to)
 
@@ -581,8 +605,11 @@ def PlotCeBr(data, gammatab, source, my_det_type, lutfile, opt='eps', dpi=100):
         plt.ylabel('Peak-to-total ratio')
         plt.grid(color='black', linestyle='--', linewidth=0.5)
 
+        max_y = max([line.get_ydata().max() for line in plt.gca().get_lines()])
+        plt.ylim(0, 1.5 * max_y)
+
         file_name0 = 'eliade_CEBR_{}_peaktotal.{}'.format(my_det_type, opt)
-        plt.savefig(save_results_to + file_name0)
+        plt.savefig(save_results_to + file_name0,  dpi = dpi)
         plt.close()
 
         plt.figure(1)
@@ -593,9 +620,11 @@ def PlotCeBr(data, gammatab, source, my_det_type, lutfile, opt='eps', dpi=100):
         plt.xlabel('Domain')
         plt.ylabel('Efficiency')
         plt.grid(color='black', linestyle='--', linewidth=0.5)
+        max_y = max([line.get_ydata().max() for line in plt.gca().get_lines()])
+        plt.ylim(0, 1.5 * max_y)
 
         file_name1 = 'eliade_CEBR_{}_eff.{}'.format(my_det_type, opt)
-        plt.savefig(save_results_to + file_name1)
+        plt.savefig(save_results_to + file_name1, dpi = dpi)
         plt.close()
 
         plt.figure(2)
@@ -606,9 +635,11 @@ def PlotCeBr(data, gammatab, source, my_det_type, lutfile, opt='eps', dpi=100):
         plt.xlabel('Domain')
         plt.ylabel('Resolution')
         plt.grid(color='black', linestyle='--', linewidth=0.5)
+        max_y = max([line.get_ydata().max() for line in plt.gca().get_lines()])
+        plt.ylim(0, 1.5 * max_y)
 
         file_name2 = 'eliade_CEBR_{}_res.{}'.format(my_det_type, opt)
-        plt.savefig(save_results_to + file_name2)
+        plt.savefig(save_results_to + file_name2, dpi = dpi)
         plt.close()
 
         blCeBrFound = False
@@ -618,7 +649,7 @@ def PlotCeBr(data, gammatab, source, my_det_type, lutfile, opt='eps', dpi=100):
 
 
 # def PlotJsonFold(data, gammatab, source, my_det_type, lutfile, opt='eps'):
-def PlotJsonFold(data, gammatab, source, my_det_type, opt='eps', dpi=100):
+def PlotJsonFold(data, gammatab, source, my_det_type, opt='eps', dpi=300):
     print('<<<<< I am in PlotJsonFold >>>>>')
     MakeDir(save_results_to)
 
@@ -710,7 +741,7 @@ def PlotJsonFold(data, gammatab, source, my_det_type, opt='eps', dpi=100):
     plt.xlabel('Fold')
     plt.ylabel('PT')
     file_name_pt = 'fold_{}_peaktotal.{}'.format(key["fold"], opt)
-    plt.savefig(save_results_to + file_name_pt)
+    plt.savefig(save_results_to + file_name_pt, dpi = dpi)
     plt.close()
 
     plt.figure(1)

@@ -30,7 +30,6 @@ from libLists import list_of_sources
 from libLists import lists_of_gamma_background
 from libLists import lists_of_gamma_background_named
 from libColorsAnsi import *
-
 lists_of_gamma_background_enabled = []
 
 current_directory = os.getcwd()
@@ -497,7 +496,7 @@ def main():
             source = my_source.name
             if '60Co' in my_source.name:
                 source = '60Co'
-            PlotJsonFold(js_tab,j_sources,my_source.name,my_params)
+            PlotJsonFold(js_tab,j_sources,my_source.name,my_params, config.dpi)
 
 if __name__ == "__main__":
     dom1 = 1
@@ -540,6 +539,7 @@ if __name__ == "__main__":
 
 
     config = parser.parse_args()
+    # config = ParseInput(ArgumentParser())
 
     if config.bg:
         bg = 1

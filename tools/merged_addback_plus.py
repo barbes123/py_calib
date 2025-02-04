@@ -396,7 +396,7 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
     # print(f'{RED} MAX {max_y} {RESET}')
 
     # plt.title('Efficiency {}'.format(meta_data))
-    plt.title('Efficiency {}' .format(cloverName))
+    plt.title('Efficiency {} {}' .format(cloverName, pltFold))
     plt.xlabel('E$\gamma$')
     plt.ylabel('Efficiency, %')
     plt.legend(loc='upper right', fontsize='medium', shadow=False, ncol=2)
@@ -409,7 +409,7 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
     plt.figure(1)
     # plt.xticks(np.arange(0, 1500, 100))
     # plt.title('Resolution {}' .format(meta_data))
-    plt.title('Resolution {}' .format(cloverName))
+    plt.title('Resolution {} Fold {}' .format(cloverName, pltFold))
     plt.xlabel('E$\gamma$')
     plt.ylabel('Resolution, keV')
     plt.legend(loc='upper left', fontsize='medium', shadow=False, ncol=2)
@@ -422,7 +422,7 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
     # plt.xticks(np.arange(0, 1500, 100))
     # plt.title('Add Back Factor Fold {} '.format(meta_data))
     # plt.title('Add Back Factor Fold')#remove to allow automatic title
-    plt.title('Addback {}' .format(cloverName))
+    plt.title('Addback {} {}' .format(cloverName, pltFold))
     plt.grid()
     plt.xlabel('E$\gamma$',fontsize=14)
 
@@ -619,7 +619,7 @@ if __name__ == "__main__":
 
             # Plotting the efficiency vs energy for the selected fold
             plt.plot(energy_levels, efficiencies, label=f'Fold {selected_fold} Sim Run {run}', color = my_colors[color_index])
-            plt.savefig('figures/simulations_eff.{}'.format('jpg'),dpi=300)
+            # plt.savefig('figures/simulations_eff.{}'.format('jpg'),dpi=300)
             color_index+=1
 
             ncol = 17

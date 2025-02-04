@@ -458,18 +458,18 @@ def main():
 
             # print('my_source.name ', my_source.name, ' ', source)
             # print(j_sources)
-            PlotDomain(js_tab, j_sources, my_source.name, j_lut, my_params.grType)
+            PlotDomain(js_tab, j_sources, my_source.name, j_lut, my_params.grType, my_params.dpi)
 
 
-            PlotClover(js_tab, j_sources, my_source.name, 1, j_lut, my_params.grType)
-            PlotClover(js_tab, j_sources, source, 2, j_lut, my_params.grType)
+            PlotClover(js_tab, j_sources, my_source.name, 1, j_lut, my_params.grType, my_params.dpi)
+            PlotClover(js_tab, j_sources, source, 2, j_lut, my_params.grType, my_params.dpi)
 
-            PlotCore(js_tab, j_sources, my_source.name, j_lut, 1, my_params.grType)
-            PlotCalibration(js_tab, j_sources, my_source.name, j_lut, 1, my_params.grType)
-            PlotCalibration(js_tab, j_sources, my_source.name, j_lut, 2, my_params.grType)
+            PlotCore(js_tab, j_sources, my_source.name, j_lut, 1, my_params.grType, my_params.dpi)
+            PlotCalibration(js_tab, j_sources, my_source.name, j_lut, 1, my_params.grType, my_params.dpi)
+            PlotCalibration(js_tab, j_sources, my_source.name, j_lut, 2, my_params.grType, my_params.dpi)
 
-            PlotCeBr(js_tab, j_sources, my_source.name, 3, j_lut, my_params.grType)
-            PlotCalibrationCeBr(js_tab, j_sources, my_source.name, j_lut, 3, my_params.grType)
+            PlotCeBr(js_tab, j_sources, my_source.name, 3, j_lut, my_params.grType, my_params.dpi)
+            PlotCalibrationCeBr(js_tab, j_sources, my_source.name, j_lut, 3, my_params.grType, my_params.dpi)
 
 
 
@@ -487,7 +487,7 @@ if __name__ == "__main__":
     grType = 'jpg'
     prefix = 'mDelila_raw'
     bgK40 = 0
-    dpi = 100
+    dpi = 300
 
     parser = ArgumentParser()
 
