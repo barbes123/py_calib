@@ -33,6 +33,7 @@ title_clover = ''
 from libLists import list_of_sources
 from libLists import list_of_clovers
 from libLists import list_of_cebr
+from libColorsAnsi import *
 
 # list_of_clovers = {"CL29", "CL30", "CL31", "CL32", "CL33", "CL34", "CL35", "CL36", "HPGe", "SEG", "LaBr"}
 # list_of_sources = {'60Co', '60CoWeak', '152Eu', '137Cs', '133Ba'}
@@ -261,6 +262,7 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile, opt='eps', dpi=
             plt.xlim(xmin, xmax)
             # plt.ylim([1, 5])
             max_y = max([line.get_ydata().max() for line in plt.gca().get_lines()])
+            # max_y = 4
             plt.ylim(0, 1.5 * max_y)
             plt.title(f'Resolution for clover {cloverkey}')
             plt.xlabel('Domain')
@@ -297,17 +299,17 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile, opt='eps', dpi=
     return True
 
 
-def PlotJsoncore(data, gammatab, source, lutfile, detKey=1, opt='eps', dpi=300):
+def PlotCore(data, gammatab, source, lutfile, detKey=1, opt='eps', dpi=300):
     debugPlotJsoncore = False
 
     MakeDir(save_results_to)
     CloverName = ''
-    # my_det_type=1
     for key in data:
         # clover=i["serial"]
         if find_domain(key["domain"], lutfile) == False:
             continue
         if key["detType"] != detKey:
+            # pass
             continue
         if key["domain"] < 100:
             continue
@@ -333,7 +335,7 @@ def PlotJsoncore(data, gammatab, source, lutfile, detKey=1, opt='eps', dpi=300):
                             print('CloverName', CloverName, 'key["domain"]', key["domain"],
                                   'key[source][element]["eff"]', key[source][element]["eff"], 'plot_color', plot_color)
                     except:
-                        print('Warining in PlotJsoncore y=key[source][element]["eff"] plot')
+                        print(f'{YELLOW}Warining in PlotJsoncore Efficiency y=key[source][element]["eff"] {RESET}')
                         continue
                     plt.figure(2)  # resolution plot
                     try:
@@ -346,58 +348,68 @@ def PlotJsoncore(data, gammatab, source, lutfile, detKey=1, opt='eps', dpi=300):
                             print('key["domain"]', key["domain"], 'key[source][element]["res"]',
                                   key[source][element]["res"], 'plot_color', plot_color)
                     except:
-                        print('Warining in PlotJsoncore y=key[source][element]["res"] plot')
+                        print(f'{YELLOW}Warining in PlotJsoncore y=key[source][element]["res"] plot{RESET}')
                         continue
-    # FindXlim(clover)
-    plt.figure(1)
-    # xmin, xmax = FinXlimGeneric(clover, lutfile)
-    # xmin -= 1
-    # xmax += 1
-    plt.xlim(100, 841)
-    # plt.xlim(xmin, xmax)
-    # plt.ylim([0, 0.1])
-    max_y = max([line.get_ydata().max() for line in plt.gca().get_lines()])
-    plt.ylim(0, 1.5 * max_y)
+        plt.figure(1)
+        plt.xlim(100, 841)
 
-    max_x = max([line.get_xdata().max() for line in plt.gca().get_lines()])
-    plt.xlim(0, 1.5 * max_x)
+        # print(plt.gca().get_lines())
+        # sys.exit()
 
-    # title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
-    # CloverName = key["serial"][:len(key["serial"])-1]
-    plt.title('Efficiency for core {} {}'.format(CloverName, detKey))
-    plt.title('Efficiency for core {} {}'.format(CloverName, detKey))
-    # print('CloverName',CloverName, key['detType'])
-    plt.xlabel('Domain')
-    plt.ylabel('Efficiency (%)')
-    plt.grid(color='black', linestyle='--', linewidth=0.5)
-    legend_without_duplicate_labels(plt)
+        # for line in plt.gca().get_lines():
+        #     print('!!!!!!!!!!',line.get_ydata())
+        # sys.exit()
 
-    plt.figure(2)
-    plt.xlim(100, 841)
-    # plt.ylim([1, 5])
-    max_y = max([line.get_ydata().max() for line in plt.gca().get_lines()])
-    plt.ylim(0, 1.5 * max_y)
+        try:
+            max_y = max([line.get_ydata().max() for line in plt.gca().get_lines()])
+        except:
+            max_y = 1
+            print(f'{YELLOW}Warning: PlotJsoncore: the max-y value for Efficiency plot was not possible to evaluate, default value {max_y} will be used {RESET}')
+        plt.ylim(0, 1.5 * max_y)
 
-    max_x = max([line.get_xdata().max() for line in plt.gca().get_lines()])
-    plt.xlim(0, 1.5 * max_x)
-    # title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
-    plt.title('Resolution for core {} det key {}'.format(CloverName, detKey))
-    plt.xlabel('Domain')
-    plt.ylabel('Resolution (keV)')
-    plt.grid(color='black', linestyle='--', linewidth=0.5)
-    legend_without_duplicate_labels(plt)
+        try:
+            max_x = max([line.get_xdata().max() for line in plt.gca().get_lines()])
+        except:
+            max_x = 1
+            print(f'{YELLOW}Warning: PlotJsoncore: the max-x value for Efficiency plot was not possible to evaluate, default value {max_x} will be used {RESET}')
+        plt.xlim(0, 1.5 * max_x)
 
-    plt.figure(1)
-    file_name5 = 'eliade_efficiency_{}_core{}.{}'.format(CloverName, detKey, opt)
-    plt.savefig(save_results_to + file_name5,  dpi = dpi)
-    plt.close()
+        # title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
+        # CloverName = key["serial"][:len(key["serial"])-1]
+        plt.title('Efficiency for core {} {}'.format(CloverName, detKey))
+        plt.title('Efficiency for core {} {}'.format(CloverName, detKey))
+        # print('CloverName',CloverName, key['detType'])
+        plt.xlabel('Domain')
+        plt.ylabel('Efficiency (%)')
+        plt.grid(color='black', linestyle='--', linewidth=0.5)
+        legend_without_duplicate_labels(plt)
 
-    plt.figure(2)
-    file_name6 = 'eliade_resolution_{}_core{}.{}'.format(CloverName, detKey, opt)
-    plt.savefig(save_results_to + file_name6,  dpi = dpi)
-    plt.close()
+        plt.figure(2)
+        plt.xlim(100, 841)
+        # plt.ylim([1, 5])
+        max_y = max([line.get_ydata().max() for line in plt.gca().get_lines()])
+        plt.ylim(0, 1.5 * max_y)
 
-    print("PlotJsoncore: Finished graphs for all core{} {}".format(CloverName, detKey))
+        max_x = max([line.get_xdata().max() for line in plt.gca().get_lines()])
+        plt.xlim(0, 1.5 * max_x)
+        # title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
+        plt.title('Resolution for core {} det key {}'.format(CloverName, detKey))
+        plt.xlabel('Domain')
+        plt.ylabel('Resolution (keV)')
+        plt.grid(color='black', linestyle='--', linewidth=0.5)
+        legend_without_duplicate_labels(plt)
+
+        plt.figure(1)
+        file_name5 = 'eliade_efficiency_{}_core{}.{}'.format(CloverName, detKey, opt)
+        plt.savefig(save_results_to + file_name5,  dpi = dpi)
+        plt.close()
+
+        plt.figure(2)
+        file_name6 = 'eliade_resolution_{}_core{}.{}'.format(CloverName, detKey, opt)
+        plt.savefig(save_results_to + file_name6,  dpi = dpi)
+        plt.close()
+
+        print("PlotJsoncore: Finished graphs for all core{} {}".format(CloverName, detKey))
     return True
 
 
@@ -405,6 +417,7 @@ def PlotCalibration(data, gammatab, source, lutfile, my_det_type=2, opt='eps', d
     if my_det_type == 3:
         # To plot CeBr calib please use PlotCalibrationCeBr instead of PlotCalibration
         return True
+    print(f'{BLUE}...doing PlotCalibration for {my_det_type} detector type... {RESET}')
 
     MakeDir(save_results_to)
     number_of_our_colors = 30
@@ -426,7 +439,6 @@ def PlotCalibration(data, gammatab, source, lutfile, my_det_type=2, opt='eps', d
                         if key["detType"] == my_det_type:  # check if the detector is the type that we want
                             blCloverFound = True
                             dom = key["domain"]
-
                             try:
                                 current_color = next(our_color_plate)
                             except:
@@ -448,6 +460,8 @@ def PlotCalibration(data, gammatab, source, lutfile, my_det_type=2, opt='eps', d
                                                     key['domain'], element))
                                             # continue
                             max_energy = max([float(i) for i in list(gammatab[source]["gammas"].keys())])
+                    else:
+                        print(f'{YELLOW}Warning PlotCalibration no ["pol_list"] for {source} {RESET}')
 
         if blCloverFound == True:
             delta = 200
@@ -471,6 +485,10 @@ def PlotCalibration(data, gammatab, source, lutfile, my_det_type=2, opt='eps', d
             plt.savefig(save_results_to + file_name,  dpi = dpi)
             plt.close()
             blCloverFound = False
+            print(f'{BLUE}PlotCalibration for {my_det_type} finished{RESET}')
+        else:
+            pass
+            # print(f'{RED}PlotCalibration failed {RESET}')
     return True
 
 

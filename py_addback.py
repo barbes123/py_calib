@@ -168,7 +168,7 @@ def ProcessFitDataStr(dom, my_source, lines, j_src):
                 # print(f'{GREEN}Found {RESET}',gamma,' ', word)
                 numbers = [s for s in word.split(' ') if s]
                 peak = TPeak(dom, numbers)
-                print('number',numbers)
+                # print('number',numbers)
                 if my_source == '137Cs':
                     peak.pos_ch = float(numbers[12])
                     peak.area = float(numbers[11])

@@ -1,124 +1,93 @@
-import json
-from TRecallEner import TRecallEner
-#def __init__(self, limDown, limUp, ampl, fwhm):
-############################
-#limDown, limUp, ampl, fwhm, limStart, limStop
-# *******************************
+from libLists import list_of_sources as list_of_sources
 
-def SetUpRecallEnerFromJson(dom, lut_recall):
-    for i in lut_recall:
-        if i['domain'] == dom:
-            return TRecallEner(i['fitLimits'][0], i['fitLimits'][1], i['ampl'], i['fwhm'], i['PTLimits'][0], i['PTLimits'][1])
-    print('Domain {} is not found in LUT_RECALL.json; setting up the default values'.format(dom))
-    return TRecallEner(200, 400, 1000, 10, 200, 700)
+def ParseInput(parser):
 
-def SetUpRecallEner(js, dom, source):
-    if source == "60Co":
-        if dom == 1:
-            return TRecallEner(200, 400, 10000, 15, 200, 400)
-        elif dom == 2:
-            return TRecallEner(200, 400, 1000, 10, 200, 700)
-        elif dom == 3:
-            return TRecallEner(200, 400, 1000, 15, 100, 700)
-        return run20Co60andbackground(js, dom)
-    elif source=="152Eu":
-        if dom == 1:
-            return TRecallEner(0, 500, 10000, 4, 0, 500)
-        elif dom == 2:
-            return TRecallEner(0, 500, 1000, 10, 200, 700)
-        elif dom == 3:
-            return TRecallEner(0, 500, 1000, 15, 100, 700)
-        return run68Eu152source(js, dom)
-# *******************************
-def run20Co60andbackground(js, dom): #file is LUT file
-    myCurrentSetting = TRecallEner(800,1200,100,4,200, 1500)
-    for i in js:
-        domainnbr=i["domain"]
-        if dom==domainnbr:
-            type=i["detType"]
-            if type==2:
-                myCurrentSetting = TRecallEner(800, 2100, 100, 7, 200, 1500)
-            elif type==10:
-                myCurrentSetting = TRecallEner(200, 600, 1000, 4, 100, 800)
-            elif type==1:
-                myCurrentSetting = TRecallEner(800, 2100, 100, 4, 200, 1500)
-    return myCurrentSetting
-def run20Co60source(js, dom): #file is LUT file
-    myCurrentSetting = TRecallEner(800,1200,100,4,200, 1500)
-    for i in js:
-        domainnbr=i["domain"]
-        if dom==domainnbr:
-            type=i["detType"]
-            if type==2:
-                myCurrentSetting = TRecallEner(800, 1400, 100, 7, 200, 1500)
-            elif type==10:
-                myCurrentSetting = TRecallEner(200, 600, 1000, 4, 100, 800)
-            elif type==1:
-                myCurrentSetting = TRecallEner(800, 1600, 100, 4, 200, 1500)
-    return myCurrentSetting
-
-def run68Eu152source(js, dom): #file is LUT file
-    
-    myCurrentSetting = TRecallEner(0,1300,100,4,0, 1500)
-    for i in js:
-        domainnbr=i["domain"]
-        if dom==domainnbr:
-            type=i["detType"]
-            if type==2:
-                myCurrentSetting = TRecallEner(50,1300,10,3,100,1500)
-            elif type==10:
-                myCurrentSetting = TRecallEner(0,500,100,4,0, 500)
-            elif type==1:
-                myCurrentSetting = TRecallEner(0,1300,100,4,0, 1500)
-    return myCurrentSetting
+    dom1 = 1
+    dom2 = 4
+    server = 9
+    runnbr = 63
+    det_type = 0
+    bg = 0
+    grType = 'jpg'
+    prefix = 'sum_fold_1'
+    runnbr = -1
+    simRuns = {}
+    blFit = True
+    blFitRes = True
+    fitFunc = 'deb'
+    dpi = 100
+    cloverName = "Clover"
 
 
-# class TRecallEner:
-#     def __init__(self, limDown, limUp, fwhm, ampl):
-#         self.limDown = limDown
-#         self.limUp = limUp
-#         self.fwhm = fwhm
-#         self.ampl = ampl
-#
-# global myCurrentSetting
-#
-# def run20Co60source(dom): #file is LUT file
-#     with open('LUT_ELIADE_S9_run20_raluca.json', 'r') as js_file:
-#         file=json.load(js_file)
-#
-#     for i in file:
-#         domainnbr=i["domain"]
-#         if dom==domainnbr:
-#             type=i["detType"]
-#             if type==2:
-#                 myCurrentSetting = TRecallEner(700, 1200, 7, 100)
-#             elif type==10:
-#                 myCurrentSetting = TRecallEner(200, 600, 4, 1000)
-#             elif type==1:
-#                 myCurrentSetting = TRecallEner(800, 1600, 4, 1000)
-#     return myCurrentSetting
-#
-#
-def run25Eu152source(dom):
-    pass
-#################################################
-#   OLD 152EU INFORMATION IN GAMMA_SOURCES.JSON
-#  "152Eu": {
-#       "t12": 426902832.0,
-#       "a0": 543500.0,
-#       "t0": "2021-03-21 12:00:00",
-#       "comment": "",
-#       "gammas": {
-#          "121.779": 0.2858,
-#          "244.693": 0.7583,
-#          "344.272": 0.265,
-#          "411.111": 0.02234,
-#          "443.979": 0.3148,
-#          "778.890": 0.12942,
-#          "964.014": 0.14605,
-#          "1085.793": 0.10207,
-#          "1112.070": 0.13644,
-#          "1407.993": 0.21005
-#       }
-#    }
-#################################################
+    parser.add_argument("-s", "--server", dest="server", default=server, type=int, choices=range(10),
+                            help="DAQ ELIADE server, default = {}".format(server))
+    parser.add_argument("-r", "--run", type=int,
+                        dest="runnbr", default=runnbr,
+                        help="Run number, default = {}".format(runnbr))
+    parser.add_argument("-folds", "--folds",  nargs=2,
+                        dest="dom", default=[dom1, dom2],
+                        help="from domain, default = {} {}".format(dom1, dom2))
+    parser.add_argument("-t", "--type",
+                        dest="det_type", default=det_type,  type=int,
+                        help="type of detector to be calibrated; default = 0".format(det_type))
+    parser.add_argument('--bg', action='store_true', help="Enables all background lines")
+    parser.add_argument('-K40', action='store_true', help="Enables 1460.820 keV")
+    parser.add_argument('-anni', action='store_true', help="Enables 511.006 keV")
+    parser.add_argument('-Tl208', action='store_true', help="Enables 2614.510 keV")
+    parser.add_argument("-gr", "--graphic type: eps, jpg or none ",
+                        dest="grType", default=grType, type=str, choices=('eps', 'jpeg', 'jpg', 'png', 'svg', 'svgz', 'tif', 'tiff', 'webp','none'),
+                        # eps, jpeg, jpg, pdf, pgf, png, ps, raw, rgba, svg, svgz, tif, tiff, webp
+                        help="Available graphic output: eps, jpeg, jpg, png, svg, svgz, tif, tiff, webp or none (no graphs); default = {}".format(grType))
+    parser.add_argument("-prefix", "--prefix to the files to be analyzed",
+                        dest="prefix", default=grType, type=str,
+                        help="Prefix for matrix (TH2) to be analyzed mDelila_raw or mDelila or ...".format(prefix))
+    parser.add_argument("-dpi", "--dpi",
+                        dest="dpi", default=dpi, type=int,
+                        help="resolution for figures; default = 100".format(dpi))
+#Merging
+    for el in list_of_sources:
+        parser.add_argument('-{}'.format(el), '--data{}'.format(el), nargs='+',
+                            help='Data for {} server run vol'.format(el))
+
+        # parser.add_argument("-folds", "--plotFolds",
+        #                     dest="plotFolds", default=0, type=str,
+        #                     help="Folds to be plotted, default {} - all".format(0))
+
+    parser.add_argument("-folds", "--plotFolds",
+                        dest="plotFolds", default=[3], type=int, nargs='+',
+                        help="Folds to be plotted, default is all (0), can provide a list like 1 2 3, mind that fold1 corresponds to 0")
+
+    parser.add_argument("-sim", "--runs from simul", type=int, nargs='+',
+                        dest="simRuns", default=[],
+                        help="Run number from simul, default is empty")
+
+    parser.add_argument("-gr", "--graphic type: eps, jpg or none ",
+                        dest="grType", default=grType, type=str,
+                        choices=('eps', 'jpeg', 'jpg', 'png', 'svg', 'svgz', 'tif', 'tiff', 'webp', 'none'),
+                        # eps, jpeg, jpg, pdf, pgf, png, ps, raw, rgba, svg, svgz, tif, tiff, webp
+                        help="Available graphic output: eps, jpeg, jpg, png, svg, svgz, tif, tiff, webp or none (no graphs); default = {}".format(
+                            grType))
+
+    parser.add_argument("-prefix", "--prefix to the files to be analyzed",
+                        dest="prefix", default=grType, type=str,
+                        help="Prefix for matrix (TH2) to be analyzed mDelila_raw or mDelila or ...".format(prefix))
+
+    parser.add_argument("-name", "--name of the clover to appear on plots",
+                        dest="cloverName", default=cloverName, type=str,
+                        help="Name of the clover how it appears on plots")
+
+    # parser.add_argument("-sim", "--run from simul", type=int,
+    #                     dest="runnbr", default=runnbr,
+    #                     help="Run number from simul, default = {}".format(runnbr))
+
+    parser.add_argument("-fit", "--fitting the efficiency",
+                        dest="fitFunc", default=fitFunc, type=str,
+                        choices=('deb', 'None'),
+                        # eps, jpeg, jpg, pdf, pgf, png, ps, raw, rgba, svg, svgz, tif, tiff, webp
+                        help="Available fit Debertin [deb], ...; default = {}".format(fitFunc))
+
+    # parser.add_argument("-dpi", "--dpi", dest="dpi", default=dpi, type=int,
+    #                     help="resolution for figures; default = 100".format(dpi))
+
+
+    return parser.parse_args()
