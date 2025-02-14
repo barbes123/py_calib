@@ -496,7 +496,7 @@ def main():
             source = my_source.name
             if '60Co' in my_source.name:
                 source = '60Co'
-            PlotJsonFold(js_tab,j_sources,my_source.name,my_params, config.dpi)
+            PlotJsonFold(js_tab,j_sources,source,my_params)
 
 if __name__ == "__main__":
     dom1 = 1
