@@ -28,6 +28,7 @@ from utilities import json_oneline_lists
 from sympy.printing.pretty.pretty_symbology import line_width
 
 list_of_bad_lines = ['79.623', '160.609']
+list_of_norm = {'S1':4.82863316066443}
 
 
 def MakeDir(path):
@@ -270,7 +271,24 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
             if source in js_new[index]:
                 print(f'{BLUE} {source} {RESET}')
                 for el in js_new[index][source]:
-                    if source!='56Co':
+                    # if source =='56Co':
+                    #     # print(list_of_data[source][0], list_of_data[source][1], list_of_data[source][2])
+                    #     # server_now = list_of_data[source][0]
+                    #     # serverID = f'S{server_now}'
+                    #     plt.figure(0)
+                    #     if el not in lists_of_gamma_background and el not in list_of_bad_lines:
+                    #         plt.scatter(
+                    #             x=float(el),
+                    #             y=js_new[index][source][el]['eff'][0]*list_of_norm[serverID],
+                    #             color=colors[source][index]
+                    #         )
+                    #         plt.errorbar(
+                    #             x=float(el),
+                    #             y=js_new[index][source][el]['eff'][0]*list_of_norm[serverID],
+                    #             yerr=js_new[index][source][el]['eff'][1],
+                    #             color=colors[source][index]
+                    #         )
+                    if True:
                         plt.figure(0)
                         if el not in lists_of_gamma_background and el not in list_of_bad_lines:
                             plt.scatter(
@@ -341,10 +359,10 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
 
     if blFit:
         dataFull = read_data_for_fit(f'data_fold_{plotTheseFolds[0]}.dat')
-        # ener_short  = [value[1] for value in dataFull.values() if not (value[0] == '56Co' or ('79.623' in str(value[1])))]
-        # eff_short = [value[2] for value in dataFull.values() if not (value[0] == '56Co' or ('71.623' in str(value[1])))]
-        ener_short  = [value[1] for value in dataFull.values() if not (value[0] == '56Co' or (str(value[1]) in list_of_bad_lines ))]
-        eff_short = [value[2] for value in dataFull.values() if not (value[0] == '56Co' or (str(value[1]) in list_of_bad_lines ))]
+        # ener_short  = [value[1] for value in dataFull.values() if not (value[0] == '56Co' or (str(value[1]) in list_of_bad_lines ))]
+        # eff_short = [value[2] for value in dataFull.values() if not (value[0] == '56Co' or (str(value[1]) in list_of_bad_lines ))]
+        ener_short  = [value[1] for value in dataFull.values() if not ((str(value[1]) in list_of_bad_lines ))]
+        eff_short = [value[2] for value in dataFull.values() if not ((str(value[1]) in list_of_bad_lines ))]
         ener_full = [value[1] for value in dataFull.values()]
         res_full = [value[3] for value in dataFull.values()]
 
@@ -355,17 +373,24 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
 
         params, covariance = curve_fit(fitDebertin, ener_short, eff_short)
         a1f, a2f, a3f, a4f, a5f = params
-        ener1 = np.linspace(min(ener_short), max(ener_short), 500)  # Generate 500 points for smoothness
+        ener1 = np.linspace(min(ener_short), max(ener_short), 1000)  # Generate 500 points for smoothness
         smooth_fit = fitDebertin(ener1, *params)  # Evaluate the fitted function on the generated points
         plt.figure(0)
         plt.plot(ener1, smooth_fit, color='black', linestyle='--', label='Debertin Fit')
+
+
 
         with open("fit_parameters.txt", "w") as file:
             file.write("Fitting Parameters for Efficiency Plot:\n")
             file.write(f"Parameters: {params}\n")
             file.write("\nCovariance Matrix:\n")
             file.write(f"Covariance: {covariance}\n")
+
+            eff_846keV = fitDebertin(846.772, *params)
+            file.write(f"Efficiency for 846.772 keV: {eff_846keV}\n")
+
             file.write("\n \n")
+
 
         if blFitRes:
             # ener, eff, res = fit_data_from_file('data_fold_3.dat')
@@ -504,6 +529,27 @@ def main():
                 js = {}
                 js[el] = js56Co
                 js_all.append(js)
+
+                try:
+                    with open('norm_56Co.json','r') as fnorm:
+                        js_norm = json.load(fnorm)
+
+                    server_now = list_of_data[el][0]
+                    serverID = f'S{server_now}'
+
+                    norm = list_of_norm [serverID]
+
+                    for entry in js56Co:
+                        fold = entry['fold']
+                        norm = js_norm[serverID][str(fold)]
+                        for values in entry.get(el, {}).values():
+                            if 'eff' in values:
+                                values['eff'] = [x * norm for x in values['eff']]
+                except:
+                    print(f'No norm for {el}')
+
+
+
         if el == '133Ba':
             with open(name, 'r') as file:
                 js133Ba = json.load(file)
