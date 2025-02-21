@@ -1,7 +1,7 @@
 #! /usr/bin/python3
 
 from os.path import exists #check if file exists
-import os
+import os, re
 import numpy as np
 import matplotlib.pyplot as plt
 import math, sys, os, json, subprocess
@@ -501,8 +501,8 @@ def main():
 if __name__ == "__main__":
     dom1 = 1
     dom2 = 4
-    server = 9
-    runnbr = 63
+    server = -1
+    runnbr = -1
     det_type = 0
     bg = 0
     grType = 'jpg'
@@ -541,6 +541,20 @@ if __name__ == "__main__":
     config = parser.parse_args()
     # config = ParseInput(ArgumentParser())
 
+    if (config.runnbr == -1 or config.server == -1):
+        try:
+            directory = os.path.basename(os.getcwd())
+            print(f"Detected Directory: {directory}")
+            match = re.search(r'addback_run_(\d+)_(\d+)_eliadeS(\d)', directory)
+            if match:
+                config.runnbr = int(match.group(1))
+                volume = int(match.group(2))
+                config.server = (match.group(3))
+                # print(f"{GREEN}The run information derived: run {config.runnbr}; server {config.server}{RESET}")
+        except:
+            print(f"{RED}Failed to get run information. Provide corercr server and run{RESET}")
+            sys.exit()
+
     if config.bg:
         bg = 1
         for el in lists_of_gamma_background_named:
@@ -553,9 +567,17 @@ if __name__ == "__main__":
         if config.anni:
             lists_of_gamma_background_enabled.append(lists_of_gamma_background_named['anni'])
 
+
+
+    print("Put Parameters: AddBack (0 - if none); server_nbr (0 - if none); run_nbr; volume_from; volume_to;")
+    print(f"{BLUE}RUNfirst {config.runnbr} {RESET}")
+    print(f"{BLUE}VOLUMEfirst   {config.server}{RESET}")
+
+
+
     print(f'{BLUE}Lists of Gamma Background Enabled: {lists_of_gamma_background_enabled} {RESET}')
 
-    print(config)
+    # print(config)
 
     # if not file_exists('{}/{}'.format(ourpath, lutfile)):
     #     print('No LUT_ELIADE.json is given: {}. Cannot continue.'.format(lutfile))
