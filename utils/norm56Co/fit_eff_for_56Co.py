@@ -4,8 +4,19 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sys, json, os
 from scipy.optimize import curve_fit
+# from argparse import ArgumentParser
+import argparse
 
-blCheckNorm = True
+# blCheckNorm = True
+
+RED = '\033[31m'
+GREEN = '\033[32m'
+YELLOW = '\033[33m'
+BLUE = '\033[34m'
+MAGENTA = '\033[35m'
+CYAN = '\033[36m'
+WHITE = '\033[37m'
+RESET = '\033[0m'  # Reset to default color
 
 
 def fitDebertin(E, a1,a2,a3,a4,a5):
@@ -27,9 +38,6 @@ log = {
     "S3": list_of_runs_S3
 }
 
-foldnbr = 4
-volnmbr = 999
-
 
 def get_source_name(server_number, run_number, data):
     server_key = f'S{server_number}'  # Convert to string to match JSON keys
@@ -44,10 +52,13 @@ def get_source_name(server_number, run_number, data):
 def Fit_Efficiency_Curve(server, run, vol, my_fold, js_norm):
 
     file = f'../s{server}/addback_run_{run}_{vol}_eliadeS{server}/addback_{run}.json'
+
+    print(file)
+
     serverID=f'S{server}'
     source = get_source_name(server,run,log)
     clover = list_of_lut_2024[serverID]
-    print(f'Source {source} Clover {clover}')
+    print(f'{BLUE}Source {source} Clover {clover}{RESET}')
     print(f'File {file}')
     fig, ax = plt.subplots(figsize=(8, 6))
 
@@ -86,7 +97,7 @@ def Fit_Efficiency_Curve(server, run, vol, my_fold, js_norm):
             except:
                 pass
 
-        if source == '56Co' and blCheckNorm:
+        if source == '56Co' and js_norm != None:
             norm = js_norm[serverID][str(fold)]
             eff = [norm*key for key in eff]
 
@@ -111,8 +122,7 @@ def Fit_Efficiency_Curve(server, run, vol, my_fold, js_norm):
 
     return params
 
-def Norm56Co152Eu(co, eu, js_norm=None):
-    #server run vol
+def Norm56Co152Eu(co, eu, js_norm=None):  #server run vol
     norm_fold = {}
     for ifold in range (1,5):
         params_56Co = Fit_Efficiency_Curve(co[0], co[1], co[2], ifold, js_norm)
@@ -126,37 +136,71 @@ def Norm56Co152Eu(co, eu, js_norm=None):
         norm_fold[ifold] = ratio
     return norm_fold
 
-def CheckNormalization():
-    with open('norm_56Co.json', 'r') as fin:
+def CheckNormalization(server, volnmbr):
+    SN = f'S{server}'
+    with open(f'norm_56Co_{SN}.json', 'r') as fin:
+
         js_norm = json.load(fin)
-        norm_s1 = Norm56Co152Eu([1, 170, 999], [1, 162, 999], js_norm)
-        norm_s2 = Norm56Co152Eu([2, 167, 999], [2, 158, 999], js_norm)
-        norm_s3 = Norm56Co152Eu([3, 36, 999], [3, 27, 999], js_norm)
+        norm_s = Norm56Co152Eu([server, log[SN]['56Co'], volnmbr], [server, log[SN]['152Eu'], volnmbr], js_norm)
         norm = {
-            'S1': norm_s1,
-            'S2': norm_s2,
-            'S3': norm_s3,
+            SN: norm_s
         }
-        with open('norm_56Co_check.json', 'w') as fout:
+        with open(f'norm_56Co_check_{SN}.json', 'w') as fout:
+            json.dump(norm, fout, indent=4)
+
+def main():
+
+    parser = argparse.ArgumentParser(description="Process run and volume parameters.")
+    parser.add_argument("-s", "--servers", nargs='*',
+                        dest="servers", default=[1, 1],
+                        help="from domain, default = {} {}".format(1, 1))
+    parser.add_argument("-v", "--volume", type=int, default=999, help="Volume number (default: 999)")
+    parser.add_argument("--check", action="store_true", help="CheckNorm")
+
+
+    args = parser.parse_args()
+
+    blCheckNorm = args.check
+
+    print('ddddddd',blCheckNorm)
+
+
+    volnmbr = args.volume
+
+    if len(args.servers) == 1:
+        args.servers.append(args.servers[0])
+
+    s_start = int(args.servers[0])
+    s_stop = int(args.servers[1])
+
+    server = s_start
+    SN = f'S{server}'
+
+    norm_s = Norm56Co152Eu([server, log[SN]['56Co'], volnmbr], [server, log[SN]['152Eu'], volnmbr])
+
+    sys.exit()
+
+    for server in range(s_start, s_stop + 1):
+        SN = f'S{server}'
+
+        print(f"{BLUE}Normalization 56Co to 152Eu for server {server}{RESET}")
+
+        if blCheckNorm:
+            print(f"{BLUE}Checking Normalization 56Co to 152Eu for server {server}{RESET}")
+            CheckNormalization(server, volnmbr)
+        else:
+            print(f"{GREEN}56Co: {server}, {log[SN]['56Co']}, {volnmbr}; 152Eu {server}, {log[SN]['152Eu']}, {volnmbr}{RESET}")
+            norm_s = Norm56Co152Eu([server, log[SN]['56Co'], volnmbr], [server, log[SN]['152Eu'], volnmbr])
+            norm = {
+                SN: norm_s,
+            }
+
+        with open(f'norm_56Co_{SN}.json', 'w') as fout:
             json.dump(norm, fout, indent=4)
 
 
-if blCheckNorm:
-    CheckNormalization()
-else:
-    norm_s1 = Norm56Co152Eu([1,170,999],[1,162,999])
-    norm_s2 = Norm56Co152Eu([2,167,999],[2,158,999])
-    norm_s3 = Norm56Co152Eu([3,36,999],[3,27,999])
-
-    norm = {
-        'S1':norm_s1,
-        'S2':norm_s2,
-        'S3':norm_s3,
-    }
-    with open('norm_56Co.json','w') as fout:
-        json.dump(norm, fout, indent=4)
-
-    print(norm)
+if __name__ == "__main__":
+    main()
 
 
 
