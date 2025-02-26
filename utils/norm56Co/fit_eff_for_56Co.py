@@ -125,8 +125,16 @@ def Fit_Efficiency_Curve(server, run, vol, my_fold, js_norm):
 def Norm56Co152Eu(co, eu, js_norm=None):  #server run vol
     norm_fold = {}
     for ifold in range (1,5):
+
         params_56Co = Fit_Efficiency_Curve(co[0], co[1], co[2], ifold, js_norm)
+        if params_56Co is None:
+            raise ValueError(f"{RED}Error: params_56Co is None. Check Fit_Efficiency_Curve return value.{RESET}")
+
         params_152Eu = Fit_Efficiency_Curve(eu[0], eu[1], eu[2], ifold, js_norm)
+        if params_152Eu is None:
+            raise ValueError(f"{RED}Error: params_152Eu is None. Check Fit_Efficiency_Curve return value.{RESET}")
+
+
         eff_846kev_56Co = fitDebertin(846.772, *params_56Co)# for key in log:
         eff_846kev_152Eu = fitDebertin(846.772, *params_152Eu)# for key in log:
         ratio = eff_846kev_152Eu/eff_846kev_56Co
@@ -162,9 +170,6 @@ def main():
 
     blCheckNorm = args.check
 
-    print('ddddddd',blCheckNorm)
-
-
     volnmbr = args.volume
 
     if len(args.servers) == 1:
@@ -177,8 +182,6 @@ def main():
     SN = f'S{server}'
 
     norm_s = Norm56Co152Eu([server, log[SN]['56Co'], volnmbr], [server, log[SN]['152Eu'], volnmbr])
-
-    sys.exit()
 
     for server in range(s_start, s_stop + 1):
         SN = f'S{server}'
