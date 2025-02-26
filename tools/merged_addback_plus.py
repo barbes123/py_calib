@@ -13,6 +13,7 @@ from argparse import ArgumentParser
 import inspect
 
 
+
 ourpath = os.getenv('PY_CALIB')
 
 import sys
@@ -23,12 +24,12 @@ from libLists import list_of_sources as list_of_sources
 from libFitFunc import *
 from libColorsAnsi import *
 from utilities import json_oneline_lists
-
+from libFitFunc import fitRadware
 
 from sympy.printing.pretty.pretty_symbology import line_width
 
 list_of_bad_lines = ['79.623', '160.609']
-list_of_norm = {'S1':4.82863316066443}
+# list_of_norm = {'S1':4.82863316066443}
 
 
 def MakeDir(path):
@@ -113,6 +114,8 @@ def PlotPT(my_data, meta_data=''):
     index = 0
     for dataset in my_data:
         # Extract fold and PT for each dataset
+        if dataset == None:
+            continue
         fold = [int(entry["fold"]) for entry in dataset]
         pt = [entry["PT"][0] for entry in dataset]  # Get the first value in the PT list for plotting
         pt_err = [entry["PT"][1] for entry in dataset]  # Extract PT errors (y-error)
@@ -288,8 +291,11 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
                     #             yerr=js_new[index][source][el]['eff'][1],
                     #             color=colors[source][index]
                     #         )
-                    if True:
+                    blNorm56Co = True
+                    if blNorm56Co:
                         plt.figure(0)
+                        print(el)
+                        # sys.exit()
                         if el not in lists_of_gamma_background and el not in list_of_bad_lines:
                             plt.scatter(
                                 x=float(el),
@@ -371,12 +377,60 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
         # print([value[1] for value in dataFull.values()])
         # sys.exit()
 
+        #Deberetit fit
         params, covariance = curve_fit(fitDebertin, ener_short, eff_short)
         a1f, a2f, a3f, a4f, a5f = params
         ener1 = np.linspace(min(ener_short), max(ener_short), 1000)  # Generate 500 points for smoothness
         smooth_fit = fitDebertin(ener1, *params)  # Evaluate the fitted function on the generated points
         plt.figure(0)
-        plt.plot(ener1, smooth_fit, color='black', linestyle='--', label='Debertin Fit')
+        plt.plot(ener1, smooth_fit, color='black', linestyle='--', label='Debertin Fit', linewidth=0.8)
+
+        blRadWareFit = False
+        if blRadWareFit:
+            # Radware fit
+            #ini: A, B, C, ...
+            # ini = [0.9, 1, 0, 5.3, -3.43611819e-01, 1e-3, 15]
+            # ini = [6.41864634e+00, 7.22905749e-02, 1.00000000e-08, 5.93837735e+00, -3.03856910e-01, 7.81655862e-02, 7.53237727e+01]
+            d = 1e-6
+            ini = [1.41864634e+00,  7.22905749e-02,  1.00000000e-08,  5.93837735e+00,  -3.03856910e-01,  7.81655862e-02,  15.53237727e+01]
+            bounds = ([ini[0], ini[1], ini[2] - d, ini[3], ini[4], ini[5], ini[6] - d],
+                      [ini[0], ini[1], ini[2] + d, ini[3], ini[4], ini[5], ini[6] + d])
+            params1, covariance = curve_fit(fitRadware, ener_short, eff_short, p0=ini, maxfev=10000)
+            # a, b, c, d, e, f, g = params1
+            ener1 = np.linspace(min(ener_short), max(ener_short), 1000)  # Generate 500 points for smoothness
+            smooth_fit = fitRadware(ener1, *params1)  # Evaluate the fitted function on the generated points
+            plt.figure(0)
+            plt.plot(ener1, smooth_fit, color='red', linestyle='--', label='RedWare Fit', linewidth=0.8)
+
+
+        blFazekas = False
+        if blFazekas:
+            initial_guess = np.ones(9)  # or another reasonable starting point
+
+            d = 1e-6
+            # ini = [-7800, -520, -122, -6.835, -37, 2]
+            # bounds = ([ini[0], ini[1], ini[2] - d, ini[3], ini[4], ini[5], ini[6] - d],
+            #           [ini[0], ini[1], ini[2] + d, ini[3], ini[4], ini[5], ini[6] + d])
+
+            # print(ener_short,eff_short)
+            ini = [-6.75306847e+01, 3.56631159e-03, 3.28925732e-03, 3.32751403e-03, 3.32427892e-03, 3.28392244e-03, 3.42122746e-03, 3.61320991e-03, 3.28016381e-03]
+
+            params, covariance = curve_fit(fitFazekas, ener_short, eff_short, p0=ini)  # , p0=initial_guess)
+
+
+
+
+            print(f"Fitted parameters: {params}")
+            # Generate smooth data for plotting
+            ener1 = np.linspace(min(ener_short), max(ener_short), 500)  # Generate 500 points for smoothness
+            smooth_fit = fitFazekas(ener1, *params)  # Evaluate the fitted function
+            res_fit = fitFazekas(ener_short, *params)  # Evaluate the fitted function
+            plt.figure(0)
+            plt.plot(ener1, smooth_fit, color='green', label='Fit Debertin')
+            plt.show()
+
+            print(res_fit)
+
 
 
 
@@ -416,7 +470,7 @@ def MergeJsonData(js60Co=None, js152Eu=None, js22Na=None, js54Mn=None, js137Cs=N
     # line = ax.get_lines()[0]  # Get the first line in the plot
     # max_y = max(line.get_ydata())
     max_y = max([line.get_ydata().max() for line in plt.gca().get_lines()])
-    plt.ylim(0, 1.5*max_y)
+    plt.ylim(0, 1.1*max_y)
     # print(line)
     # print(f'{RED} MAX {max_y} {RESET}')
 
@@ -531,25 +585,32 @@ def main():
                 js_all.append(js)
 
                 try:
-                    with open('norm_56Co.json','r') as fnorm:
-                        js_norm = json.load(fnorm)
-
                     server_now = list_of_data[el][0]
                     serverID = f'S{server_now}'
+                    print(f'{GREEN}File for 56Co normalization: norm_56Co_S{server_now}.json{RESET}')
 
-                    norm = list_of_norm [serverID]
+                    fnorm_name = f'norm_56Co_S{server_now}.json'
+                    if not os.path.exists(fnorm_name) :
+                        raise ValueError(
+                            f"{RED}Error: File {fnorm_name} does not exist. Check.{RESET}")
+                    else:
+                        print(f"{GREEN}File {fnorm_name} exist. ok.{RESET}")
+
+                    with open(fnorm_name,'r') as fnorm:
+                        js_norm = json.load(fnorm)
+                    print(js_norm[serverID])
+                    # norm = list_of_norm[serverID]
+                    # norm = js_norm[serverID]
 
                     for entry in js56Co:
                         fold = entry['fold']
                         norm = js_norm[serverID][str(fold)]
+                        print('n',norm)
                         for values in entry.get(el, {}).values():
                             if 'eff' in values:
                                 values['eff'] = [x * norm for x in values['eff']]
                 except:
-                    print(f'No norm for {el}')
-
-
-
+                    print(f'{RED}No normalization for {el}{RESET}')
         if el == '133Ba':
             with open(name, 'r') as file:
                 js133Ba = json.load(file)
@@ -662,11 +723,10 @@ if __name__ == "__main__":
                     energy_levels.append(energy)  # Append the energy level
                     efficiencies.append(folds[selected_fold])  # Append the efficiency for the selected fold
 
-
-            # Plotting the efficiency vs energy for the selected fold
+            color_index = run % 10
             plt.plot(energy_levels, efficiencies, label=f'Fold {selected_fold} Sim Run {run}', color = my_colors[color_index])
             # plt.savefig('figures/simulations_eff.{}'.format('jpg'),dpi=300)
-            color_index+=1
+            # color_index+=1
 
             ncol = 17
             selected_fold = plotTheseFolds[0] + 1
@@ -681,7 +741,7 @@ if __name__ == "__main__":
                 ncol = 5
             energy_sim, ab_sim = ReadSimData(f'run_{run}/add_back_all_run_{run}.txt', 1, ncol)
             plt.figure(2)  # add sim to addback
-            plt.plot(energy_sim, ab_sim, marker='', linestyle='-', color=my_colors[color_index], linewidth=1)
+            plt.plot(energy_sim, ab_sim, marker='', linestyle='-', color=my_colors[color_index], label=f'Sim Run {run}', linewidth=1)
 
         # Customize the plot
         plt.xlabel('Energy (keV)')
