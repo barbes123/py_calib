@@ -8,6 +8,9 @@ import numpy as np
 import os
 import matplotlib.colors as mcolors
 from random import choice
+from libGlobalVars import state
+from libColorsAnsi import  *
+
 
 opt = 'jpg'
 # dpi = 300
@@ -20,24 +23,27 @@ opt = 'jpg'
 # PlotCalibration - plots calibration curves
 ##################################################################
 
+def GetFigSavePath():
+    save_figures_to = f'{state.save_results_to}/figures'
+    print(f'{GREEN}Figures will be saved in {save_figures_to}{RESET}')
+
+
 # ourpath = '/data10/live/IT/py_calib'
 ourpath = os.getenv('PY_CALIB')
 
 current_directory = os.getcwd()
 datapath = '{}/'.format(current_directory)
 
-global save_results_to
-# save_results_to = '/home/rmiron/Desktop/dir/python_exercises/calibrations/figures/'
-save_results_to = '{}figures/'.format(datapath)
+# global save_results_to
+save_figures_to = f'{state.save_results_to}figures'
+# print(f'{GREEN}{save_figures_to}{RESET}')
+print(f'{GREEN}Figures will be saved in {save_figures_to}{RESET}')
+
 title_clover = ''
-from libLists import list_of_sources
-from libLists import list_of_clovers
-from libLists import list_of_cebr
-
-# list_of_clovers = {"CL29", "CL30", "CL31", "CL32", "CL33", "CL34", "CL35", "CL36", "HPGe", "SEG", "LaBr"}
-# list_of_sources = {'60Co', '60CoWeak', '152Eu', '137Cs', '133Ba'}
-# list_of_cebr = {"CEBR1", "CEBR2", "CEBR3", "CEBR4"}
-
+from libLists import *
+# from libLists import list_of_sources
+# from libLists import list_of_clovers
+# from libLists import list_of_cebr
 
 # res and eff vs ener for each domain
 
@@ -88,7 +94,7 @@ def find_domain(domain, lutfile):
 
 
 def PlotJsondom(data, gammatab, source, lutfile, opt='eps'):
-    MakeDir(save_results_to)
+    MakeDir(save_figures_to)
 
     for i in data:
         # print('checking type {}'.format(type(i['domain'])))
@@ -129,7 +135,7 @@ def PlotJsondom(data, gammatab, source, lutfile, opt='eps'):
             interactive(True)
             # plt.show()
             file_name1 = 'dom_{}_res.{}'.format(dom, opt)
-            plt.savefig(save_results_to + file_name1)
+            plt.savefig(save_figures_to + file_name1)
             plt.close()
             plt.figure(2)
             for key in i[source].keys():
@@ -167,7 +173,7 @@ def PlotJsondom(data, gammatab, source, lutfile, opt='eps'):
 
             plt.show()
             file_name2 = 'dom_{}_eff.{}'.format(dom, opt)
-            plt.savefig(save_results_to + file_name2)
+            plt.savefig(save_figures_to + file_name2)
             interactive(False)
             plt.close()
     print("Finished domain graphs")
@@ -181,8 +187,12 @@ def legend_without_duplicate_labels(figure):
 
 
 def PlotJsonclover(data, gammatab, source, my_det_type, lutfile, opt='eps'):
-    print('<<<<< I am in PlotJsonclover >>>>>')
-    MakeDir(save_results_to)
+    # GetFigSavePath()
+    save_figures_to = f'{state.save_results_to}/figures'
+    print(f'{BLUE} <<<<< I am in PlotJsonclover. Save data to {save_figures_to} >>>>>{RESET}')
+    MakeDir(save_figures_to)
+
+    # sys.exit()
 
     for cloverkey in list_of_clovers:
         #print(f"\nProcessing clover {cloverkey}")
@@ -298,10 +308,10 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile, opt='eps'):
                         plt.ylim([0, 0.006])
                     elif my_det_type == 2:
                         plt.ylim([0, 0.01])
-                    plt.savefig(save_results_to + f'eliade_{cloverkey}_efficiency.{opt}')
+                    plt.savefig(save_figures_to + f'eliade_{cloverkey}_efficiency.{opt}')
                 elif fig == 2:  # Resolution
                     plt.ylim([0, 3])
-                    plt.savefig(save_results_to + f'eliade_{cloverkey}_{my_det_type}_resolution.{opt}')
+                    plt.savefig(save_figures_to + f'eliade_{cloverkey}_{my_det_type}_resolution.{opt}')
                 elif fig == 0:  # Peak-to-total
                     if my_det_type in [1, 10]:
                         plt.ylim([0.0, 0.1])
@@ -309,7 +319,7 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile, opt='eps'):
                         plt.ylim([0, 0.25])
                     # Use legend_without_duplicate_labels for consistency with other plots
                     #legend_without_duplicate_labels(plt)
-                    plt.savefig(save_results_to + f'eliade_{cloverkey}_{my_det_type}_peaktotal.{opt}')
+                    plt.savefig(save_figures_to + f'eliade_{cloverkey}_{my_det_type}_peaktotal.{opt}')
                 plt.close()
 
     print('\nFinished CLOVER graphs')
@@ -318,7 +328,7 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile, opt='eps'):
 def PlotJsoncore(data, gammatab, source, lutfile, detKey=1, opt='eps'):
     debugPlotJsoncore = False
 
-    MakeDir(save_results_to)
+    MakeDir(save_figures_to)
     CloverName = ''
     # my_det_type=1
     for key in data:
@@ -407,12 +417,12 @@ def PlotJsoncore(data, gammatab, source, lutfile, detKey=1, opt='eps'):
 
     plt.figure(1)
     file_name5 = 'eliade_efficiency_{}_core{}.{}'.format(CloverName, detKey, opt)
-    plt.savefig(save_results_to + file_name5)
+    plt.savefig(save_figures_to + file_name5)
     plt.close()
 
     plt.figure(2)
     file_name6 = 'eliade_resolution_{}_core{}.{}'.format(CloverName, detKey, opt)
-    plt.savefig(save_results_to + file_name6)
+    plt.savefig(save_figures_to + file_name6)
     plt.close()
 
     print("PlotJsoncore: Finished graphs for all core{} {}".format(CloverName, detKey))
@@ -420,11 +430,14 @@ def PlotJsoncore(data, gammatab, source, lutfile, detKey=1, opt='eps'):
 
 
 def PlotCalibration(data, gammatab, source, lutfile, my_det_type=2, opt='eps'):
+
+    save_figures_to = f'{state.save_results_to}/figures'
+
     if my_det_type == 3:
         # To plot CeBr calib please use PlotCalibrationCeBr instead of PlotCalibration
         return True
 
-    MakeDir(save_results_to)
+    MakeDir(save_figures_to)
     number_of_our_colors = 30
     our_color_plate = iter(cm.rainbow(np.linspace(0, 1, number_of_our_colors)))
     # niter = 0
@@ -480,7 +493,7 @@ def PlotCalibration(data, gammatab, source, lutfile, my_det_type=2, opt='eps'):
             # plt.show()
             file_name = 'eliade_{}_{}_calibration.{}'.format(cloverkey, my_det_type, opt)
             file_name = 'eliade_{}_{}_calibration.{}'.format(cloverkey, my_det_type, opt)
-            plt.savefig(save_results_to + file_name)
+            plt.savefig(save_figures_to + file_name)
             plt.close()
             blCloverFound = False
     return True
@@ -488,7 +501,7 @@ def PlotCalibration(data, gammatab, source, lutfile, my_det_type=2, opt='eps'):
 
 def PlotCalibrationCeBr(data, gammatab, source, lutfile, my_det_type=3, opt='eps'):
     print('<<<<< I am in PlotCalibrationCeBr >>>>>')
-    MakeDir(save_results_to)
+    MakeDir(save_figures_to)
     number_of_our_colors = 30
     our_color_plate = iter(cm.rainbow(np.linspace(0, 1, number_of_our_colors)))
     colors = ["red", "orange", "yellow", "green", "blue", "indigo",
@@ -552,7 +565,7 @@ def PlotCalibrationCeBr(data, gammatab, source, lutfile, my_det_type=3, opt='eps
         # plt.show()
         file_name = 'eliade_{}_calibration.{}'.format(my_det_type, opt)
         file_name = 'eliade_{}_calibration.{}'.format(my_det_type, opt)
-        plt.savefig(save_results_to + file_name)
+        plt.savefig(save_figures_to + file_name)
         plt.close()
         blCloverFound = False
     return True
@@ -560,7 +573,7 @@ def PlotCalibrationCeBr(data, gammatab, source, lutfile, my_det_type=3, opt='eps
 
 def PlotCeBr(data, gammatab, source, my_det_type, lutfile, opt='eps'):
     print('<<<<< I am in PlotCeBr >>>>>')
-    MakeDir(save_results_to)
+    MakeDir(save_figures_to)
 
     # my_det_type = 2
     ### RESOLUTION, EFFICIENCY AND PEAK-TO-TOTAL RATIO FOR CLOVERS
@@ -628,7 +641,7 @@ def PlotCeBr(data, gammatab, source, my_det_type, lutfile, opt='eps'):
         plt.grid(color='black', linestyle='--', linewidth=0.5)
 
         file_name0 = 'eliade_CEBR_{}_peaktotal.{}'.format(my_det_type, opt)
-        plt.savefig(save_results_to + file_name0)
+        plt.savefig(save_figures_to + file_name0)
         plt.close()
 
         plt.figure(1)
@@ -641,7 +654,7 @@ def PlotCeBr(data, gammatab, source, my_det_type, lutfile, opt='eps'):
         plt.grid(color='black', linestyle='--', linewidth=0.5)
 
         file_name1 = 'eliade_CEBR_{}_eff.{}'.format(my_det_type, opt)
-        plt.savefig(save_results_to + file_name1)
+        plt.savefig(save_figures_to + file_name1)
         plt.close()
 
         plt.figure(2)
@@ -654,7 +667,7 @@ def PlotCeBr(data, gammatab, source, my_det_type, lutfile, opt='eps'):
         plt.grid(color='black', linestyle='--', linewidth=0.5)
 
         file_name2 = 'eliade_CEBR_{}_res.{}'.format(my_det_type, opt)
-        plt.savefig(save_results_to + file_name2)
+        plt.savefig(save_figures_to + file_name2)
         plt.close()
 
         blCeBrFound = False
@@ -666,7 +679,7 @@ def PlotCeBr(data, gammatab, source, my_det_type, lutfile, opt='eps'):
 # def PlotJsonFold(data, gammatab, source, my_det_type, lutfile, opt='eps'):
 def PlotJsonFold(data, gammatab, source, my_det_type, opt='eps'):
     print('<<<<< I am in PlotJsonFold >>>>>')
-    MakeDir(save_results_to)
+    MakeDir(save_figures_to)
 
     plt.figure(0)
     for key in data:
@@ -766,7 +779,7 @@ def PlotJsonFold(data, gammatab, source, my_det_type, opt='eps'):
     plt.xlabel('Fold')
     plt.ylabel('PT')
     file_name_pt = 'fold_{}_peaktotal.{}'.format(key["fold"], opt)
-    plt.savefig(save_results_to + file_name_pt)
+    plt.savefig(save_figures_to + file_name_pt)
     plt.close()
 
     plt.figure(1)
@@ -774,7 +787,7 @@ def PlotJsonFold(data, gammatab, source, my_det_type, opt='eps'):
     plt.xlabel('Fold')
     plt.ylabel('Efficiency, %')
     file_name_eff = 'fold_{}_eff.{}'.format(key["fold"], opt)
-    plt.savefig(save_results_to + file_name_eff)
+    plt.savefig(save_figures_to + file_name_eff)
     plt.close()
 
     plt.figure(2)
@@ -782,7 +795,7 @@ def PlotJsonFold(data, gammatab, source, my_det_type, opt='eps'):
     plt.xlabel('Fold')
     plt.ylabel('Resolution, keV')
     file_name_res = 'fold_{}_res.{}'.format(key["fold"], opt)
-    plt.savefig(save_results_to + file_name_res)
+    plt.savefig(save_figures_to + file_name_res)
     plt.close()
 
     plt.figure(3)
@@ -790,7 +803,7 @@ def PlotJsonFold(data, gammatab, source, my_det_type, opt='eps'):
     plt.xlabel('Fold')
     plt.ylabel('Add Back factor')
     file_name_ab = 'fold_{}_ab.{}'.format(key["fold"], opt)
-    plt.savefig(save_results_to + file_name_ab)
+    plt.savefig(save_figures_to + file_name_ab)
     plt.close()
 
     plt.figure(5)
@@ -799,7 +812,7 @@ def PlotJsonFold(data, gammatab, source, my_det_type, opt='eps'):
     plt.xlabel('E$\gamma$')
     plt.ylabel('Add Back factor fold')
     file_name_ab = 'fold_ab_all.{}'.format(opt)
-    plt.savefig(save_results_to + file_name_ab)
+    plt.savefig(save_figures_to + file_name_ab)
     plt.close()
 
     for fold in range(11, Nfold + 1):
@@ -809,7 +822,7 @@ def PlotJsonFold(data, gammatab, source, my_det_type, opt='eps'):
         plt.xlabel('Eg')
         plt.ylabel('Add Back factor fold')
         file_name_ab = 'fold_{}_ab.{}'.format(fold, opt)
-        plt.savefig(save_results_to + file_name_ab)
+        plt.savefig(save_figures_to + file_name_ab)
         plt.close()
 
     print('Finished Fold graphs')

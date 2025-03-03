@@ -33,18 +33,21 @@ sys.path.insert(1, '{}/lib'.format(ourpath))
 
 from libCalib1 import TIsotope as TIso
 from libCalib1 import TMeasurement as Tmeas
-from libPlotEliadeNewJS import PlotJsondom as PlotDomain
-from libPlotEliadeNewJS import PlotJsonclover as PlotClover
-from libPlotEliadeNewJS import PlotCeBr
-from libPlotEliadeNewJS import PlotJsoncore as PlotCore
-from libPlotEliadeNewJS import PlotCalibration
-from libPlotEliadeNewJS import PlotCalibrationCeBr
+
 from TRecallEner import TRecallEner
 from libSettings import SetUpRecallEner
 from libSettings import SetUpRecallEnerFromJson
 from utilities import *
 from libLists import lists_of_gamma_background
 from libReadNewJS import IsotopeData
+from libGlobalVars import state
+# from libPlotEliadeNewJS import PlotJsondom as PlotDomain
+from libPlotEliadeNewJS import PlotJsonclover
+from libPlotEliadeNewJS import PlotCalibration
+from libPlotEliadeNewJS import GetFigSavePath
+
+# def update_global_var(new_value):
+#     state.save_results_to = new_value  # Modify the shared variable
 
 current_directory = os.getcwd()
 
@@ -56,8 +59,6 @@ else:
     datapath = '{}/'.format(current_directory)
 
 print('Path to RecalEnergy {}'.format(path))
-save_results_to = 'figures/'
-
 print('Data path: ', datapath)
 
 lutfile = 'LUT_ELIADE.json'
@@ -391,7 +392,7 @@ def main():
     print(my_run.__str__())
 
     global my_source
-    my_source = TIso(None, None, None, None)
+    my_source = TIso(None, None, None, None, None)
     my_source.setup_source_from_json(j_sources, my_run.source)
     if my_run.tstop < my_run.tstart:
         print("Check start and stop time of this run. Tstart must be bigger than Tstop")
@@ -403,17 +404,6 @@ def main():
     print(my_source.__str__())
     print('sum {}; err {}; int {}'.format(n_decays_sum, n_decays_err, n_decays_int))
 
-    # blBackGround = False
-    # print('!!!!!!',my_params.bg)
-    # if my_params.bg > 0:
-    #     blBackGround = True
-
-    # print('Gammas ', j_sources['Co60']['gammas'])
-    # global myCurrentSetting
-    # myCurrentSetting = TRecallEner(800,1200,100,4, 200, 1500)
-
-    # command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly1 -v 2'.format(path, current_file, src, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
-    
     source4Fit = my_source.name
     if '60Co' in source4Fit:
         source4Fit = '60Co'
@@ -432,8 +422,18 @@ def main():
     print('command_line////////////////////', command_line)
     print()
     #json_path = '{}{}/{}_peaks_data.json'.format(datapath, my_run.run, my_run.run)
-    json_path = '{}selected_run_{}_{}_eliadeS{}_output_data/selected_run_{}_{}_eliadeS{}_parameters.json'.format(datapath,my_params.runnbr, my_params.volnbr, my_params.server,my_params.runnbr, my_params.volnbr, my_params.server)
+    run = my_params.runnbr
+    vol = my_params.volnbr
+    server = my_params.server
+
+
+    json_path = f'{datapath}selected_run_{run}_{vol}_eliadeS{server}_calib/selected_run_{run}_{vol}_eliadeS{server}.json'
+    save_results_to = f'{datapath}selected_run_{my_params.runnbr}_{my_params.volnbr}_eliadeS{my_params.server}_calib'
+    state.save_results_to = save_results_to
+    # json_path = f'{save_results_to}/selected_run_{my_params.runnbr}_{my_params.volnbr}_eliadeS{my_params.server}.json'
     print('json_path ', json_path)
+    print('save_results_to ', save_results_to)
+
     result_scr = subprocess.run(['{}'.format(command_line)], shell=True)
     print()
     print()
@@ -485,39 +485,12 @@ def main():
         current_file = '{}{}_py_{}.spe'.format(datapath,prefix,domain)
         # current_file = '{}mDelila_raw_py_{}.spe'.format(datapath, domain)
 
-        # if file_exists(current_file):
-
-
-        # command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly1 -v 2'.format(path, current_file, src, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
-        # command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly1 -v 2'.format(path, current_file, src, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
-        # command_line = '{} -f selected_run_162_999_eliadeS1.root -rp ~/onlineEliade/LookUpTables/s1/LUT_RECALL_S1_CL29.json '.format(path)
-        # print('command_line ', command_line)
 
         if debug:
             print('I am ready to do fit for domain {} : '.format(domain))
-
-        # result_scr = subprocess.run(['{}'.format(command_line)], shell=True, capture_output=True)
-        # result_scr = subprocess.run(['{}'.format(command_line)], shell=True)
-        # print(result_scr)
-        # sys.exit()
-        # fitdata = result_scr.stdout.decode()
-        # print(fitdata)
-        # global total
-        # total = 1
-        #total = SumAsci(current_file)
-        # total = SumAsciLimits(current_file, myCurrentSetting.limStart, myCurrentSetting.limStop)
-        # ProcessFitDataStr(domain, my_source.name, fitdata, j_sources, j_lut)
-
-
-    # with open('new_{}'.format(lutfile), 'w') as ofile:
-    #     js_tab = json.dump(j_lut, ofile, indent=3, default=str)
-
-    # with open('calib_res_{}.json'.format(my_run.run), 'w') as ofile:
-    #     ofile.write(j_results)
-
     try:
         # Build the file path dynamically using parameters provided in terminal
-        file_path = '{}selected_run_{}_{}_eliadeS{}_output_data/selected_run_{}_{}_eliadeS{}_parameters.json'.format(
+        file_path = '{}selected_run_{}_{}_eliadeS{}_calib/selected_run_{}_{}_eliadeS{}.json'.format(
             datapath,
             my_params.runnbr, 
             my_params.volnbr, 
@@ -526,7 +499,10 @@ def main():
             my_params.volnbr, 
             my_params.server
         )
-        
+
+        # GetFigSavePath.GetFigSavePath()
+        # GetFigSavePath()
+
         print(f"Attempting to open file: {file_path}")
         with open(file_path, 'r') as ifile:
             js_tab = json.load(ifile)
@@ -549,11 +525,11 @@ def main():
                 #PlotDomain(js_tab, j_sources, source, j_lut, my_params.grType)
 
                 # Plot for HPGe (type 1)
-                PlotClover(js_tab, j_sources, source, 1, j_lut, my_params.grType)
+                PlotJsonclover(js_tab, j_sources, source, 1, j_lut, my_params.grType)
                 PlotCalibration(js_tab, j_sources, source, j_lut, 1, my_params.grType)
                 
                 # Plot for Segmented detectors (type 2)
-                PlotClover(js_tab, j_sources, source, 2, j_lut, my_params.grType)
+                PlotJsonclover(js_tab, j_sources, source, 2, j_lut, my_params.grType)
                 PlotCalibration(js_tab, j_sources, source, j_lut, 2, my_params.grType)
 
     except FileNotFoundError:
