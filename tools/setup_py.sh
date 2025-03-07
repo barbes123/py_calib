@@ -3,7 +3,41 @@
 
 my_home=$HOME
 
-echo $my_home
+echo "Home directory $my_home"
+
+
+#run analysis
+
+#------------------------------------------------------------------
+link="/usr/local/bin/runme"
+source="$PWD/run_me.py"
+echo "source $source and link $link"
+
+sudo unlink $link
+sudo ln -s $source $link
+#------------------------------------------------------------------
+
+
+
+#AddBack
+
+echo /usr/local/bin/ab.run
+sudo unlink /usr/local/bin/ab.run
+echo $HOME/onlineEliade/tools/AddBackSimTools/addback_run.py
+sudo ln -s $HOME/onlineEliade/tools/AddBackSimTools/addback_run.py /usr/local/bin/ab.run
+
+echo /usr/local/bin/ab.merge
+sudo unlink /usr/local/bin/ab.merge
+echo $PWD/merged_addback_plus.py
+sudo ln -s $PWD/merged_addback_plus.py /usr/local/bin/ab.merge
+
+echo /usr/local/bin/ab.addback
+sudo unlink /usr/local/bin/ab.addback
+echo $PY_CALIB/py_addback.py
+sudo ln -s $PY_CALIB/py_addback.py /usr/local/bin/ab.addback
+
+
+# Calibration
 
 echo /usr/local/bin/pc
 sudo unlink /usr/local/bin/pc
@@ -45,10 +79,7 @@ sudo unlink /usr/local/bin/lut.add.zerota
 echo $PWD/time_calib_zero.py
 sudo ln -s $PWD/time_calib_zero.py /usr/local/bin/lut.add.zerota
 
-echo /usr/local/bin/ab
-sudo unlink /usr/local/bin/ab
-echo $PY_CALIB/py_addback.py
-sudo ln -s $PY_CALIB/py_addback.py /usr/local/bin/ab
+
 
 echo /usr/local/bin/lut.getdatafromserver
 sudo unlink /usr/local/bin/lut.getdatafromserver
@@ -60,7 +91,4 @@ sudo unlink /usr/local/bin/lut.adddata2json
 echo $PWD/add_data_to_json.py
 sudo ln -s $PWD/add_data_to_json.py /usr/local/bin/lut.adddata2json
 
-echo /usr/local/bin/ab.merge
-sudo unlink /usr/local/bin/ab.merge
-echo $PWD/merged_addback_plus.py
-sudo ln -s $PWD/merged_addback_plus.py /usr/local/bin/ab.merge
+
