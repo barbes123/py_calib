@@ -494,6 +494,7 @@ def PlotCalibration(data, gammatab, source, lutfile, my_det_type=2, opt='eps', d
 
 def PlotCalibrationCeBr(data, gammatab, source, lutfile, my_det_type=3, opt='eps', dpi=300):
     print('<<<<< I am in PlotCalibrationCeBr >>>>>')
+    print(f'{BLUE}...doing PlotCalibration for {my_det_type} detector type... {RESET}')
     MakeDir(save_results_to)
     number_of_our_colors = 30
     our_color_plate = iter(cm.rainbow(np.linspace(0, 1, number_of_our_colors)))
@@ -548,7 +549,7 @@ def PlotCalibrationCeBr(data, gammatab, source, lutfile, my_det_type=3, opt='eps
     if blCeBrFound == True:
         delta = 200
         # print("calib")
-        plt.xlim([0, 16000])
+        plt.xlim([0, 8000])
         plt.ylim([0, max_energy + delta])  # maximum energy from source + delta: [0; max+delta]
         plt.xlabel('Channel')
         plt.ylabel('Energy (keV)')
@@ -614,8 +615,14 @@ def PlotCeBr(data, gammatab, source, my_det_type, lutfile, opt='eps', dpi=300):
                                     except:
                                         continue  # print("Energy {} missing from domain {}".format(key[source][element], key["domain"]))
     if blCeBrFound == True:
+
+        selected_data = [entry for entry in lutfile if entry["detType"] == 3]
+        min_domain = min(selected_data, key=lambda x: x["domain"])["domain"]
+        max_domain = max(selected_data, key=lambda x: x["domain"])["domain"]
+
+
         plt.figure(0)
-        plt.xlim(900, 1000)
+        plt.xlim(min_domain - 1, max_domain + 1)
         plt.ylim([0.01, 0.3])
 
         plt.title(f'Peak to Total ratio for CeBr {my_det_type}')
@@ -631,7 +638,7 @@ def PlotCeBr(data, gammatab, source, my_det_type, lutfile, opt='eps', dpi=300):
         plt.close()
 
         plt.figure(1)
-        plt.xlim(900, 1000)
+        plt.xlim(min_domain - 1, max_domain + 1)
         plt.ylim([0.01, 0.4])
 
         plt.title(f'Efficiency for CeBr {my_det_type}')
@@ -646,12 +653,12 @@ def PlotCeBr(data, gammatab, source, my_det_type, lutfile, opt='eps', dpi=300):
         plt.close()
 
         plt.figure(2)
-        plt.xlim(900, 1000)
+        plt.xlim(min_domain - 1, max_domain + 1)
         plt.ylim([0, 50])
 
         plt.title(f'Resolution for CeBr {my_det_type}')
         plt.xlabel('Domain')
-        plt.ylabel('Resolution')
+        plt.ylabel('Resolution, keV')
         plt.grid(color='black', linestyle='--', linewidth=0.5)
         max_y = max([line.get_ydata().max() for line in plt.gca().get_lines()])
         plt.ylim(0, 1.5 * max_y)

@@ -475,6 +475,7 @@ def main():
             PlotCore(js_tab, j_sources, my_source.name, j_lut, 1, my_params.grType, my_params.dpi)
             PlotCalibration(js_tab, j_sources, my_source.name, j_lut, 1, my_params.grType, my_params.dpi)
             PlotCalibration(js_tab, j_sources, my_source.name, j_lut, 2, my_params.grType, my_params.dpi)
+            # PlotCalibration(js_tab, j_sources, my_source.name, j_lut, 3, my_params.grType, my_params.dpi)
 
             PlotCeBr(js_tab, j_sources, my_source.name, 3, j_lut, my_params.grType, my_params.dpi)
             PlotCalibrationCeBr(js_tab, j_sources, my_source.name, j_lut, 3, my_params.grType, my_params.dpi)
