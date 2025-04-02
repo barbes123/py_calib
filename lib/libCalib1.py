@@ -65,6 +65,7 @@ class TIsotope:
         return sum, err_sum
 
     def GetNdecaysIntegral(self, start, stop):
+	#This function provides data for RecallCalib
         t1 = (start - self.date0).total_seconds()
         t2 = (stop - self.date0).total_seconds()
         ndecays = lambda t, a0, decay_constant: a0 * np.exp(-1 * decay_constant * t)
@@ -74,6 +75,23 @@ class TIsotope:
         # print("Error from the quad integral is {}".format(err))
         # return nn, err
         return nn, err_my
+
+    def GetNdecaysIntegral2(self, start, stop):
+	#This function provides data for AN and AP calculations
+        t1 = (start - self.date0).total_seconds()
+        t2 = (stop - self.date0).total_seconds()
+        decay_constant = self.decay_constant()
+        a0 = self.a0
+        
+        ndecays = lambda t, a0, decay_constant: a0 * np.exp(-1 * decay_constant * t)
+        
+        print("Decay constant is {}".format(decay_constant))
+        nn, err = quad(ndecays, t1, t2, args=(a0, decay_constant))
+        
+        print("Time elapsed is {} s".format(t2 - t1))
+        
+        return nn, err, t1, t2, a0, decay_constant
+
 
 class TMeasurement:
     def __init__(self, server, run, source, tstart, tstop, distance):
