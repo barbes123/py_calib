@@ -1,85 +1,64 @@
 #! /usr/bin/python3
-# Calculate efficiency using n_decays_sum and relative intensities
 
-# Read json/gamma_sources.json
-# source name is in my_source.name (match keys (which is table gamma-ray energy))
-# update "serial" and "detType" from LUT_ELIADE.json
-from os.path import exists #check if file exists
-from math import log
+# Calculate efficiency using n_decays_sum and relative intensities
 
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-import math, sys, os, json, subprocess
+import math, sys, json, subprocess
 from pathlib import Path
 from argparse import ArgumentParser
-import inspect
 from datetime import datetime
+from os.path import exists
+from math import log
 
 try:
     ourpath = os.getenv('PY_CALIB')
-    #path='{}{}'.format(Path.home(),'/onlineEliade/tools/eu7/eu7')
-    #path='{}{}'.format(Path.home(),'/EliadeSorting/EliadeTools/RecalEnergy')
-    #path='/home/andrei/RootCalib/task'
-    path='/data10/live/IT/RootCalib/rootcalib'
-    #path='/home/andrei/GammaSet-main/gammaset'
+    path = os.path.dirname(ourpath)+'/GammaSet'
     print('PY_CALIB path: ', ourpath)
+    print('path for GammaSet: ', path)
 except:
-    print('Cannont find environmental PY_CALIB variable, please, check')
+    print('Cannot find environmental PY_CALIB variable, please check')
     sys.exit()
 
+# Add library paths
 sys.path.insert(1, 'lib')
 sys.path.insert(1, '{}/lib'.format(ourpath))
 
+# Import required modules
 from libCalib1 import TIsotope as TIso
 from libCalib1 import TMeasurement as Tmeas
-
+from libPlotEliadeAA import PlotJsondom as PlotDomain
+from libPlotEliadeAA import PlotJsonclover as PlotClover
+from libPlotEliadeAA import PlotCeBr
+from libPlotEliadeAA import PlotCore as PlotCore
+from libPlotEliadeAA import PlotCalibration
+from libPlotEliadeAA import Save_results_to_path as save_results_to_path
+from libPlotEliadeAA import PlotCalibrationCeBr
 from TRecallEner import TRecallEner
 from libSettings import SetUpRecallEner
 from libSettings import SetUpRecallEnerFromJson
 from utilities import *
 from libLists import lists_of_gamma_background
-from libReadNewJS import IsotopeData
-from libGlobalVars import state
-# from libPlotEliadeNewJS import PlotJsondom as PlotDomain
-from libPlotEliadeNewJS import PlotJsonclover
-from libPlotEliadeNewJS import PlotCalibration
-from libPlotEliadeNewJS import GetFigSavePath
+from libCalibAA import IsotopeData
 
-# def update_global_var(new_value):
-#     state.save_results_to = new_value  # Modify the shared variable
-
+# Get current directory
 current_directory = os.getcwd()
-
-# print('Cur dir: ', current_directory)
-if (current_directory == ourpath):
-    print('Running directory is {}'.format(ourpath))
-    datapath = '{}/data/'.format(current_directory)
-else:
-    datapath = '{}/'.format(current_directory)
+datapath = '{}/'.format(current_directory)
 
 print('Path to RecalEnergy {}'.format(path))
-print('Data path: ', datapath)
 
+# Configuration files
 lutfile = 'LUT_ELIADE.json'
 lutreallener = 'LUT_RECALL.json'
 lut_recall_fname = '{}/{}'.format(ourpath, lutreallener)
 
+# Global variables
 j_results = {}
 list_results = []
-
-
-# blPlot = True
 debug = False
-# OnlyCores = False
-CalibDetType = 0
 
-j_sources = None
-blFirstElement = False
-
-
-
-
+# Initialize params globally to be accessible in functions
 global my_params
 
 class TStartParams:
@@ -398,17 +377,28 @@ def main():
         print("Check start and stop time of this run. Tstart must be bigger than Tstop")
         sys.exit()
     global n_decays_sum
-    n_decays_sum, n_decays_err = my_source.GetNdecaysIntegral(my_run.tstart, my_run.tstop)
+    n_decays_sum, n_decays_err, newt1, newt2, newa0, newdeccst= my_source.GetNdecaysIntegral2(my_run.tstart, my_run.tstop)
     global n_decays_int
     n_decays_int = my_source.GetNdecays(my_run.tstart, my_run.tstop)
     print(my_source.__str__())
     print('sum {}; err {}; int {}'.format(n_decays_sum, n_decays_err, n_decays_int))
 
+    # blBackGround = False
+    # print('!!!!!!',my_params.bg)
+    # if my_params.bg > 0:
+    #     blBackGround = True
+
+    # print('Gammas ', j_sources['Co60']['gammas'])
+    # global myCurrentSetting
+    # myCurrentSetting = TRecallEner(800,1200,100,4, 200, 1500)
+
+    # command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly1 -v 2'.format(path, current_file, src, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
+    
     source4Fit = my_source.name
     if '60Co' in source4Fit:
         source4Fit = '60Co'
-    elif '54Mn' in source4Fit:
-        source4Fit = 'ener 834.848 -ener 511.006'
+    #elif '54Mn' in source4Fit:
+    #    source4Fit = 'ener 834.848 -ener 511.006'
     src = source4Fit
     if my_params.bg == 1:
         src = '{}'.format(source4Fit)
@@ -417,24 +407,20 @@ def main():
         print('command_line////////////////////', command_line)
 
     # Updated command_line with required and optional arguments
-    command_line = '{} -f selected_run_{}_{}_eliadeS{}.root -rp {} -sc {}  -ec {} -s {}'.format(
-        path, my_params.runnbr, my_params.volnbr, my_params.server, lut_recall_fname, 0, 300, src)
-    print('command_line////////////////////', command_line)
-    print()
+    
+    command_line = '{} -f selected_run_{}_{}_eliadeS{}.root -rp {} -sc {}  -ec {} -s {} -fd {}'.format(
+        path+'/gammaset', my_params.runnbr, my_params.volnbr, my_params.server, lut_recall_fname, my_params.dom1, my_params.dom2, src, 1)
+    #print('command_line////////////////////', command_line)
+
+    print('n_decays_sum', n_decays_sum)
+    print('I am ready to run c++')
     #json_path = '{}{}/{}_peaks_data.json'.format(datapath, my_run.run, my_run.run)
-    run = my_params.runnbr
-    vol = my_params.volnbr
-    server = my_params.server
+    json_path = '{}selected_run_{}_{}_eliadeS{}_calib/selected_run_{}_{}_eliadeS{}.json'.format(datapath,my_params.runnbr, my_params.volnbr, my_params.server,my_params.runnbr, my_params.volnbr, my_params.server)
+    print('json_path.//////////////////////////////////////// ', json_path)
+    if not norun:
+        result_scr = subprocess.run(['{}'.format(command_line)], shell=True)
+    print('I finished c++')
 
-
-    json_path = f'{datapath}selected_run_{run}_{vol}_eliadeS{server}_calib/selected_run_{run}_{vol}_eliadeS{server}.json'
-    save_results_to = f'{datapath}selected_run_{my_params.runnbr}_{my_params.volnbr}_eliadeS{my_params.server}_calib'
-    state.save_results_to = save_results_to
-    # json_path = f'{save_results_to}/selected_run_{my_params.runnbr}_{my_params.volnbr}_eliadeS{my_params.server}.json'
-    print('json_path ', json_path)
-    print('save_results_to ', save_results_to)
-
-    result_scr = subprocess.run(['{}'.format(command_line)], shell=True)
     print()
     print()
     gamma_sources = read_gamma_sources()
@@ -456,11 +442,32 @@ def main():
     print('decayCalculated', calculateTotalActivity())
 
 
-    isotope_data_obj = IsotopeData(experimental_data, gamma_sources, source_name, n_decays_sum, n_decays_err)
-    isotope_data_obj.parse_experimental_data()
-    isotope_data_obj.add_probabilities_to_peaks()
-    isotope_data_obj.save_experimental_data(json_path)
+    #isotope_data_obj = IsotopeData(experimental_data, gamma_sources, source_name, n_decays_sum, n_decays_err)
+    #isotope_data_obj.parse_experimental_data()
+    #isotope_data_obj.add_probabilities_to_peaks()
+    #isotope_data_obj.save_experimental_data(json_path)
     #isotope_data_obj.plot_efficiencies()
+
+    isotope_data = IsotopeData(experimental_data, gamma_sources, source_name, n_decays_sum, n_decays_err)    
+    # Set advanced parameters for efficiency calculation
+    isotope_data.set_advanced_parameters(
+        A0=newa0, sigma_A0=newa0 * 0.05, 
+        lambd=newdeccst, sigma_lambd=0,
+        T1=newt1, sigma_T1=0.5,          
+        T2=newt2, sigma_T2=0.5
+    )
+    
+    # Parse data
+    isotope_data.parse_experimental_data()
+    
+    # Use advanced calculation
+    isotope_data.add_probabilities_to_peaks(use_advanced_calculation=True)
+    
+    # Plot results
+    #isotope_data.plot_efficiencies()
+    
+    # Save updated data back to the original path
+    isotope_data.save_experimental_data(json_path)
 
     # Plot efficiencies
     #isotope_data_obj.plot_efficiencies()
@@ -485,9 +492,36 @@ def main():
         current_file = '{}{}_py_{}.spe'.format(datapath,prefix,domain)
         # current_file = '{}mDelila_raw_py_{}.spe'.format(datapath, domain)
 
+        # if file_exists(current_file):
+
+
+        # command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly1 -v 2'.format(path, current_file, src, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
+        # command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly1 -v 2'.format(path, current_file, src, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
+        # command_line = '{} -f selected_run_162_999_eliadeS1.root -rp ~/onlineEliade/LookUpTables/s1/LUT_RECALL_S1_CL29.json '.format(path)
+        # print('command_line ', command_line)
 
         if debug:
             print('I am ready to do fit for domain {} : '.format(domain))
+
+        # result_scr = subprocess.run(['{}'.format(command_line)], shell=True, capture_output=True)
+        # result_scr = subprocess.run(['{}'.format(command_line)], shell=True)
+        # print(result_scr)
+        # sys.exit()
+        # fitdata = result_scr.stdout.decode()
+        # print(fitdata)
+        # global total
+        # total = 1
+        #total = SumAsci(current_file)
+        # total = SumAsciLimits(current_file, myCurrentSetting.limStart, myCurrentSetting.limStop)
+        # ProcessFitDataStr(domain, my_source.name, fitdata, j_sources, j_lut)
+
+
+    # with open('new_{}'.format(lutfile), 'w') as ofile:
+    #     js_tab = json.dump(j_lut, ofile, indent=3, default=str)
+
+    # with open('calib_res_{}.json'.format(my_run.run), 'w') as ofile:
+    #     ofile.write(j_results)
+
     try:
         # Build the file path dynamically using parameters provided in terminal
         file_path = '{}selected_run_{}_{}_eliadeS{}_calib/selected_run_{}_{}_eliadeS{}.json'.format(
@@ -499,10 +533,7 @@ def main():
             my_params.volnbr, 
             my_params.server
         )
-
-        # GetFigSavePath.GetFigSavePath()
-        # GetFigSavePath()
-
+        
         print(f"Attempting to open file: {file_path}")
         with open(file_path, 'r') as ifile:
             js_tab = json.load(ifile)
@@ -516,22 +547,49 @@ def main():
                 elif '152Eu' in my_source.name:
                     source = '152Eu'
 
-                # This library contains functions to plot results from data analysis.
-                # PlotJsondom - graphs for indvidual domains
-                # PlotJsonclover -  plots for all domains of a clover
-                # PlotJsoncore - plots only core 1
-                # PlotCalibration - plots calibration curves
-
-                #PlotDomain(js_tab, j_sources, source, j_lut, my_params.grType)
-
-                # Plot for HPGe (type 1)
-                PlotJsonclover(js_tab, j_sources, source, 1, j_lut, my_params.grType)
-                PlotCalibration(js_tab, j_sources, source, j_lut, 1, my_params.grType)
                 
-                # Plot for Segmented detectors (type 2)
-                PlotJsonclover(js_tab, j_sources, source, 2, j_lut, my_params.grType)
-                PlotCalibration(js_tab, j_sources, source, j_lut, 2, my_params.grType)
+            # This library contains functions to plot results from data analysis.
+            # PlotJsondom - graphs for indvidual domains
+            # PlotJsonclover -  plots for all domains of a clover
+            # PlotJsoncore - plots only core 1
+            # PlotCalibration - plots calibration cur
 
+            #PlotDomain(js_tab, j_sources, source, j_lut, my_params.grType)
+
+            # Plot for HPGe (type 1)
+            #afiseaza PT, eff, res pentru core
+
+            figures_path = '{}selected_run_{}_{}_eliadeS{}_calib/figures/'.format(
+                datapath,
+                my_params.runnbr, 
+                my_params.volnbr, 
+                my_params.server
+            )
+            MakeDir(figures_path)
+            # print(js_tab)
+            # sys.exit()
+            save_results_to_path(figures_path)
+            PlotClover(js_tab, j_sources, source, 1, j_lut, my_params.grType)
+            #nu ploteaza nimic bun
+            # PlotCore(js_tab, j_sources, source, j_lut, 1, my_params.grType) 
+            #ploteaza calibrarea 1
+            PlotCalibration(js_tab, j_sources, source, j_lut, 1, my_params.grType)
+            
+            # Plot for Segmented detectors (type 2)
+            #PT, eff, core mare
+            PlotClover(js_tab, j_sources, source, 2, j_lut, my_params.grType)
+            #nimic bun
+            # PlotCore(js_tab, j_sources, source, j_lut, 2, my_params.grType)
+            #ploteaza calibrarea 2
+            
+            PlotCalibration(js_tab, j_sources, source, j_lut, 2, my_params.grType)
+            
+            #Plot CeBr/LaBr (keeping existing)
+            #nimic bun
+            #PlotCeBr(js_tab, j_sources, source, 1, j_lut, my_params.grType)
+            #PlotCalibrationCeBr(js_tab, j_sources, source, j_lut, 1, my_params.grType)
+
+            # PlotJsonclover for HPGe (type 1)
     except FileNotFoundError:
         print(f"Error: File not found at {file_path}")
         print("Make sure the analysis has completed successfully and the output file exists.")
@@ -552,6 +610,7 @@ if __name__ == "__main__":
     bg = 0
     grType = 'jpg'
     prefix = 'mDelila_raw'
+    norun = False
     # lut_recall = '~/onlineEliade/LookUpTables/s1/LUT_RECALL_S1_CL29.json'
 
     parser = ArgumentParser()
@@ -571,6 +630,9 @@ if __name__ == "__main__":
                         dest="volnbr", default=volnbr,
                         help="volume number, default = {}".format(volnbr))
 
+    parser.add_argument('--norun', action='store_true', help="Do only plotting on already analyzed set")
+
+
     parser.add_argument("-d", "--domains",  nargs=2,
                         dest="dom", default=[dom1, dom2],
                         help="from domain, default = {} {}".format(dom1, dom2))
@@ -589,6 +651,9 @@ if __name__ == "__main__":
                         help="Prefix for matrix (TH2) to be analyzed mDelila_raw or mDelila or ...".format(
                             prefix))
     config = parser.parse_args()
+
+    if config.norun:
+        norun = True
 
     print(config)
 
