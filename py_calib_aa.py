@@ -62,7 +62,7 @@ debug = False
 global my_params
 
 class TStartParams:
-    def __init__(self, server, runnbr, volnbr, dom1, dom2, det_type, bg, grType, prefix):
+    def __init__(self, server, runnbr, volnbr, dom1, dom2, det_type, bg, grType, prefix, fitrange, peakthresh):
         self.server = int(server)
         self.runnbr = runnbr
         self.volnbr = volnbr
@@ -72,10 +72,13 @@ class TStartParams:
         self.bg = bg
         self.grType = grType
         self.prefix = prefix
+        self.fitrange = fitrange
+        self.peakthresh = peakthresh
 
     def __repr__(self):
         print('=========================================')
         print('Server {}, Run {}, domFrom {}, domTo {}, bg {}'.format(self.server, self.runnbr, self.dom1, self.dom2, self.bg))
+        print('Fit Range {}, Peak Threshold {}'.format(self.fitrange, self.peakthresh))
         print('=========================================')
 
 class TPeak:
@@ -408,8 +411,14 @@ def main():
 
     # Updated command_line with required and optional arguments
     
-    command_line = '{} -f selected_run_{}_{}_eliadeS{}.root -rp {} -sc {}  -ec {} -s {} -fd {}'.format(
-        path+'/gammaset', my_params.runnbr, my_params.volnbr, my_params.server, lut_recall_fname, my_params.dom1, my_params.dom2, src, 1)
+    #command_line = '{}/gammaset' -f selected_run_{}_{}_eliadeS{}.root -rp {} -sc {}  -ec {} -s {} -fd {}'.format(
+    #    path, my_params.runnbr, my_params.volnbr, my_params.server, lut_recall_fname, my_params.dom1, my_params.dom2, src, 1)
+    command_line = ('{}/gammaset -f selected_run_{}_{}_eliadeS{}.root '
+                    '-rp {} -sc {} -ec {} -s "{}" -fd {} '
+                    '-br {} -peakthresh {} -rb 1').format(
+        path, my_params.runnbr, my_params.volnbr, my_params.server,
+        lut_recall_fname, my_params.dom1, my_params.dom2, src, 3,
+        my_params.fitrange, my_params.peakthresh)
     #print('command_line////////////////////', command_line)
 
     print('n_decays_sum', n_decays_sum)
@@ -650,6 +659,10 @@ if __name__ == "__main__":
                         dest="prefix", default=grType, type=str,
                         help="Prefix for matrix (TH2) to be analyzed mDelila_raw or mDelila or ...".format(
                             prefix))
+    parser.add_argument("--fitrange", type=int, dest="fitrange", default=10,
+                        help="Basic range (left/right) for C++ peak fitting, default = 10")
+    parser.add_argument("--peakthresh", type=float, dest="peakthresh", default=0.0001,
+                        help="Peak threshold for C++ analysis, default = 0.0001")
     config = parser.parse_args()
 
     if config.norun:
@@ -665,7 +678,7 @@ if __name__ == "__main__":
         print('No LUT_RECALL.json is given: {}. Cannot continue.'.format(lutreallener))
         sys.exit()
 
-    my_params = TStartParams(config.server, config.runnbr, config.volnbr, config.dom[0], config.dom[1], config.det_type, config.bg, config.grType, config.prefix)
+    my_params = TStartParams(config.server, config.runnbr, config.volnbr, config.dom[0], config.dom[1], config.det_type, config.bg, config.grType, config.prefix, config.fitrange, config.peakthresh)
 
 
 #     print('Input Parameters: server, run, domDown, domUp, detType')
