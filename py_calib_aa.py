@@ -565,7 +565,9 @@ def main():
 
             #PlotDomain(js_tab, j_sources, source, j_lut, my_params.grType)
 
-            # Plot for HPGe (type 1)
+
+
+        # Plot for HPGe (type 1)
             #afiseaza PT, eff, res pentru core
 
             figures_path = '{}selected_run_{}_{}_eliadeS{}_calib/figures/'.format(
@@ -578,6 +580,8 @@ def main():
             # print(js_tab)
             # sys.exit()
             save_results_to_path(figures_path)
+            PlotDomain(js_tab, j_sources, my_source.name, j_lut, my_params.grType)
+
             PlotClover(js_tab, j_sources, source, 1, j_lut, my_params.grType)
             #nu ploteaza nimic bun
             # PlotCore(js_tab, j_sources, source, j_lut, 1, my_params.grType) 

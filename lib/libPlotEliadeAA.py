@@ -95,12 +95,13 @@ def PlotJsondom(data, gammatab, source, lutfile, opt='eps', dpi=300):
     MakeDir(save_results_to)
 
     for i in data:
-        # print('checking type {}'.format(type(i['domain'])))
+
         dom = i["domain"]
 
         if find_domain(dom, lutfile) == False:
             continue
         else:
+
             # print('F1 ', i)
             # print('F2 ', i['60CoWeak'])
             # print('F3 ', i['60CoWeak'].keys())
@@ -174,6 +175,8 @@ def PlotJsondom(data, gammatab, source, lutfile, opt='eps', dpi=300):
             # plt.show()
             file_name2 = 'dom_{}_eff.{}'.format(dom, opt)
             plt.savefig(save_results_to + file_name2,  dpi = dpi)
+            print(f'PATH {save_results_to}')
+
             interactive(False)
             plt.close()
     print("Finished domain graphs")

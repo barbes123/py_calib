@@ -11,7 +11,7 @@ def fitResolution(E, a1, b1, c1):
     return np.sqrt(a1+b1*E+c1*E*E)
 
 def fitDebertin(E, a1,a2,a3,a4,a5):
-    return a1 * np.log(E) + a2 * np.log(E) / E + a3 * np.log(E) ** 2 / E + a4 * np.0log(E) ** 4 / E + a5 * np.log(E) ** 5 / E
+    return a1 * np.log(E) + a2 * np.log(E) / E + a3 * np.log(E) ** 2 / E + a4 * np.log(E) ** 4 / E + a5 * np.log(E) ** 5 / E
 
 def fitRadware(energy, A, B, C, D, E, F, G):
     E1 = 100
