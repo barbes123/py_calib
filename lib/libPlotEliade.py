@@ -9,6 +9,17 @@ import os
 import matplotlib.colors as mcolors
 from random import choice
 
+
+# ANSI escape codes for colors
+RED = '\033[31m'
+GREEN = '\033[32m'
+YELLOW = '\033[33m'
+BLUE = '\033[34m'
+MAGENTA = '\033[35m'
+CYAN = '\033[36m'
+WHITE = '\033[37m'
+RESET = '\033[0m'  # Reset to default color
+
 opt = 'jpg'
 # dpi = 300
 
@@ -33,7 +44,7 @@ title_clover = ''
 from libLists import list_of_sources
 from libLists import list_of_clovers
 from libLists import list_of_cebr
-from libColorsAnsi import *
+#from libColorsAnsi import *
 
 # list_of_clovers = {"CL29", "CL30", "CL31", "CL32", "CL33", "CL34", "CL35", "CL36", "HPGe", "SEG", "LaBr"}
 # list_of_sources = {'60Co', '60CoWeak', '152Eu', '137Cs', '133Ba'}
