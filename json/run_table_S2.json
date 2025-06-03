@@ -1,5 +1,41 @@
 [    
+      {
+        "runNumber": 174,
+        "start": "2025-05-30 13:29:22",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES2",
+        "comment": "",
+        "source": "152Eu",
+        "distance": ""
+    },
     {
+        "runNumber": 173,
+        "start": "2025-05-29 11:38:43",
+        "stop": "2025-05-30 13:23:50",
+        "expName": "ES2",
+        "comment": "",
+        "source": "137Cs",
+        "distance": ""
+    },
+    {
+        "runNumber": 172,
+        "start": "2025-05-27 15:39:22",
+        "stop": "2025-05-29 11:33:59",
+        "expName": "ES2",
+        "comment": "",
+        "source": "54Mn",
+        "distance": ""
+    },
+    {
+        "runNumber": 171,
+        "start": "2025-05-22 15:21:56",
+        "stop": "2025-05-27 15:31:18",
+        "expName": "ES2",
+        "comment": "",
+        "source": "60Co",
+        "distance": ""
+    },
+ {
         "runNumber": 170,
         "start": "2025-05-16 15:12:33",
         "stop": "2025-05-22 14:21:49",
