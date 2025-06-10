@@ -49,6 +49,13 @@ sudo unlink /usr/local/bin/py_aa
 echo $PY_CALIB/py_calib_aa.py
 sudo ln -s $PY_CALIB/py_calib_aa.py /usr/local/bin/py_aa
 
+
+echo /usr/local/bin/py_b
+sudo unlink /usr/local/bin/py_b
+echo $PY_CALIB/py_calib_batch.py
+sudo ln -s $PY_CALIB/py_calib_batch.py /usr/local/bin/py_b 
+
+
 echo /usr/local/bin/lut.print
 sudo unlink /usr/local/bin/lut.print
 echo $PWD/lut_print.py
