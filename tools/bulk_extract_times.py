@@ -1,3 +1,5 @@
+#! /usr/bin/python3
+
 """
 Bulk ROOT File Timing Extraction Tool
 
@@ -59,15 +61,27 @@ def process_single_file(filename):
         # Open the ROOT file
         file = uproot.open(filename)
         tree = file["ELIADE_Tree"]
+#        print("Tree is taken")
+    except Exception as e:
+        print(f"Cannot get Tree")
+        return None
+
         
+    try:
         # Extract FineTS data
         fine_timestamps = np.array(tree["FineTS"].array())
+        fine_timestamps = fine_timestamps[~np.isnan(fine_timestamps)]
+    except Exception as e:
+        print(f"Cannot get FineTS")
+        return None
         
+    try:        
         if len(fine_timestamps) == 0:
             return None
         
         # Calculate duration in picoseconds
-        duration_picoseconds = int(fine_timestamps.max() - fine_timestamps.min())
+        duration_picoseconds = float(fine_timestamps.max() - fine_timestamps.min())/1e12
+        print(f'duration_picoseconds {duration_picoseconds} fine_timestamps.max(), fine_timestamps.min()')
         
         file.close()
         return duration_picoseconds
@@ -76,11 +90,11 @@ def process_single_file(filename):
         print(f"Error processing {filename}: {e}")
         return None
 
-def bulk_process_runs(run_number):
+def bulk_process_runs(serverID, run_number):
     """Process all files for a given run number"""
     
     # Pattern to match files like run171_0_eliadeS2.root, run171_1_eliadeS2.root, etc.
-    pattern = f"run{run_number}_*_eliadeS2.root"
+    pattern = f"run{run_number}_*_eliadeS{serverID}.root"
     
     # Find all matching files
     files = glob.glob(pattern)
@@ -90,6 +104,8 @@ def bulk_process_runs(run_number):
     
     results = {}
     
+    print(files)
+    
     for filepath in files:
         print(f"Processing {filepath}...")
         
@@ -97,11 +113,13 @@ def bulk_process_runs(run_number):
         filename_no_ext = os.path.splitext(os.path.basename(filepath))[0]
         
         # Process the file
+        print('>>> ready to go to process_single_file')
         duration = process_single_file(filepath)
+        print('>>> out of process_single_file')
         
         if duration is not None:
             results[filename_no_ext] = duration
-            print(f"  Duration: {duration} picoseconds ({duration/1e12:.3f} seconds)")
+            print(f"  Duration: {duration} picoseconds ({duration:.3f} seconds)")
         else:
             print(f"  Failed to process")
     
@@ -109,15 +127,21 @@ def bulk_process_runs(run_number):
 
 def main():
     parser = argparse.ArgumentParser(description='Extract timing information from multiple ROOT files')
+    parser.add_argument('serverID', type=int, help='Server Number)')
     parser.add_argument('run_number', type=int, help='Run number to process (e.g., 171)')
-    parser.add_argument('--output', '-o', default='run_durations.json', help='Output JSON filename')
+#    parser.add_argument('--output', '-o', default='run_durations.json', help='Output JSON filename')
+
     
     args = parser.parse_args()
+    runID = args.run_number
+    serID = args.serverID
     
-    print(f"Processing run {args.run_number}...")
+    print(f'Processing server {serID} run {runID}')
+    
+#    if 0< args.sereverID > 9:
     
     # Process all files for the run
-    durations = bulk_process_runs(args.run_number)
+    durations = bulk_process_runs(args.serverID, args.run_number)
     
     if not durations:
         print("No files processed successfully!")
@@ -129,18 +153,22 @@ def main():
     }
     
     # Write to JSON file
-    with open(args.output, 'w') as f:
+    
+    foutput = f"duration_{args.run_number}_eliadeS{args.serverID}.json"
+    
+#    with open(args.output, 'w') as f:
+    with open(foutput, 'w') as f:
         json.dump(output_data, f, indent=2)
     
-    print(f"\nResults written to {args.output}")
+    print(f"\nResults written to {foutput}")
     print(f"Processed {len(durations)} files:")
     
     # Print summary
     total_duration_ps = sum(durations.values())
-    total_duration_s = total_duration_ps / 1e12
+    total_duration_s = total_duration_ps 
     
     for filename, duration_ps in durations.items():
-        duration_s = duration_ps / 1e12
+        duration_s = duration_ps
         print(f"  {filename}: {duration_ps} ps ({duration_s:.3f} s)")
     
     print(f"\nTotal recording time: {total_duration_ps} ps ({total_duration_s:.3f} s)")
