@@ -19,16 +19,37 @@ def find_dicts_with_domain(obj, target_domain):
             matches.extend(find_dicts_with_domain(item, target_domain))
     return matches
 
-def load_run_durations(parent_dir, durations_file="run_durations.json"):
-    """Load run durations from JSON file"""
+def load_run_durations(parent_dir, durations_file):
+    """Load run durations from new JSON format and convert to old-style dictionary (in picoseconds)"""
     durations_path = os.path.join(parent_dir, durations_file)
     if not os.path.exists(durations_path):
         raise FileNotFoundError(f"Error: {durations_file} not found in {parent_dir}")
     
     with open(durations_path, "r") as f:
         durations_data = json.load(f)
+
+    if "run_durations_seconds" not in durations_data:
+        raise KeyError("Missing 'run_durations_seconds' key in JSON file")
+
+    duration_dict = {}
+    for entry in durations_data["run_durations_seconds"]:
+        try:
+            runnbr = entry["runnbr"]
+            volnbr = entry["volnbr"]
+            server = entry["server"]
+            duration_seconds = entry["duration"]
+
+            # Convert seconds to picoseconds
+            duration_ps = int(duration_seconds * 1e12)
+
+            key = f"run{runnbr}_{volnbr}_eliadeS{server}"
+            duration_dict[key] = duration_ps
+        except KeyError as e:
+            print(f"Skipping entry due to missing key: {e}")
     
-    return durations_data["run_durations_picoseconds"]
+    return duration_dict
+
+
 
 def find_matching_folders(parent_dir, target_run, target_S, run_durations):
     """Find folders matching the pattern and with valid run durations"""
@@ -319,11 +340,13 @@ def plot_peak_positions_vs_time(target_run, domain_start, domain_end, target_S,
         print(f"Looking for domains {domain_start}-{domain_end} in run {target_run} S{target_S}")
         print(f"Working directory: {parent_dir}")
     
-    # Load run durations
+    # Construct the duration file name based on run and S
+    durations_file = f"duration_{target_run}_eliadeS{target_S}.json"
+
     try:
         run_durations = load_run_durations(parent_dir, durations_file)
         if verbose:
-            print(f"Loaded {len(run_durations)} run durations")
+            print(f"Loaded {len(run_durations)} run durations from {durations_file}")
     except FileNotFoundError as e:
         print(str(e))
         return None
@@ -399,7 +422,6 @@ def main():
     parser.add_argument('domain_end', type=int, help='Ending domain number (e.g., 115)')
     parser.add_argument('target_S', type=int, help='Target S number (e.g., 2)')
     parser.add_argument('--parent_dir', type=str, help='Parent directory path (default: current directory)')
-    parser.add_argument('--durations_file', type=str, default="run_durations.json", help='Durations file name')
     parser.add_argument('--no_plots', action='store_true', help='Skip creating plots')
     parser.add_argument('--quiet', action='store_true', help='Suppress verbose output')
     
@@ -411,7 +433,6 @@ def main():
         domain_end=args.domain_end,
         target_S=args.target_S,
         parent_dir=args.parent_dir,
-        durations_file=args.durations_file,
         verbose=not args.quiet,
         create_plots=not args.no_plots
     )
