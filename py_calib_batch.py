@@ -403,33 +403,27 @@ def main():
         src = '{}'.format(source4Fit)
         for gamma in lists_of_gamma_background:
             src = src + ' -ener {}'.format(gamma)
-    
-    print('TEEEEEST////////////////////')
 
     #    path, my_params.runnbr, my_params.volnbr, my_params.server, lut_recall_fname, my_params.dom1, my_params.dom2, src, 1)
     for volnbr in range(my_params.vol0, my_params.vol1 + 1):
-        command_line = ('{}/gammaset -f selected_run_{}_{}_eliadeS{}.root '
-                        '-rp {} -sc {} -ec {} -s {} -fd {} '
-                        '-br {} -peakthresh {} -rb 1 -hist {}').format(
-            path, my_params.runnbr, volnbr, my_params.server,
-            lut_recall_fname, my_params.dom1, my_params.dom2, src, 3,
-            my_params.fitrange, my_params.peakthresh, prefix)
-
-        print( '<<<command_line>>', f"{path}/gammaset -f selected_run_{my_params.runnbr}_{volnbr}_eliadeS{my_params.server}.root "
-               f"-rp {lut_recall_fname} -sc {my_params.dom1} -ec {my_params.dom2} -s \"{src}\" -fd 3 "
-               f"-br {my_params.fitrange} -peakthresh {my_params.peakthresh} -rb 1 -hist {prefix}")
+        command_line = (
+            f"{path}/gammaset -f selected_run_{my_params.runnbr}_{volnbr}_eliadeS{my_params.server}.root "
+            f"-rp {lut_recall_fname} -sc {my_params.dom1} -ec {my_params.dom2} -s {src} -fd 3 "
+            f"-br {my_params.fitrange} -peakthresh {my_params.peakthresh} -rb 1 -hist {my_params.prefix}"
+        )
+        print("Command to run:")
+        print(command_line)
 
         result_scr = subprocess.run(['{}'.format(command_line)], shell=True)
 
-
-    result = plot_peak_positions_vs_time(
-        target_run=my_params.runnbr,
-        domain_start=dom1,
-        domain_end=dom2,
-        target_S=my_params.server,
-        verbose=True,    # Set to False to suppress output
-        create_plots=True  # Set to False to only extract data without creating plots
-    )
+        result = plot_peak_positions_vs_time(
+            target_run=my_params.runnbr,
+            domain_start=my_params.dom1,
+            domain_end=my_params.dom2,
+            target_S=my_params.server,
+            verbose=True,    # Set to False to suppress output
+            create_plots=True  # Set to False to only extract data without creating plots
+         )
 
     if result is None:
         print("Failed to process data")
