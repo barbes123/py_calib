@@ -63,20 +63,22 @@ debug = False
 global my_params
 
 class TStartParams:
-    def __init__(self, server, runnbr, volnbr, dom1, dom2, det_type, bg, grType, prefix, fitrange, peakthresh, start_vol=1, end_vol=1):
+    def __init__(self, server, runnbr, dom1, dom2, det_type, bg, grType, prefix, fitrange, peakthresh, vol0, vol1):
         self.server = int(server)
         self.runnbr = runnbr
-        self.volnbr = volnbr
+        # self.volnbr = volnbr
         self.dom1 = int(dom1)
         self.dom2 = int(dom2)
+        self.vol0 = int(vol0)
+        self.vol1 = int(vol1)
         self.det_type = det_type
         self.bg = bg
         self.grType = grType
         self.prefix = prefix
         self.fitrange = fitrange
         self.peakthresh = peakthresh
-        self.start_vol = start_vol
-        self.end_vol = end_vol
+        # self.start_vol = start_vol
+        # self.end_vol = end_vol
 
 
     def __repr__(self):
@@ -424,13 +426,18 @@ def main():
     
     
     #    path, my_params.runnbr, my_params.volnbr, my_params.server, lut_recall_fname, my_params.dom1, my_params.dom2, src, 1)
-    for volnbr in range(my_params.start_vol, my_params.end_vol + 1):
+    for volnbr in range(my_params.vol0, my_params.vol1 + 1):
         command_line = ('{}/gammaset -f selected_run_{}_{}_eliadeS{}.root '
                         '-rp {} -sc {} -ec {} -s "{}" -fd {} '
                         '-br {} -peakthresh {} -rb 1 -hist {}').format(
             path, my_params.runnbr, volnbr, my_params.server,
             lut_recall_fname, my_params.dom1, my_params.dom2, src, 3,
             my_params.fitrange, my_params.peakthresh, prefix)
+
+        print( '<<<command_line>>', f"{path}/gammaset -f selected_run_{my_params.runnbr}_{volnbr}_eliadeS{my_params.server}.root "
+               f"-rp {lut_recall_fname} -sc {my_params.dom1} -ec {my_params.dom2} -s \"{src}\" -fd 3 "
+               f"-br {my_params.fitrange} -peakthresh {my_params.peakthresh} -rb 1 -hist {prefix}")
+
         result_scr = subprocess.run(['{}'.format(command_line)], shell=True)
 
 
@@ -473,6 +480,8 @@ def main():
 if __name__ == "__main__":
     dom1 = 100
     dom2 = 109
+    vol0 = 0
+    vol1 = 0
     server = 9
     runnbr = 63
     volnbr = 999
@@ -496,9 +505,15 @@ if __name__ == "__main__":
     #                     dest="lut_recall", default=lut_recall,
     #                     help="LUT_RECALL, default = {}".format(lut_recall))
 
-    parser.add_argument("-vol", "--volume", type=int,
-                        dest="volnbr", default=volnbr,
-                        help="volume number, default = {}".format(volnbr))
+    # parser.add_argument("-vol", "--volume", type=int,
+    #                     dest="volnbr", default=volnbr,
+    #                     help="volume number, default = {}".format(volnbr))
+
+
+
+    parser.add_argument("-vol", "--volumes from ... to ....",  nargs=2,
+                        dest="vol", default=[vol0, vol1],
+                        help="default = {} {}".format(vol0, vol1))
 
     parser.add_argument('--norun', action='store_true', help="Do only plotting on already analyzed set")
 
@@ -506,9 +521,11 @@ if __name__ == "__main__":
     parser.add_argument("-d", "--domains",  nargs=2,
                         dest="dom", default=[dom1, dom2],
                         help="from domain, default = {} {}".format(dom1, dom2))
+
     parser.add_argument("-t", "--type",
                         dest="det_type", default=det_type,  type=int,
                         help="type of detector to be calibrated; default = 0".format(det_type))
+
     parser.add_argument("-b", "--background",
                         dest="bg", default=bg, type=int,
                         help="to take in energy calib background lines (1); default = {}".format(bg))
@@ -545,9 +562,28 @@ if __name__ == "__main__":
         print('No LUT_RECALL.json is given: {}. Cannot continue.'.format(lutreallener))
         sys.exit()
 
-    my_params = TStartParams(config.server, config.runnbr, config.volnbr, config.dom[0], config.dom[1],
-                            config.det_type, config.bg, config.grType, config.prefix, config.fitrange, config.peakthresh,
-                            config.start_vol, config.end_vol)
+    my_params = TStartParams(
+        server=config.server,
+        runnbr=config.runnbr,
+        dom1=config.dom[0],
+        dom2=config.dom[1],
+        det_type=config.det_type,
+        bg=config.bg,
+        grType=config.grType,
+        prefix=config.prefix,
+        fitrange=config.fitrange,
+        peakthresh=config.peakthresh,
+        vol0=config.vol[0],
+        vol1=config.vol[1]
+    )
+
+
+    for name, value in vars(my_params).items():
+        print(f"{name}: {value}")
+
+# my_params = TStartParams(config.server, config.runnbr, config.volnbr, config.dom[0], config.dom[1],
+#                             config.det_type, config.bg, config.grType, config.prefix, config.fitrange, config.peakthresh,
+#                             config.start_vol, config.end_vol)
 
 
 #     print('Input Parameters: server, run, domDown, domUp, detType')
