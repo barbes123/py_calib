@@ -392,17 +392,7 @@ def main():
     print(my_source.__str__())
     print('sum {}; err {}; int {}'.format(n_decays_sum, n_decays_err, n_decays_int))
 
-    # blBackGround = False
-    # print('!!!!!!',my_params.bg)
-    # if my_params.bg > 0:
-    #     blBackGround = True
-
-    # print('Gammas ', j_sources['Co60']['gammas'])
-    # global myCurrentSetting
-    # myCurrentSetting = TRecallEner(800,1200,100,4, 200, 1500)
-
-    # command_line = '{} -spe {} -{} -lim {} {} -fmt A 16384 -dwa {} {} -poly1 -v 2'.format(path, current_file, src, myCurrentSetting.limDown, myCurrentSetting.limUp, myCurrentSetting.fwhm, myCurrentSetting.ampl)
-    
+    # Setup source for fitting
     source4Fit = my_source.name
     if '60Co' in source4Fit:
         source4Fit = '60Co'
@@ -413,22 +403,13 @@ def main():
         src = '{}'.format(source4Fit)
         for gamma in lists_of_gamma_background:
             src = src + ' -ener {}'.format(gamma)
-        print('command_line////////////////////', command_line)
+    
+    print('TEEEEEST////////////////////')
 
-    # Updated command_line with required and optional arguments
-    
-    #command_line = '{}/gammaset' -f selected_run_{}_{}_eliadeS{}.root -rp {} -sc {}  -ec {} -s {} -fd {}'.format(
-    
-    
-    
-    
-    
-    
-    
     #    path, my_params.runnbr, my_params.volnbr, my_params.server, lut_recall_fname, my_params.dom1, my_params.dom2, src, 1)
     for volnbr in range(my_params.vol0, my_params.vol1 + 1):
         command_line = ('{}/gammaset -f selected_run_{}_{}_eliadeS{}.root '
-                        '-rp {} -sc {} -ec {} -s "{}" -fd {} '
+                        '-rp {} -sc {} -ec {} -s {} -fd {} '
                         '-br {} -peakthresh {} -rb 1 -hist {}').format(
             path, my_params.runnbr, volnbr, my_params.server,
             lut_recall_fname, my_params.dom1, my_params.dom2, src, 3,
@@ -443,9 +424,9 @@ def main():
 
     result = plot_peak_positions_vs_time(
         target_run=my_params.runnbr,
-        domain_start=100,
-        domain_end=140,
-        target_S=2,
+        domain_start=dom1,
+        domain_end=dom2,
+        target_S=my_params.server,
         verbose=True,    # Set to False to suppress output
         create_plots=True  # Set to False to only extract data without creating plots
     )
@@ -511,9 +492,9 @@ if __name__ == "__main__":
 
 
 
-    parser.add_argument("-vol", "--volumes from ... to ....",  nargs=2,
+    parser.add_argument("-vol", "--volumes", nargs=2, type=int,
                         dest="vol", default=[vol0, vol1],
-                        help="default = {} {}".format(vol0, vol1))
+                        help="Volume range from start to end, default = {} {}".format(vol0, vol1))
 
     parser.add_argument('--norun', action='store_true', help="Do only plotting on already analyzed set")
 
