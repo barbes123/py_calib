@@ -404,6 +404,7 @@ def main():
         src = '{}'.format(source4Fit)
         for gamma in lists_of_gamma_background:
             src = src + ' -ener {}'.format(gamma)
+    print(my_params.prefix)
 
     #    path, my_params.runnbr, my_params.volnbr, my_params.server, lut_recall_fname, my_params.dom1, my_params.dom2, src, 1)
     for volnbr in range(my_params.vol0, my_params.vol1 + 1):
@@ -411,7 +412,7 @@ def main():
             f"{path}/gammaset -f selected_run_{my_params.runnbr}_{volnbr}_eliadeS{my_params.server}.root "
             f"-rp {lut_recall_fname} -sc {my_params.dom1} -ec {my_params.dom2} -s {src} -fd 3 "
             f"-br {my_params.fitrange} -peakthresh {my_params.peakthresh} -rb 1 -hist {my_params.prefix} "
-            f"-guideSigma {guideSigma} -fgf {Tail}"
+            f"-guideSigma {my_params.guideSigma} -fgf {Tail}"
         )
         #fgf - tail 1 is off ; 0 is on
         print("Command to run:")
@@ -523,7 +524,7 @@ if __name__ == "__main__":
                         # eps, jpeg, jpg, pdf, pgf, png, ps, raw, rgba, svg, svgz, tif, tiff, webp
                         help="Available graphic output: eps, jpeg, jpg, png, svg, svgz, tif, tiff, webp or none (no graphs); default = {}".format(grType))
     parser.add_argument("-prefix", "--prefix to the files to be analyzed",
-                        dest="prefix", default=grType, type=str,
+                        dest="prefix", default=prefix, type=str,
                         help="Prefix for matrix (TH2) to be analyzed mDelila_raw or mDelila or ...".format(
                             prefix))
     parser.add_argument("--fitrange", type=int, dest="fitrange", default=10,
