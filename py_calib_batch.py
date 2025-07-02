@@ -63,7 +63,7 @@ debug = False
 global my_params
 
 class TStartParams:
-    def __init__(self, server, runnbr, dom1, dom2, det_type, bg, grType, prefix, fitrange, peakthresh, vol0, vol1):
+    def __init__(self, server, runnbr, dom1, dom2, det_type, bg, grType, prefix, fitrange, peakthresh, vol0, vol1, guideSigma):
         self.server = int(server)
         self.runnbr = runnbr
         # self.volnbr = volnbr
@@ -77,6 +77,7 @@ class TStartParams:
         self.prefix = prefix
         self.fitrange = fitrange
         self.peakthresh = peakthresh
+        self.guideSigma = guideSigma
         # self.start_vol = start_vol
         # self.end_vol = end_vol
 
@@ -409,8 +410,10 @@ def main():
         command_line = (
             f"{path}/gammaset -f selected_run_{my_params.runnbr}_{volnbr}_eliadeS{my_params.server}.root "
             f"-rp {lut_recall_fname} -sc {my_params.dom1} -ec {my_params.dom2} -s {src} -fd 3 "
-            f"-br {my_params.fitrange} -peakthresh {my_params.peakthresh} -rb 1 -hist {my_params.prefix}"
+            f"-br {my_params.fitrange} -peakthresh {my_params.peakthresh} -rb 1 -hist {my_params.prefix} "
+            f"-guideSigma {guideSigma} -fgf {Tail}"
         )
+        #fgf - tail 1 is off ; 0 is on
         print("Command to run:")
         print(command_line)
 
@@ -465,6 +468,9 @@ if __name__ == "__main__":
     grType = 'jpg'
     prefix = 'mEliade'
     norun = False
+    Tail = 1 # no tail
+    guideSigma = 1
+    peakthresh = 0
     # lut_recall = '~/onlineEliade/LookUpTables/s1/LUT_RECALL_S1_CL29.json'
 
     parser = ArgumentParser()
@@ -491,6 +497,7 @@ if __name__ == "__main__":
                         help="Volume range from start to end, default = {} {}".format(vol0, vol1))
 
     parser.add_argument('--norun', action='store_true', help="Do only plotting on already analyzed set")
+    parser.add_argument('--tail', action='store_true', help="Gaussian fit with tails")
 
 
     parser.add_argument("-d", "--domains",  nargs=2,
@@ -500,6 +507,13 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--type",
                         dest="det_type", default=det_type,  type=int,
                         help="type of detector to be calibrated; default = 0".format(det_type))
+
+    parser.add_argument("-guideSigma", "--guideSigma",
+                        dest="guideSigma", default=70,  type=float,
+                        help="guideSigma - normal parameter for initial sigma, 75 keV for CeBr. This opt will be cancelled")
+
+    # parser.add_argument("-peakthresh", "--peakthresh", dest="peakthresh", default=0.2,  type=float, help="peakthresh some threshold")
+
 
     parser.add_argument("-b", "--background",
                         dest="bg", default=bg, type=int,
@@ -527,6 +541,9 @@ if __name__ == "__main__":
     if config.norun:
         norun = True
 
+    if config.tail:
+        Tail = 0
+
     print(config)
 
     if not file_exists('{}/{}'.format(ourpath, lutfile)):
@@ -549,7 +566,8 @@ if __name__ == "__main__":
         fitrange=config.fitrange,
         peakthresh=config.peakthresh,
         vol0=config.vol[0],
-        vol1=config.vol[1]
+        vol1=config.vol[1],
+        guideSigma = config.guideSigma
     )
 
 
