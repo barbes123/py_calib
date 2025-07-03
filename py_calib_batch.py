@@ -407,27 +407,28 @@ def main():
     print(my_params.prefix)
 
     #    path, my_params.runnbr, my_params.volnbr, my_params.server, lut_recall_fname, my_params.dom1, my_params.dom2, src, 1)
-    for volnbr in range(my_params.vol0, my_params.vol1 + 1):
-        command_line = (
-            f"{path}/gammaset -f selected_run_{my_params.runnbr}_{volnbr}_eliadeS{my_params.server}.root "
-            f"-rp {lut_recall_fname} -sc {my_params.dom1} -ec {my_params.dom2} -s {src} -fd 3 "
-            f"-br {my_params.fitrange} -peakthresh {my_params.peakthresh} -rb 1 -hist {my_params.prefix} "
-            f"-guideSigma {my_params.guideSigma} -fgf {Tail}"
-        )
+    # for volnbr in range(my_params.vol0, my_params.vol1 + 1):
+    #     command_line = (
+    #         f"{path}/gammaset -f selected_run_{my_params.runnbr}_{volnbr}_eliadeS{my_params.server}.root "
+    #         f"-rp {lut_recall_fname} -sc {my_params.dom1} -ec {my_params.dom2} -s {src} -fd 3 "
+    #         f"-br {my_params.fitrange} -peakthresh {my_params.peakthresh} -rb 1 -hist {my_params.prefix} "
+    #         f"-guideSigma {my_params.guideSigma} -fgf {Tail}"
+    #     )
         #fgf - tail 1 is off ; 0 is on
-        print("Command to run:")
-        print(command_line)
+        # print("Command to run:")
+        # print(command_line)
+        # print(f'<<<Finished selected_run_{my_params.runnbr}_{volnbr}_eliadeS{my_params.server}.root >>>')
 
-        result_scr = subprocess.run(['{}'.format(command_line)], shell=True)
+        # result_scr = subprocess.run(['{}'.format(command_line)], shell=True)
 
-        result = plot_peak_positions_vs_time(
-            target_run=my_params.runnbr,
-            domain_start=my_params.dom1,
-            domain_end=my_params.dom2,
-            target_S=my_params.server,
-            verbose=True,    # Set to False to suppress output
-            create_plots=True  # Set to False to only extract data without creating plots
-         )
+    result = plot_peak_positions_vs_time(
+        target_run=my_params.runnbr,
+        domain_start=my_params.dom1,
+        domain_end=my_params.dom2,
+        target_S=my_params.server,
+        verbose=True,    # Set to False to suppress output
+        create_plots=True  # Set to False to only extract data without creating plots
+     )
 
     if result is None:
         print("Failed to process data")
@@ -499,6 +500,9 @@ if __name__ == "__main__":
 
     parser.add_argument('--norun', action='store_true', help="Do only plotting on already analyzed set")
     parser.add_argument('--tail', action='store_true', help="Gaussian fit with tails")
+
+    parser.add_argument('--nocalib', action='store_true', help="Disable calibration fittings")
+    parser.add_argument('--noplots', action='store_true', help="Disable plotting of fitting details")
 
 
     parser.add_argument("-d", "--domains",  nargs=2,
