@@ -406,20 +406,51 @@ def main():
             src = src + ' -ener {}'.format(gamma)
     print(my_params.prefix)
 
-    #    path, my_params.runnbr, my_params.volnbr, my_params.server, lut_recall_fname, my_params.dom1, my_params.dom2, src, 1)
-    # for volnbr in range(my_params.vol0, my_params.vol1 + 1):
-    #     command_line = (
-    #         f"{path}/gammaset -f selected_run_{my_params.runnbr}_{volnbr}_eliadeS{my_params.server}.root "
-    #         f"-rp {lut_recall_fname} -sc {my_params.dom1} -ec {my_params.dom2} -s {src} -fd 3 "
-    #         f"-br {my_params.fitrange} -peakthresh {my_params.peakthresh} -rb 1 -hist {my_params.prefix} "
-    #         f"-guideSigma {my_params.guideSigma} -fgf {Tail}"
-    #     )
-        #fgf - tail 1 is off ; 0 is on
-        # print("Command to run:")
-        # print(command_line)
-        # print(f'<<<Finished selected_run_{my_params.runnbr}_{volnbr}_eliadeS{my_params.server}.root >>>')
 
-        # result_scr = subprocess.run(['{}'.format(command_line)], shell=True)
+
+
+
+
+
+
+
+
+
+
+
+
+    # Define the path to the durations file
+    parent_dir = os.getcwd()
+    durations_file = f"duration_{my_params.runnbr}_eliadeS{my_params.server}.json"
+    durations_path = os.path.join(parent_dir, durations_file)
+
+    # Check if the file exists
+    if not os.path.exists(durations_path):
+        print(f"Error: The file {durations_path} does not exist.")
+        sys.exit()  # Terminate the code if the file doesn't exist
+
+    # If the file exists, the code will continue running
+    print(f"File {durations_path} found, proceeding with the program.")
+
+
+
+    if not config.nocalib:  # Only run the loop if --nocalib is not set
+        for volnbr in range(my_params.vol0, my_params.vol1 + 1):
+            command_line = (
+                f"{path}/gammaset -f selected_run_{my_params.runnbr}_{volnbr}_eliadeS{my_params.server}.root "
+                f"-rp {lut_recall_fname} -sc {my_params.dom1} -ec {my_params.dom2} -s {src} -fd 3 "
+                f"-br {my_params.fitrange} -peakthresh {my_params.peakthresh} -rb 1 -hist {my_params.prefix} "
+                f"-guideSigma {my_params.guideSigma} -fgf {Tail}"
+            )
+            # fgf - tail 1 is off; 0 is on
+            print("Command to run:")
+            print(command_line)
+            print(f'<<<Finished selected_run_{my_params.runnbr}_{volnbr}_eliadeS{my_params.server}.root >>>')
+
+            result_scr = subprocess.run(['{}'.format(command_line)], shell=True)
+    else:
+        print("Skipping calibration fittings because --nocalib flag is set.")
+
 
     result = plot_peak_positions_vs_time(
         target_run=my_params.runnbr,
@@ -434,6 +465,19 @@ def main():
         print("Failed to process data")
         return
     
+
+
+
+
+
+
+
+
+
+
+
+
+
     # Access the extracted data
     print(f"Total data points: {len(result['y'])}")
     print(f"Time range: {min(result['x'])} - {max(result['x'])} ps")
