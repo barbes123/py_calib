@@ -51,8 +51,8 @@ sudo ln -s $PY_CALIB/py_calib_aa.py /usr/local/bin/py_aa
 
 echo /usr/local/bin/calib.all
 sudo unlink /usr/local/bin/calib.all
-echo $HOME/onlineEliade/tools/root_hist_to_ascii.py
-sudo ln -s $HOME/onlineEliade/tools/root_hist_to_ascii.py /usr/local/bin/calib.all
+echo $PY_CALIB/tools/root_hist_to_ascii.py
+sudo ln -s $PY_CALIB/tools/root_hist_to_ascii.py /usr/local/bin/calib.all
 
 
 
