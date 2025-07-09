@@ -7,13 +7,13 @@ from pathlib import Path
 from os.path import exists
 current_path = Path.cwd()
 
-# try:
-#     ourpath = os.getenv('PY_CALIB')
-#     path = os.path.dirname(ourpath)
-#     print('PY_CALIB path: ', ourpath)
-# except:
-#     print('Cannot find environmental PY_CALIB variable, please check')
-#     sys.exit()
+try:
+    py_calib_path = os.getenv('PY_CALIB')
+    path = os.path.dirname(py_calib_path)
+    print('PY_CALIB PATH: ', py_calib_path)
+except:
+    print('Cannot find environmental PY_CALIB variable, please check')
+    sys.exit()
 
 class HistogramConverter:
     def __init__(self, file="toconvertfile.root", hname="mDelila_raw", maxbin=16384, 
@@ -160,7 +160,9 @@ def add_calib_to_lut(dir, run, vol, server, lut_name):
         return  mylut
 
 
-    lut_path = Path.home() / "onlineEliade" / "LookUpTables" / f"s{server}" / lut_name
+    # lut_path = Path.home() / "onlineEliade" / "LookUpTables" / f"s{server}" / lut_name
+    lut_path = py_calib_path + "/" + "LUT_ELIADE.json"
+    print(f"Path for the LUT_ELIADE.json {lut_path}")
     if exists(lut_path):
        with open('{}'.format(lut_path),'r') as flut:
 
@@ -255,9 +257,9 @@ def main():
     # print(args.noconvert)
     # sys.exit()
 
-    if args.lut == None:
-        print('Provide the lut table for analysis using -lut ')
-        sys.exit()
+    # if args.lut == None:
+    #     print('Provide the lut table for analysis using -lut ')
+    #     sys.exit()
 
     #To Convert once single file given by file name
     if args.file != "None":
