@@ -423,14 +423,15 @@ def main():
     parent_dir = os.getcwd()
     durations_file = f"duration_{my_params.runnbr}_eliadeS{my_params.server}.json"
     durations_path = os.path.join(parent_dir, durations_file)
+    if not config.noenerplots:  # Only run the loop if --nocalib is not set
 
-    # Check if the file exists
-    if not os.path.exists(durations_path):
-        print(f"Error: The file {durations_path} does not exist.")
-        sys.exit()  # Terminate the code if the file doesn't exist
+        # Check if the file exists
+        if not os.path.exists(durations_path):
+            print(f"Error: The file {durations_path} does not exist.")
+            sys.exit()  # Terminate the code if the file doesn't exist
 
-    # If the file exists, the code will continue running
-    print(f"File {durations_path} found, proceeding with the program.")
+        # If the file exists, the code will continue running
+        print(f"File {durations_path} found, proceeding with the program.")
 
 
 
@@ -451,42 +452,29 @@ def main():
     else:
         print("Skipping calibration fittings because --nocalib flag is set.")
 
+    if not config.noenerplots:  # Only run the loop if --nocalib is not set
+        result = plot_peak_positions_vs_time(
+            target_run=my_params.runnbr,
+            domain_start=my_params.dom1,
+            domain_end=my_params.dom2,
+            target_S=my_params.server,
+            verbose=True,    # Set to False to suppress output
+            create_plots=True  # Set to False to only extract data without creating plots
+        )
 
-    result = plot_peak_positions_vs_time(
-        target_run=my_params.runnbr,
-        domain_start=my_params.dom1,
-        domain_end=my_params.dom2,
-        target_S=my_params.server,
-        verbose=True,    # Set to False to suppress output
-        create_plots=True  # Set to False to only extract data without creating plots
-     )
-
-    if result is None:
-        print("Failed to process data")
-        return
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-    # Access the extracted data
-    print(f"Total data points: {len(result['y'])}")
-    print(f"Time range: {min(result['x'])} - {max(result['x'])} ps")
-    print(f"Position range: {min(result['y']):.2f} - {max(result['y']):.2f}")
-    print(f"Unique isotopes: {sorted(result['unique_isotopes'])}")
-    print(f"Unique domains: {sorted(set(result['domains']))}")
-    
-    if 'output_path' in result:
-        print(f"Plots saved to: {result['output_path']}")
+        if result is None:
+            print("Failed to process data")
+            return
+        
+        # Access the extracted data
+        print(f"Total data points: {len(result['y'])}")
+        print(f"Time range: {min(result['x'])} - {max(result['x'])} ps")
+        print(f"Position range: {min(result['y']):.2f} - {max(result['y']):.2f}")
+        print(f"Unique isotopes: {sorted(result['unique_isotopes'])}")
+        print(f"Unique domains: {sorted(set(result['domains']))}")
+        
+        if 'output_path' in result:
+            print(f"Plots saved to: {result['output_path']}")
     
     #print('command_line////////////////////', command_line)
 
@@ -546,6 +534,8 @@ if __name__ == "__main__":
     parser.add_argument('--tail', action='store_true', help="Gaussian fit with tails")
 
     parser.add_argument('--nocalib', action='store_true', help="Disable calibration fittings")
+    parser.add_argument('--noenerplots', action='store_true', help="Disable energy over time plots")
+
     parser.add_argument('--noplots', action='store_true', help="Disable plotting of fitting details")
 
 
