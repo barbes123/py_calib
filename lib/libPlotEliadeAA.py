@@ -33,7 +33,28 @@ title_clover = ''
 from libLists import list_of_sources
 from libLists import list_of_clovers
 from libLists import list_of_cebr
-from libColorsAnsi import *
+
+# Import colors with fallback
+try:
+    from libColorsAnsi import *
+except ImportError:
+    # Fallback color definitions
+    RED = '\033[31m'
+    GREEN = '\033[32m'
+    YELLOW = '\033[33m'
+    BLUE = '\033[34m'
+    MAGENTA = '\033[35m'
+    CYAN = '\033[36m'
+    WHITE = '\033[37m'
+    RESET = '\033[0m'
+
+# Ensure colors are defined (fallback for any import issues)
+if 'BLUE' not in globals():
+    BLUE = '\033[34m'
+if 'YELLOW' not in globals():
+    YELLOW = '\033[33m'
+if 'RESET' not in globals():
+    RESET = '\033[0m'
 
 # list_of_clovers = {"CL29", "CL30", "CL31", "CL32", "CL33", "CL34", "CL35", "CL36", "HPGe", "SEG", "LaBr"}
 # list_of_sources = {'60Co', '60CoWeak', '152Eu', '137Cs', '133Ba'}
@@ -56,10 +77,19 @@ def MakeDir(path):
 def FinXlimGeneric(key, js_lut):
     list_domains = []
     for el in js_lut:
-        if el["serial"].rstrip(el["serial"][-1]) == key:
-            list_domains.append(el['domain'])
-    # print(min(list_domains), max(list_domains))
-    return min(list_domains), max(list_domains)
+        try:
+            serial_key = el.get("serial", "")
+            if serial_key and len(serial_key) > 0:
+                serial_trimmed = serial_key.rstrip(serial_key[-1])
+                if serial_trimmed == key:
+                    list_domains.append(el['domain'])
+        except (KeyError, IndexError, TypeError):
+            continue
+    
+    if list_domains:
+        return min(list_domains), max(list_domains)
+    else:
+        return 100, 150  # Default fallback values
 
 
 def FindXlim(name):
@@ -209,8 +239,25 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile, opt='eps', dpi=
                 print(f"I am not able to find domain {key['domain']} cloverkey {cloverkey}")
                 continue
             else:
-                if key["serial"].rstrip(key["serial"][-1]) == cloverkey:  # check if clover is found
-                    serial1 = key["serial"].rstrip(key["serial"][-1])
+                # Safe serial string handling
+                try:
+                    serial_key = key.get("serial", "")
+                    if not serial_key or len(serial_key) == 0:
+                        print(f"Warning: Empty or missing serial for domain {key['domain']}")
+                        continue
+                    
+                    # Safe string operation - check if serial has at least one character
+                    if len(serial_key) > 0:
+                        serial1 = serial_key.rstrip(serial_key[-1])
+                    else:
+                        print(f"Warning: Serial too short for domain {key['domain']}")
+                        continue
+                        
+                except (KeyError, IndexError, TypeError) as e:
+                    print(f"Error processing serial for domain {key['domain']}: {e}")
+                    continue
+                    
+                if serial1 == cloverkey:  # check if clover is found
                     # print(f"I am able to find serial {serial1} and domain  {key["domain"]}  cloverkey {cloverkey}")
                     if key["detType"] == my_det_type:  # check if the detector is the type that we want
                         blCloverFound = True
@@ -479,7 +526,21 @@ def PlotCalibration(data, gammatab, source, lutfile, my_det_type=2, opt='eps', d
             if key['detType'] != my_det_type:  # or key['detType'] == 3:
                 continue
             else:
-                if key["serial"].rstrip(key["serial"][-1]) == cloverkey:  # check if clover is found
+                # Safe serial string handling for calibration plotting
+                try:
+                    serial_key = key.get("serial", "")
+                    if not serial_key or len(serial_key) == 0:
+                        continue
+                    
+                    if len(serial_key) > 0:
+                        serial_trimmed = serial_key.rstrip(serial_key[-1])
+                    else:
+                        continue
+                        
+                except (KeyError, IndexError, TypeError):
+                    continue
+                    
+                if serial_trimmed == cloverkey:  # check if clover is found
                     if key["pol_list"]:
                         if key["detType"] == my_det_type:  # check if the detector is the type that we want
                             blCloverFound = True

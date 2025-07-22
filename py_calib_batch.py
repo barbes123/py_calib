@@ -423,7 +423,7 @@ def main():
     parent_dir = os.getcwd()
     durations_file = f"duration_{my_params.runnbr}_eliadeS{my_params.server}.json"
     durations_path = os.path.join(parent_dir, durations_file)
-    if not config.noenerplots:  # Only run the loop if --nocalib is not set
+    if config.enerplots:  # Only run the loop if --enerplots is set
 
         # Check if the file exists
         if not os.path.exists(durations_path):
@@ -435,13 +435,13 @@ def main():
 
 
 
-    if not config.nocalib:  # Only run the loop if --nocalib is not set
+    if config.calib:  # Only run the loop if --calib is set
         for volnbr in range(my_params.vol0, my_params.vol1 + 1):
             command_line = (
                 f"{path}/gammaset -f selected_run_{my_params.runnbr}_{volnbr}_eliadeS{my_params.server}.root "
                 f"-rp {lut_recall_fname} -sc {my_params.dom1} -ec {my_params.dom2} -s {src} -fd 3 "
                 f"-br {my_params.fitrange} -peakthresh {my_params.peakthresh} -rb 1 -hist {my_params.prefix} "
-                f"-guideSigma {my_params.guideSigma} -fgf {Tail}"
+                f"-guideSigma {my_params.guideSigma} -fgf {Tail} -hough 0"
             )
             # fgf - tail 1 is off; 0 is on
             print("Command to run:")
@@ -449,10 +449,43 @@ def main():
             print(f'<<<Finished selected_run_{my_params.runnbr}_{volnbr}_eliadeS{my_params.server}.root >>>')
 
             result_scr = subprocess.run(['{}'.format(command_line)], shell=True)
-    else:
-        print("Skipping calibration fittings because --nocalib flag is set.")
 
-    if not config.noenerplots:  # Only run the loop if --nocalib is not set
+            # JSON post-processing (serial and energy calculation)
+            if config.processjson:
+                json_path = '{}selected_run_{}_{}_eliadeS{}_calib/selected_run_{}_{}_eliadeS{}.json'.format(
+                    datapath, my_params.runnbr, volnbr, my_params.server, my_params.runnbr, volnbr, my_params.server)
+                print(f'Processing JSON data for volume {volnbr}: {json_path}')
+                # Check if JSON file exists after C++ analysis
+                if os.path.exists(json_path):
+                    # Update domain and serial information
+                    update_domain_serial(json_path, j_lut)
+                    # Process efficiency data using IsotopeData
+                    with open(json_path, 'r') as exp_file:
+                        experimental_data = json.load(exp_file)
+                    print(f'Processing efficiency calculations for volume {volnbr}')
+                    isotope_data = IsotopeData(experimental_data, j_sources, my_source.name, n_decays_sum, n_decays_err)    
+                    # Set advanced parameters for efficiency calculation
+                    isotope_data.set_advanced_parameters(
+                        A0=newa0, sigma_A0=newa0 * 0.05, 
+                        lambd=newdeccst, sigma_lambd=0,
+                        T1=newt1, sigma_T1=0.5,          
+                        T2=newt2, sigma_T2=0.5
+                    )
+                    # Parse data and calculate efficiencies
+                    isotope_data.parse_experimental_data()
+                    isotope_data.add_probabilities_to_peaks(use_advanced_calculation=True)
+                    # Save updated data back to the JSON file
+                    isotope_data.save_experimental_data(json_path)
+                    print(f'Efficiency calculations completed for volume {volnbr}')
+                else:
+                    print(f'Warning: JSON file not found for volume {volnbr}: {json_path}')
+            else:
+                print("Skipping JSON post-processing because --processjson flag is not set.")
+
+    else:
+        print("Skipping calibration fittings because --calib flag is not set.")
+
+    if config.enerplots:  # Only run the loop if --enerplots is set
         result = plot_peak_positions_vs_time(
             target_run=my_params.runnbr,
             domain_start=my_params.dom1,
@@ -475,6 +508,167 @@ def main():
         
         if 'output_path' in result:
             print(f"Plots saved to: {result['output_path']}")
+
+    # Plotting section - added from py_calib_aa.py
+    if config.plots:  # Only run plotting if --plots is set
+        print("Starting plotting phase...")
+        
+        # Loop through all volumes for plotting
+        for volnbr in range(my_params.vol0, my_params.vol1 + 1):
+            print(f"Plotting for volume {volnbr}...")
+            
+            try:
+                # Build the file path dynamically using parameters
+                file_path = '{}selected_run_{}_{}_eliadeS{}_calib/selected_run_{}_{}_eliadeS{}.json'.format(
+                    datapath,
+                    my_params.runnbr, 
+                    volnbr,  # Use current volume in loop
+                    my_params.server,
+                    my_params.runnbr, 
+                    volnbr,  # Use current volume in loop
+                    my_params.server
+                )
+                
+                print(f"Attempting to open file: {file_path}")
+                with open(file_path, 'r') as ifile:
+                    js_tab = json.load(ifile)
+                    print(f"File opened successfully for volume {volnbr}!")
+                    
+                    # Validate JSON data
+                    if not js_tab or len(js_tab) == 0:
+                        print(f"Warning: JSON file for volume {volnbr} is empty or invalid")
+                        continue
+                    
+                    # Plot section
+                    if my_params.grType != 'none':
+                        # Validate source name
+                        if not hasattr(my_source, 'name') or not my_source.name:
+                            print(f"Warning: Source name is empty for volume {volnbr}")
+                            continue
+                            
+                        source = my_source.name
+                        print(f"Processing source: '{source}' for volume {volnbr}")
+                        
+                        # Safe string checking
+                        try:
+                            if '60Co' in str(my_source.name):
+                                source = '60Co'
+                            elif '152Eu' in str(my_source.name):
+                                source = '152Eu'
+                        except (TypeError, AttributeError) as e:
+                            print(f"Error processing source name for volume {volnbr}: {e}")
+                            continue
+
+                        # Create figures directory for this volume
+                        figures_path = '{}selected_run_{}_{}_eliadeS{}_calib/figures/'.format(
+                            datapath,
+                            my_params.runnbr, 
+                            volnbr,  # Use current volume in loop
+                            my_params.server
+                        )
+                        MakeDir(figures_path)
+                        save_results_to_path(figures_path)
+                        
+                        # Validate data before plotting
+                        try:
+                            # Check if required data structures exist
+                            if not j_sources:
+                                print(f"Warning: j_sources is empty for volume {volnbr}")
+                                continue
+                            if not j_lut:
+                                print(f"Warning: j_lut is empty for volume {volnbr}")
+                                continue
+                            
+                            print(f"Starting plots for volume {volnbr} with source '{source}'")
+                            
+                            # Generate all plots for this volume with individual error handling
+                            try:
+                                PlotDomain(js_tab, j_sources, my_source.name, j_lut, my_params.grType)
+                                print(f"PlotDomain completed for volume {volnbr}")
+                            except Exception as e:
+                                print(f"Error in PlotDomain for volume {volnbr}: {e}")
+                            
+                            try:
+                                PlotClover(js_tab, j_sources, source, 1, j_lut, my_params.grType)
+                                print(f"PlotClover (type 1) completed for volume {volnbr}")
+                            except Exception as e:
+                                print(f"Error in PlotClover (type 1) for volume {volnbr}: {e}")
+                                print(f"Debug - Source: '{source}', j_sources keys: {list(j_sources.keys()) if j_sources else 'None'}")
+                                if js_tab and len(js_tab) > 0:
+                                    sample_entry = js_tab[0]
+                                    print(f"Debug - Sample js_tab entry keys: {list(sample_entry.keys())}")
+                                    if 'serial' in sample_entry:
+                                        print(f"Debug - Sample serial: '{sample_entry['serial']}' (type: {type(sample_entry['serial'])}, length: {len(str(sample_entry['serial']))})")
+                            
+                            try:
+                                PlotCalibration(js_tab, j_sources, source, j_lut, 1, my_params.grType)
+                                print(f"PlotCalibration (type 1) completed for volume {volnbr}")
+                            except Exception as e:
+                                print(f"Error in PlotCalibration (type 1) for volume {volnbr}: {e}")
+                                import traceback
+                                traceback.print_exc()
+                            
+                            # Plot for Segmented detectors (type 2)
+                            try:
+                                PlotClover(js_tab, j_sources, source, 2, j_lut, my_params.grType)
+                                print(f"PlotClover (type 2) completed for volume {volnbr}")
+                            except Exception as e:
+                                print(f"Error in PlotClover (type 2) for volume {volnbr}: {e}")
+                            
+                            try:
+                                PlotCalibration(js_tab, j_sources, source, j_lut, 2, my_params.grType)
+                                print(f"PlotCalibration (type 2) completed for volume {volnbr}")
+                            except Exception as e:
+                                print(f"Error in PlotCalibration (type 2) for volume {volnbr}: {e}")
+                            
+                        except Exception as e:
+                            print(f"Error during plotting setup for volume {volnbr}: {e}")
+                            continue
+                        
+                        print(f"Plotting completed for volume {volnbr}")
+                        
+            except FileNotFoundError:
+                print(f"Warning: File not found for volume {volnbr} at {file_path}")
+                print("Skipping this volume and continuing...")
+                continue
+            except PermissionError:
+                print(f"Error: Permission denied when accessing file for volume {volnbr}")
+                continue
+            except json.JSONDecodeError:
+                print(f"Error: File for volume {volnbr} is not a valid JSON file")
+                continue
+            except Exception as e:
+                print(f"An unexpected error occurred for volume {volnbr}: {e}")
+                print(f"Error type: {type(e).__name__}")
+                
+                # Add debugging information
+                print(f"Debug info for volume {volnbr}:")
+                try:
+                    print(f"  - my_source.name: '{my_source.name}' (type: {type(my_source.name)})")
+                    print(f"  - my_source.name length: {len(str(my_source.name))}")
+                except:
+                    print(f"  - Error accessing my_source.name")
+                
+                try:
+                    print(f"  - j_sources keys: {list(j_sources.keys()) if j_sources else 'None'}")
+                except:
+                    print(f"  - Error accessing j_sources")
+                
+                try:
+                    print(f"  - js_tab length: {len(js_tab) if js_tab else 'None'}")
+                    if js_tab and len(js_tab) > 0:
+                        print(f"  - First js_tab entry keys: {list(js_tab[0].keys())}")
+                except:
+                    print(f"  - Error accessing js_tab")
+                    
+                import traceback
+                print(f"Full traceback:")
+                traceback.print_exc()
+                continue
+                
+        print("Plotting phase completed for all volumes.")
+    else:
+        print("Skipping plotting because --plots flag is not set.")
     
     #print('command_line////////////////////', command_line)
 
@@ -487,7 +681,43 @@ def main():
     #    result_scr = subprocess.run(['{}'.format(command_line)], shell=True)
     #print('I finished c++')
 
-   
+    # --- Update LUT functionality ---
+    if config.update_lut:
+        lut_template_path = f"{ourpath}/LUT_ELIADE.json"
+        with open(lut_template_path, 'r') as lut_file:
+            lut_template = json.load(lut_file)
+
+        for volnbr in range(my_params.vol0, my_params.vol1 + 1):
+            calib_json_path = f"selected_run_{my_params.runnbr}_{volnbr}_eliadeS{my_params.server}_calib/selected_run_{my_params.runnbr}_{volnbr}_eliadeS{my_params.server}.json"
+            lut_out_dir = f"LUT_R{my_params.runnbr}_V{volnbr}_S{my_params.server}/"
+            lut_out_path = f"{lut_out_dir}LUT_R{my_params.runnbr}_V{volnbr}_S{my_params.server}.json"
+            try:
+                if not os.path.exists(calib_json_path):
+                    print(f"Calibration JSON not found for volume {volnbr}: {calib_json_path}")
+                    continue
+                if not os.path.exists(lut_out_dir):
+                    os.makedirs(lut_out_dir)
+                with open(calib_json_path, 'r') as jf:
+                    calib_data = json.load(jf)
+                # Copy template and update pol_list for each domain
+                lut_new = []
+                for lut_entry in lut_template:
+                    domain = lut_entry.get('domain')
+                    # Find matching calibration entry
+                    pol_list = None
+                    for entry in calib_data:
+                        if entry.get('domain') == domain:
+                            pol_list = entry.get('pol_list')
+                            break
+                    lut_entry_new = lut_entry.copy()
+                    if pol_list is not None:
+                        lut_entry_new['pol_list'] = pol_list
+                    lut_new.append(lut_entry_new)
+                with open(lut_out_path, 'w') as lut_file:
+                    json.dump(lut_new, lut_file, indent=3)
+                print(f"Generated LUT for volume {volnbr}: {lut_out_path}")
+            except Exception as e:
+                print(f"Error generating LUT for volume {volnbr}: {e}")
 
 if __name__ == "__main__":
     dom1 = 100
@@ -533,10 +763,11 @@ if __name__ == "__main__":
     parser.add_argument('--norun', action='store_true', help="Do only plotting on already analyzed set")
     parser.add_argument('--tail', action='store_true', help="Gaussian fit with tails")
 
-    parser.add_argument('--nocalib', action='store_true', help="Disable calibration fittings")
-    parser.add_argument('--noenerplots', action='store_true', help="Disable energy over time plots")
-
-    parser.add_argument('--noplots', action='store_true', help="Disable plotting of fitting details")
+    parser.add_argument('--calib', action='store_true', help="Enable calibration fittings")
+    parser.add_argument('--enerplots', action='store_true', help="Enable energy over time plots")
+    parser.add_argument('--plots', action='store_true', help="Enable plotting of fitting details")
+    parser.add_argument('--processjson', action='store_true', help="Enable JSON post-processing: serial and energy calculation")
+    parser.add_argument('--update-lut', action='store_true', help="Update LUT_ELIADE.json with pol_list from processed calibration data")
 
 
     parser.add_argument("-d", "--domains",  nargs=2,
@@ -557,15 +788,12 @@ if __name__ == "__main__":
     parser.add_argument("-b", "--background",
                         dest="bg", default=bg, type=int,
                         help="to take in energy calib background lines (1); default = {}".format(bg))
-    parser.add_argument("-gr", "--graphic type: eps, jpg or none ",
-                        dest="grType", default=grType, type=str, choices=('eps', 'jpeg', 'jpg', 'png', 'svg', 'svgz', 'tif', 'tiff', 'webp','none'),
-                        # eps, jpeg, jpg, pdf, pgf, png, ps, raw, rgba, svg, svgz, tif, tiff, webp
+    parser.add_argument("-gr", dest="grType", default=grType, type=str,
+                        choices=('eps', 'jpeg', 'jpg', 'png', 'svg', 'svgz', 'tif', 'tiff', 'webp','none'),
                         help="Available graphic output: eps, jpeg, jpg, png, svg, svgz, tif, tiff, webp or none (no graphs); default = {}".format(grType))
-    parser.add_argument("-prefix", "--prefix to the files to be analyzed",
-                        dest="prefix", default=prefix, type=str,
-                        help="Prefix for matrix (TH2) to be analyzed mDelila_raw or mDelila or ...".format(
-                            prefix))
-    parser.add_argument("--fitrange", type=int, dest="fitrange", default=10,
+    parser.add_argument("-prefix", dest="prefix", default=prefix, type=str,
+                        help="Prefix for matrix (TH2) to be analyzed mDelila_raw or mDelila or ...".format(prefix))
+    parser.add_argument("--fitrange", type=int, dest="fitrange", default=-1,
                         help="Basic range (left/right) for C++ peak fitting, default = 10")
     parser.add_argument("--peakthresh", type=float, dest="peakthresh", default=0.0001,
                         help="Peak threshold for C++ analysis, default = 0.0001")
