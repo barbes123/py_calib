@@ -439,7 +439,7 @@ def main():
         for volnbr in range(my_params.vol0, my_params.vol1 + 1):
             command_line = (
                 f"{path}/gammaset -f selected_run_{my_params.runnbr}_{volnbr}_eliadeS{my_params.server}.root "
-                f"-rp {lut_recall_fname} -sc {my_params.dom1} -ec {my_params.dom2} -s {src} -fd 3 "
+                f"-rp {lut_recall_fname} -sc {my_params.dom1} -ec {my_params.dom2} -s {src} -pd 2 -fd 3 "
                 f"-br {my_params.fitrange} -peakthresh {my_params.peakthresh} -rb 1 -hist {my_params.prefix} "
                 f"-guideSigma {my_params.guideSigma} -fgf {Tail} -hough 0"
             )
