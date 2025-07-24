@@ -687,9 +687,11 @@ def main():
         with open(lut_template_path, 'r') as lut_file:
             lut_template = json.load(lut_file)
 
+        lut_out_dir = f"LUT_R{my_params.runnbr}S{my_params.server}/"
+        if not os.path.exists(lut_out_dir):
+            os.makedirs(lut_out_dir)
         for volnbr in range(my_params.vol0, my_params.vol1 + 1):
             calib_json_path = f"selected_run_{my_params.runnbr}_{volnbr}_eliadeS{my_params.server}_calib/selected_run_{my_params.runnbr}_{volnbr}_eliadeS{my_params.server}.json"
-            lut_out_dir = f"LUT_R{my_params.runnbr}_V{volnbr}_S{my_params.server}/"
             lut_out_path = f"{lut_out_dir}LUT_R{my_params.runnbr}_V{volnbr}_S{my_params.server}.json"
             try:
                 if not os.path.exists(calib_json_path):
