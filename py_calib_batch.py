@@ -439,7 +439,7 @@ def main():
         for volnbr in range(my_params.vol0, my_params.vol1 + 1):
             command_line = (
                 f"{path}/gammaset -f selected_run_{my_params.runnbr}_{volnbr}_eliadeS{my_params.server}.root "
-                f"-rp {lut_recall_fname} -sc {my_params.dom1} -ec {my_params.dom2} -s {src} -pd 2 -fd 3 "
+                f"-rp {lut_recall_fname} -sc {my_params.dom1} -ec {my_params.dom2} -s {src} -pd {my_params.pd} -fd 3 "
                 f"-br {my_params.fitrange} -peakthresh {my_params.peakthresh} -rb 1 -hist {my_params.prefix} "
                 f"-guideSigma {my_params.guideSigma} -fgf {Tail} -hough 0"
             )
@@ -762,6 +762,7 @@ if __name__ == "__main__":
 
     parser.add_argument('--norun', action='store_true', help="Do only plotting on already analyzed set")
     parser.add_argument('--tail', action='store_true', help="Gaussian fit with tails")
+    parser.add_argument('--pd', type=int, default=1, help="Set the -pd parameter for gammaset (default: 1)")
 
     parser.add_argument('--calib', action='store_true', help="Enable calibration fittings")
     parser.add_argument('--enerplots', action='store_true', help="Enable energy over time plots")
@@ -836,6 +837,7 @@ if __name__ == "__main__":
         vol1=config.vol[1],
         guideSigma = config.guideSigma
     )
+    my_params.pd = config.pd
 
 
     for name, value in vars(my_params).items():
