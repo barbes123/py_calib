@@ -692,7 +692,7 @@ def main():
             os.makedirs(lut_out_dir)
         for volnbr in range(my_params.vol0, my_params.vol1 + 1):
             calib_json_path = f"selected_run_{my_params.runnbr}_{volnbr}_eliadeS{my_params.server}_calib/selected_run_{my_params.runnbr}_{volnbr}_eliadeS{my_params.server}.json"
-            lut_out_path = f"{lut_out_dir}LUT_R{my_params.runnbr}_V{volnbr}_S{my_params.server}.json"
+            lut_out_path = f"{lut_out_dir}LUT_R{my_params.runnbr}V{volnbr}S{my_params.server}.json"
             try:
                 if not os.path.exists(calib_json_path):
                     print(f"Calibration JSON not found for volume {volnbr}: {calib_json_path}")
