@@ -50,7 +50,7 @@
         "stop": "2025-06-20 15:05:34",
         "expName": "ES5",
         "comment": "",
-        "source": "133Ba",
+        "source": "60Co",
         "distance": "0"
     },
     {
@@ -59,7 +59,7 @@
         "stop": "2025-06-16 13:19:58",
         "expName": "ES5",
         "comment": "",
-        "source": "133Ba",
+        "source": "152Eu",
         "distance": "0"
     },
     {
