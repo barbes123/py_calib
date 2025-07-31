@@ -65,10 +65,10 @@
     {
         "runNumber": 98,
         "start": "2025-06-12 15:15:59",
-        "stop": "1970-01-01 02:00:00",
+        "stop": "2025-06-13 10:20:30",
         "expName": "ES4",
         "comment": null,
-        "source": "60Co",
+        "source": "133Ba",
         "distance": null
     },
     {
