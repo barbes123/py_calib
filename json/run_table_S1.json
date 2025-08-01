@@ -1,5 +1,266 @@
 [   
     {
+        "runNumber": 220,
+        "start": "2025-06-26 09:06:11",
+        "stop": "2025-06-26 14:26:52",
+        "expName": "ES1",
+        "comment": "",
+        "source": "152Eu",
+        "distance": "0"
+    },
+    {
+        "runNumber": 219,
+        "start": "2025-06-24 13:35:49",
+        "stop": "2025-06-26 08:46:55",
+        "expName": "ES1",
+        "comment": "",
+        "source": "152Eu",
+        "distance": "0"
+    },
+    {
+        "runNumber": 218,
+        "start": "2025-06-23 12:26:11",
+        "stop": "2025-06-24 13:25:57",
+        "expName": "ES1",
+        "comment": "",
+        "source": "152Eu",
+        "distance": "0"
+    },
+    {
+        "runNumber": 217,
+        "start": "2025-06-23 12:00:13",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES1",
+        "comment": "",
+        "source": "152Eu",
+        "distance": "0"
+    },
+    {
+        "runNumber": 216,
+        "start": "2025-06-23 12:00:00",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES1",
+        "comment": "",
+        "source": "152Eu",
+        "distance": "0"
+    },
+    {
+        "runNumber": 215,
+        "start": "2025-06-23 11:54:55",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES1",
+        "comment": "",
+        "source": "152Eu",
+        "distance": "0"
+    },
+    {
+        "runNumber": 214,
+        "start": "2025-06-23 11:54:29",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES1",
+        "comment": "",
+        "source": "152Eu",
+        "distance": "0"
+    },
+    {
+        "runNumber": 213,
+        "start": "2025-06-23 11:45:39",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES1",
+        "comment": "",
+        "source": "152Eu",
+        "distance": "0"
+    },
+    {
+        "runNumber": 212,
+        "start": "2025-06-23 11:36:15",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES1",
+        "comment": "",
+        "source": "152Eu",
+        "distance": "0"
+    },
+    {
+        "runNumber": 211,
+        "start": "2025-06-20 15:14:52",
+        "stop": "2025-06-21 14:23:54",
+        "expName": "ES1",
+        "comment": "",
+        "source": "152Eu",
+        "distance": "0"
+    },
+    {
+        "runNumber": 210,
+        "start": "2025-06-19 15:53:41",
+        "stop": "2025-06-20 11:01:30",
+        "expName": "ES1",
+        "comment": "",
+        "source": "152Eu",
+        "distance": "0"
+    },
+    {
+        "runNumber": 209,
+        "start": "2025-06-18 18:19:19",
+        "stop": "2025-06-19 11:04:05",
+        "expName": "ES1",
+        "comment": "",
+        "source": "152Eu",
+        "distance": "0"
+    },
+    {
+        "runNumber": 208,
+        "start": "2025-06-17 17:10:46",
+        "stop": "2025-06-18 16:26:34",
+        "expName": "ES1",
+        "comment": "",
+        "source": "152Eu",
+        "distance": "0"
+    },
+    {
+        "runNumber": 207,
+        "start": "2025-06-16 14:13:29",
+        "stop": "2025-06-17 10:51:29",
+        "expName": "ES1",
+        "comment": "",
+        "source": "60Co",
+        "distance": "0"
+    },
+    {
+        "runNumber": 206,
+        "start": "2025-06-16 13:34:03",
+        "stop": "2025-06-16 14:12:56",
+        "expName": "ES1",
+        "comment": "",
+        "source": "60Co",
+        "distance": "0"
+    },
+    {
+        "runNumber": 205,
+        "start": "2025-06-13 10:35:20",
+        "stop": "2025-06-16 13:17:53",
+        "expName": "ES1",
+        "comment": "",
+        "source": "152Eu",
+        "distance": "0"
+    },
+    {
+        "runNumber": 204,
+        "start": "2025-06-06 15:32:21",
+        "stop": "2025-06-13 10:12:54",
+        "expName": "ES1",
+        "comment": "",
+        "source": "133Ba",
+        "distance": "0"
+    },
+    {
+        "runNumber": 203,
+        "start": "2025-06-06 15:29:28",
+        "stop": "2025-06-06 15:30:01",
+        "expName": "ES1",
+        "comment": "",
+        "source": "152Eu",
+        "distance": "0"
+    },
+    {
+        "runNumber": 202,
+        "start": "2025-06-06 15:25:47",
+        "stop": "2025-06-06 15:26:24",
+        "expName": "ES1",
+        "comment": "",
+        "source": "152Eu",
+        "distance": "0"
+    },
+    {
+        "runNumber": 201,
+        "start": "2025-06-06 15:21:12",
+        "stop": "2025-06-06 15:23:42",
+        "expName": "ES1",
+        "comment": "",
+        "source": "152Eu",
+        "distance": "0"
+    },
+    {
+        "runNumber": 200,
+        "start": "2025-06-06 15:13:20",
+        "stop": "2025-06-06 15:16:29",
+        "expName": "ES1",
+        "comment": "",
+        "source": "152Eu",
+        "distance": "0"
+    },
+    {
+        "runNumber": 199,
+        "start": "2025-06-06 15:01:57",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES1",
+        "comment": "",
+        "source": "152Eu",
+        "distance": "0"
+    },
+    {
+        "runNumber": 198,
+        "start": "2025-06-05 13:42:48",
+        "stop": "2025-06-06 14:29:12",
+        "expName": "ES1",
+        "comment": "",
+        "source": "152Eu",
+        "distance": "0"
+    },
+    {
+        "runNumber": 197,
+        "start": "2025-06-05 13:40:05",
+        "stop": "2025-06-05 13:42:27",
+        "expName": "ES1",
+        "comment": "",
+        "source": "152Eu",
+        "distance": "0"
+    },
+    {
+        "runNumber": 196,
+        "start": "2025-06-05 13:39:33",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES1",
+        "comment": "",
+        "source": "152Eu",
+        "distance": "0"
+    },
+    {
+        "runNumber": 195,
+        "start": "2025-06-05 13:39:14",
+        "stop": "2025-06-05 13:39:15",
+        "expName": "ES1",
+        "comment": "",
+        "source": "152Eu",
+        "distance": "0"
+    },
+    {
+        "runNumber": 194,
+        "start": "2025-06-05 13:38:35",
+        "stop": "2025-06-05 13:39:10",
+        "expName": "ES1",
+        "comment": "",
+        "source": "152Eu",
+        "distance": "0"
+    },
+    {
+        "runNumber": 193,
+        "start": "2025-06-05 13:37:08",
+        "stop": "2025-06-05 13:38:08",
+        "expName": "ES1",
+        "comment": "",
+        "source": "152Eu",
+        "distance": "0"
+    },
+    {
+        "runNumber": 192,
+        "start": "2025-06-05 11:18:21",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES1",
+        "comment": "",
+        "source": "152Eu",
+        "distance": "0"
+    },
+    {
         "runNumber": 191,
         "start": "2025-06-02 16:16:01",
         "stop": "1970-01-01 02:00:00",
