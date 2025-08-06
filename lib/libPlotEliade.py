@@ -309,119 +309,195 @@ def PlotJsonclover(data, gammatab, source, my_det_type, lutfile, opt='eps', dpi=
 
     return True
 
-
 def PlotCore(data, gammatab, source, lutfile, detKey=1, opt='eps', dpi=300):
     debugPlotJsoncore = False
-
     MakeDir(save_results_to)
-    CloverName = ''
+
+    # Initialize figures outside the loop
+    fig_eff = plt.figure(1)  # Efficiency plot
+    fig_res = plt.figure(2)  # Resolution plot
+
     for key in data:
-        # clover=i["serial"]
         if find_domain(key["domain"], lutfile) == False:
             continue
-        if key["detType"] != detKey:
-            # pass
+        if key["detType"] != detKey or key["domain"] < 100:
             continue
-        if key["domain"] < 100:
-            continue
-        if debugPlotJsoncore:
-            print('key["domain"]', key["domain"])
+
+        CloverName = key["serial"][:len(key["serial"]) - 1]  # Update CloverName per iteration
 
         for gammakey in list_of_sources:
             if source == gammakey:
                 for element in gammatab[source]["gammas"]:
-                    plot_color = "k"
+                    # Get plot color (same as your original code)
                     with open('{}/json/gamma_set.json'.format(ourpath), 'r') as jason_file:
                         gammaset = json.load(jason_file)
-                        plot_color = gammaset[source]['gammas'][element]  # using different colors for each energy
-                    plt.figure(1)  # efficiency plot
+                        plot_color = gammaset[source]['gammas'][element]
+
+                    # Plot Efficiency (Figure 1)
                     try:
-                        CloverName = key["serial"][:len(key["serial"]) - 1]  # for plotting
-                        plt.scatter(x=key["domain"], y=key[source][element]["eff"], color=plot_color,
-                                    label=f"{element}")
-                        plt.errorbar(x=key["domain"], y=key[source][element]["eff"],
-                                     yerr=key[source][element]["err_eff"], fmt='o', color=plot_color, ecolor=plot_color,
-                                     capsize=5)
-                        if debugPlotJsoncore:
-                            print('CloverName', CloverName, 'key["domain"]', key["domain"],
-                                  'key[source][element]["eff"]', key[source][element]["eff"], 'plot_color', plot_color)
-                    except:
-                        print(f'{YELLOW}Warining in PlotJsoncore Efficiency y=key[source][element]["eff"] {RESET}')
-                        continue
-                    plt.figure(2)  # resolution plot
+                        plt.figure(1)
+                        plt.scatter(key["domain"], key[source][element]["eff"], color=plot_color, label=f"{element}")
+                        plt.errorbar(key["domain"], key[source][element]["eff"],
+                                     yerr=key[source][element]["err_eff"], fmt='o', color=plot_color,
+                                     ecolor=plot_color, capsize=5)
+                    except Exception as e:
+                        print(f'{YELLOW}Warning in Efficiency plot: {e}{RESET}')
+
+                    # Plot Resolution (Figure 2)
                     try:
-                        plt.scatter(x=key["domain"], y=key[source][element]["res"], color=plot_color,
-                                    label=f"{element}")
-                        plt.errorbar(x=key["domain"], y=key[source][element]["res"],
-                                     yerr=key[source][element]["err_res"], fmt='o', color=plot_color, ecolor=plot_color,
-                                     capsize=5)
-                        if debugPlotJsoncore:
-                            print('key["domain"]', key["domain"], 'key[source][element]["res"]',
-                                  key[source][element]["res"], 'plot_color', plot_color)
-                    except:
-                        print(f'{YELLOW}Warining in PlotJsoncore y=key[source][element]["res"] plot{RESET}')
-                        continue
-        plt.figure(1)
-        plt.xlim(100, 841)
+                        plt.figure(2)
+                        plt.scatter(key["domain"], key[source][element]["res"], color=plot_color, label=f"{element}")
+                        plt.errorbar(key["domain"], key[source][element]["res"],
+                                     yerr=key[source][element]["err_res"], fmt='o', color=plot_color,
+                                     ecolor=plot_color, capsize=5)
+                    except Exception as e:
+                        print(f'{YELLOW}Warning in Resolution plot: {e}{RESET}')
 
-        # print(plt.gca().get_lines())
-        # sys.exit()
+    # Finalize Efficiency Plot (Figure 1)
+    plt.figure(1)
+    plt.xlim(100, 150)
+    plt.ylim(0, 1.5 * max([line.get_ydata().max() for line in plt.gca().get_lines()]))
+    plt.title(f'Efficiency for cores (DetKey {detKey})')
+    plt.xlabel('Domain')
+    plt.ylabel('Efficiency (%)')
+    plt.grid(linestyle='--', linewidth=0.5)
+    legend_without_duplicate_labels(plt)
 
-        # for line in plt.gca().get_lines():
-        #     print('!!!!!!!!!!',line.get_ydata())
-        # sys.exit()
+    #         file_name5 = 'eliade_efficiency_{}_core{}.{}'.format(CloverName, detKey, opt)
+    #         plt.savefig(save_results_to + file_name5,  dpi = dpi)
+    # plt.savefig(f'{save_results_to}/eliade_efficiency_core{detKey}.{opt}', dpi=dpi)
+    plt.savefig(f'{save_results_to}/eliade_efficiency_{CloverName}_core{detKey}.{opt}', dpi=dpi)
+    plt.close()
 
-        try:
-            max_y = max([line.get_ydata().max() for line in plt.gca().get_lines()])
-        except:
-            max_y = 1
-            print(f'{YELLOW}Warning: PlotJsoncore: the max-y value for Efficiency plot was not possible to evaluate, default value {max_y} will be used {RESET}')
-        plt.ylim(0, 1.5 * max_y)
+    # Finalize Resolution Plot (Figure 2)
+    plt.figure(2)
+    plt.xlim(100, 150)
+    plt.ylim(0, 1.5 * max([line.get_ydata().max() for line in plt.gca().get_lines()]))
+    plt.title(f'Resolution for cores (DetKey {detKey})')
+    plt.xlabel('Domain')
+    plt.ylabel('Resolution (keV)')
+    plt.grid(linestyle='--', linewidth=0.5)
+    legend_without_duplicate_labels(plt)
+    plt.savefig(f'{save_results_to}/eliade_resolution_{CloverName}_core{detKey}.{opt}', dpi=dpi)
+    # plt.savefig(f'{save_results_to}/eliade_resolution_cores_det{detKey}.{opt}', dpi=dpi)
+    plt.close()
 
-        try:
-            max_x = max([line.get_xdata().max() for line in plt.gca().get_lines()])
-        except:
-            max_x = 1
-            print(f'{YELLOW}Warning: PlotJsoncore: the max-x value for Efficiency plot was not possible to evaluate, default value {max_x} will be used {RESET}')
-        plt.xlim(0, 1.5 * max_x)
-
-        # title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
-        # CloverName = key["serial"][:len(key["serial"])-1]
-        plt.title('Efficiency for core {} {}'.format(CloverName, detKey))
-        plt.title('Efficiency for core {} {}'.format(CloverName, detKey))
-        # print('CloverName',CloverName, key['detType'])
-        plt.xlabel('Domain')
-        plt.ylabel('Efficiency (%)')
-        plt.grid(color='black', linestyle='--', linewidth=0.5)
-        legend_without_duplicate_labels(plt)
-
-        plt.figure(2)
-        plt.xlim(100, 841)
-        # plt.ylim([1, 5])
-        max_y = max([line.get_ydata().max() for line in plt.gca().get_lines()])
-        plt.ylim(0, 1.5 * max_y)
-
-        max_x = max([line.get_xdata().max() for line in plt.gca().get_lines()])
-        plt.xlim(0, 1.5 * max_x)
-        # title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
-        plt.title('Resolution for core {} det key {}'.format(CloverName, detKey))
-        plt.xlabel('Domain')
-        plt.ylabel('Resolution (keV)')
-        plt.grid(color='black', linestyle='--', linewidth=0.5)
-        legend_without_duplicate_labels(plt)
-
-        plt.figure(1)
-        file_name5 = 'eliade_efficiency_{}_core{}.{}'.format(CloverName, detKey, opt)
-        plt.savefig(save_results_to + file_name5,  dpi = dpi)
-        plt.close()
-
-        plt.figure(2)
-        file_name6 = 'eliade_resolution_{}_core{}.{}'.format(CloverName, detKey, opt)
-        plt.savefig(save_results_to + file_name6,  dpi = dpi)
-        plt.close()
-
-        print("PlotJsoncore: Finished graphs for all core{} {}".format(CloverName, detKey))
+    print(f"PlotCore: Finished plots for all cores (DetKey {detKey})")
     return True
+
+
+# def PlotCore(data, gammatab, source, lutfile, detKey=1, opt='eps', dpi=300):
+#     debugPlotJsoncore = False
+#
+#     MakeDir(save_results_to)
+#     CloverName = ''
+#     for key in data:
+#         # clover=i["serial"]
+#         if find_domain(key["domain"], lutfile) == False:
+#             continue
+#         if key["detType"] != detKey:
+#             # pass
+#             continue
+#         if key["domain"] < 100:
+#             continue
+#         if debugPlotJsoncore:
+#             print('key["domain"]', key["domain"])
+#
+#         for gammakey in list_of_sources:
+#             if source == gammakey:
+#                 for element in gammatab[source]["gammas"]:
+#                     plot_color = "k"
+#                     with open('{}/json/gamma_set.json'.format(ourpath), 'r') as jason_file:
+#                         gammaset = json.load(jason_file)
+#                         plot_color = gammaset[source]['gammas'][element]  # using different colors for each energy
+#                     plt.figure(1)  # efficiency plot
+#                     try:
+#                         CloverName = key["serial"][:len(key["serial"]) - 1]  # for plotting
+#                         plt.scatter(x=key["domain"], y=key[source][element]["eff"], color=plot_color,
+#                                     label=f"{element}")
+#                         plt.errorbar(x=key["domain"], y=key[source][element]["eff"],
+#                                      yerr=key[source][element]["err_eff"], fmt='o', color=plot_color, ecolor=plot_color,
+#                                      capsize=5)
+#                         if debugPlotJsoncore:
+#                             print('CloverName', CloverName, 'key["domain"]', key["domain"],
+#                                   'key[source][element]["eff"]', key[source][element]["eff"], 'plot_color', plot_color)
+#                     except:
+#                         print(f'{YELLOW}Warining in PlotJsoncore Efficiency y=key[source][element]["eff"] {RESET}')
+#                         continue
+#                     plt.figure(2)  # resolution plot
+#                     try:
+#                         plt.scatter(x=key["domain"], y=key[source][element]["res"], color=plot_color,
+#                                     label=f"{element}")
+#                         plt.errorbar(x=key["domain"], y=key[source][element]["res"],
+#                                      yerr=key[source][element]["err_res"], fmt='o', color=plot_color, ecolor=plot_color,
+#                                      capsize=5)
+#                         if debugPlotJsoncore:
+#                             print('key["domain"]', key["domain"], 'key[source][element]["res"]',
+#                                   key[source][element]["res"], 'plot_color', plot_color)
+#                     except:
+#                         print(f'{YELLOW}Warining in PlotJsoncore y=key[source][element]["res"] plot{RESET}')
+#                         continue
+#         plt.figure(1)
+#         plt.xlim(100, 841)
+#
+#         # print(plt.gca().get_lines())
+#         # sys.exit()
+#
+#         # for line in plt.gca().get_lines():
+#         #     print('!!!!!!!!!!',line.get_ydata())
+#         # sys.exit()
+#
+#         try:
+#             max_y = max([line.get_ydata().max() for line in plt.gca().get_lines()])
+#         except:
+#             max_y = 1
+#             print(f'{YELLOW}Warning: PlotJsoncore: the max-y value for Efficiency plot was not possible to evaluate, default value {max_y} will be used {RESET}')
+#         plt.ylim(0, 1.5 * max_y)
+#
+#         try:
+#             max_x = max([line.get_xdata().max() for line in plt.gca().get_lines()])
+#         except:
+#             max_x = 1
+#             print(f'{YELLOW}Warning: PlotJsoncore: the max-x value for Efficiency plot was not possible to evaluate, default value {max_x} will be used {RESET}')
+#         plt.xlim(0, 1.5 * max_x)
+#
+#         # title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
+#         # CloverName = key["serial"][:len(key["serial"])-1]
+#         plt.title('Efficiency for core {} {}'.format(CloverName, detKey))
+#         plt.title('Efficiency for core {} {}'.format(CloverName, detKey))
+#         # print('CloverName',CloverName, key['detType'])
+#         plt.xlabel('Domain')
+#         plt.ylabel('Efficiency (%)')
+#         plt.grid(color='black', linestyle='--', linewidth=0.5)
+#         legend_without_duplicate_labels(plt)
+#
+#         plt.figure(2)
+#         plt.xlim(100, 841)
+#         # plt.ylim([1, 5])
+#         max_y = max([line.get_ydata().max() for line in plt.gca().get_lines()])
+#         plt.ylim(0, 1.5 * max_y)
+#
+#         max_x = max([line.get_xdata().max() for line in plt.gca().get_lines()])
+#         plt.xlim(0, 1.5 * max_x)
+#         # title_clover=clover.rstrip(clover[-1])#CL29 instead of CL29G
+#         plt.title('Resolution for core {} det key {}'.format(CloverName, detKey))
+#         plt.xlabel('Domain')
+#         plt.ylabel('Resolution (keV)')
+#         plt.grid(color='black', linestyle='--', linewidth=0.5)
+#         legend_without_duplicate_labels(plt)
+#
+#         plt.figure(1)
+#         file_name5 = 'eliade_efficiency_{}_core{}.{}'.format(CloverName, detKey, opt)
+#         plt.savefig(save_results_to + file_name5,  dpi = dpi)
+#         plt.close()
+#
+#         plt.figure(2)
+#         file_name6 = 'eliade_resolution_{}_core{}.{}'.format(CloverName, detKey, opt)
+#         plt.savefig(save_results_to + file_name6,  dpi = dpi)
+#         plt.close()
+#
+#         print("PlotJsoncore: Finished graphs for all core{} {}".format(CloverName, detKey))
+#     return True
 
 
 def PlotCalibration(data, gammatab, source, lutfile, my_det_type=2, opt='eps', dpi=300):
@@ -615,7 +691,9 @@ def PlotCeBr(data, gammatab, source, my_det_type, lutfile, opt='eps', dpi=300):
                                                      yerr=key[source][element]["err_eff"], fmt='o', color=plot_color,
                                                      ecolor=plot_color, capsize=5)
                                     except:
-                                        continue  # print("Energy {} missing from domain {}".format(key[source][element], key["domain"]))
+                                        # continue
+                                        print("Energy {} missing from domain {}".format(key[source][element], key["domain"]))
+                                        continue
                                     plt.figure(2)  # resolution plot
                                     try:
                                         plt.scatter(x=key["domain"], y=key[source][element]["res"], color=plot_color,
