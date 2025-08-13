@@ -492,7 +492,8 @@ def main():
             domain_end=my_params.dom2,
             target_S=my_params.server,
             verbose=True,    # Set to False to suppress output
-            create_plots=True  # Set to False to only extract data without creating plots
+            create_plots=True,  # Set to False to only extract data without creating plots
+            show_annotations=not config.no_annotations  # Disable annotations if --no-annotations is set
         )
 
         if result is None:
@@ -508,6 +509,11 @@ def main():
         
         if 'output_path' in result:
             print(f"Plots saved to: {result['output_path']}")
+        
+        if 'json_output_path' in result and result['json_output_path']:
+            print(f"Data saved to JSON file: {result['json_output_path']}")
+        elif 'json_output_path' in result:
+            print("Warning: Failed to save JSON data file")
 
     # Plotting section - added from py_calib_aa.py
     if config.plots:  # Only run plotting if --plots is set
@@ -768,6 +774,7 @@ if __name__ == "__main__":
 
     parser.add_argument('--calib', action='store_true', help="Enable calibration fittings")
     parser.add_argument('--enerplots', action='store_true', help="Enable energy over time plots")
+    parser.add_argument('--no-annotations', action='store_true', help="Disable text annotations on energy plots")
     parser.add_argument('--plots', action='store_true', help="Enable plotting of fitting details")
     parser.add_argument('--processjson', action='store_true', help="Enable JSON post-processing: serial and energy calculation")
     parser.add_argument('--update-lut', action='store_true', help="Update LUT_ELIADE.json with pol_list from processed calibration data")

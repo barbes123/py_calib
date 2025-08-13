@@ -158,7 +158,7 @@ def extract_data_from_folders(parent_dir, subfolders, target_run, target_S, doma
         'unique_isotopes': unique_isotopes
     }
 
-def create_plots_for_domain(domain, data, target_run, target_S, output_path, verbose=True):
+def create_plots_for_domain(domain, data, target_run, target_S, output_path, verbose=True, show_annotations=True):
     """Create plots for a specific domain"""
     # Filter data for this domain
     domain_indices = [i for i, d in enumerate(data['domains']) if d == domain]
@@ -180,16 +180,16 @@ def create_plots_for_domain(domain, data, target_run, target_S, output_path, ver
     
     # Create subplot figure
     _create_energy_subplots(domain, domain_x, domain_y, domain_isotopes, domain_energies, 
-                           domain_filenames, domain_unique_energies, target_run, target_S, output_path)
+                           domain_filenames, domain_unique_energies, target_run, target_S, output_path, show_annotations)
     
     # Create combined plot
     _create_combined_plot(domain, domain_x, domain_y, domain_isotopes, domain_energies, 
-                         domain_filenames, domain_unique_energies, target_run, target_S, output_path)
+                         domain_filenames, domain_unique_energies, target_run, target_S, output_path, show_annotations)
     
     return True
 
 def _create_energy_subplots(domain, domain_x, domain_y, domain_isotopes, domain_energies, 
-                           domain_filenames, domain_unique_energies, target_run, target_S, output_path):
+                           domain_filenames, domain_unique_energies, target_run, target_S, output_path, show_annotations=True):
     """Create separate subplots for each energy"""
     n_plots = len(domain_unique_energies)
     if n_plots == 0:
@@ -224,7 +224,7 @@ def _create_energy_subplots(domain, domain_x, domain_y, domain_isotopes, domain_
         energy_data.sort(key=lambda item: item[0])
         
         if energy_data:
-            energy_x_sorted = [item[0] for item in energy_data]
+            energy_x_sorted = [item[0] / 1e12 for item in energy_data]  # Convert to seconds
             energy_y_sorted = [item[1] for item in energy_data]
             energy_isotopes_sorted = [item[2] for item in energy_data]
             energy_filenames_sorted = [item[3] for item in energy_data]
@@ -233,16 +233,24 @@ def _create_energy_subplots(domain, domain_x, domain_y, domain_isotopes, domain_
             
             ax.plot(energy_x_sorted, energy_y_sorted, 'o-', alpha=0.7, linewidth=2, markersize=8)
             ax.scatter(energy_x_sorted, energy_y_sorted, c=colors, alpha=0.7, s=50, zorder=5)
-            ax.set_xlabel("Cumulative Time (ps)")
+            ax.set_xlabel("Cumulative Time (s)")
             ax.set_ylabel("pos_ch/kev")
-            ax.set_title(f"Energy {energy} keV\n({len(energy_y_sorted)} points)")
+            
+            # Only show detailed titles if show_annotations is True
+            if show_annotations:
+                ax.set_title(f"Energy {energy} keV\n({len(energy_y_sorted)} points)")
+            else:
+                ax.set_title(f"{energy} keV")
+            
             ax.grid(True, alpha=0.3)
             
-            for x, y, filename in zip(energy_x_sorted, energy_y_sorted, energy_filenames_sorted):
-                ax.annotate(filename, (x, y), xytext=(5, 5), textcoords='offset points', 
-                           fontsize=8, alpha=0.7)
+            # Only add annotations if show_annotations is True
+            if show_annotations:
+                for x, y, filename in zip(energy_x_sorted, energy_y_sorted, energy_filenames_sorted):
+                    ax.annotate(filename, (x, y), xytext=(5, 5), textcoords='offset points', 
+                               fontsize=8, alpha=0.7)
             
-            if len(set(energy_isotopes_sorted)) > 1:
+            if len(set(energy_isotopes_sorted)) > 1 and show_annotations:
                 isotopes_str = ", ".join(set(energy_isotopes_sorted))
                 ax.set_title(f"Energy {energy} keV\nIsotopes: {isotopes_str}\n({len(energy_y_sorted)} points)")
     
@@ -250,8 +258,13 @@ def _create_energy_subplots(domain, domain_x, domain_y, domain_isotopes, domain_
     for i in range(n_plots, len(axes)):
         axes[i].set_visible(False)
     
-    fig.suptitle(f"Peak Positions vs Run Duration by Energy\n(domain {domain}, run {target_run}, S{target_S})", 
-                 fontsize=14, y=0.98)
+    # Adjust main title based on show_annotations
+    if show_annotations:
+        fig.suptitle(f"Peak Positions vs Run Duration by Energy\n(domain {domain}, run {target_run}, S{target_S})", 
+                     fontsize=14, y=0.98)
+    else:
+        fig.suptitle(f"Domain {domain} - Run {target_run} - S{target_S}", 
+                     fontsize=14, y=0.98)
     
     if len(domain_unique_isotopes) > 1:
         legend_patches = [mpatches.Patch(color=color, label=isotope) 
@@ -261,13 +274,15 @@ def _create_energy_subplots(domain, domain_x, domain_y, domain_isotopes, domain_
     plt.tight_layout()
     plt.subplots_adjust(top=0.90)
     
-    subplot_filename = f"energy_subplots_run_{target_run}_domain_{domain}_S{target_S}.png"
+    # Add suffix to filename if annotations are disabled
+    suffix = "_no_annotations" if not show_annotations else ""
+    subplot_filename = f"energy_subplots_run_{target_run}_domain_{domain}_S{target_S}{suffix}.png"
     subplot_path = os.path.join(output_path, subplot_filename)
     plt.savefig(subplot_path, dpi=300, bbox_inches='tight')
     plt.close()
 
 def _create_combined_plot(domain, domain_x, domain_y, domain_isotopes, domain_energies, 
-                         domain_filenames, domain_unique_energies, target_run, target_S, output_path):
+                         domain_filenames, domain_unique_energies, target_run, target_S, output_path, show_annotations=True):
     """Create combined plot for all energies in a domain"""
     plt.figure(figsize=(12, 8))
     
@@ -284,7 +299,7 @@ def _create_combined_plot(domain, domain_x, domain_y, domain_isotopes, domain_en
         energy_data.sort(key=lambda item: item[0])
         
         if energy_data:
-            energy_x = [item[0] for item in energy_data]
+            energy_x = [item[0] / 1e12 for item in energy_data]  # Convert to seconds
             energy_y = [item[1] for item in energy_data]
             energy_isotopes = [item[2] for item in energy_data]
             
@@ -293,15 +308,24 @@ def _create_combined_plot(domain, domain_x, domain_y, domain_isotopes, domain_en
                     markersize=8, label=f"{energy_isotopes[0]} {energy} keV")
     
     point_colors = [color_map[(isotope, energy)] for isotope, energy in zip(domain_isotopes, domain_energies)]
-    plt.scatter(domain_x, domain_y, c=point_colors, alpha=0.7, s=50, zorder=5)
+    domain_x_seconds = [x / 1e12 for x in domain_x]  # Convert to seconds
+    plt.scatter(domain_x_seconds, domain_y, c=point_colors, alpha=0.7, s=50, zorder=5)
     
-    for x, y, filename in zip(domain_x, domain_y, domain_filenames):
-        plt.annotate(filename, (x, y), xytext=(5, 5), textcoords='offset points', 
-                    fontsize=8, alpha=0.7)
+    # Only add annotations if show_annotations is True
+    if show_annotations:
+        for x, y, filename in zip(domain_x_seconds, domain_y, domain_filenames):
+            plt.annotate(filename, (x, y), xytext=(5, 5), textcoords='offset points', 
+                        fontsize=8, alpha=0.7)
     
-    plt.xlabel("Cumulative Time (picoseconds)")
+    plt.xlabel("Cumulative Time (seconds)")
     plt.ylabel("pos_ch/kev")
-    plt.title(f"All Peak Positions vs Cumulative Time\n(domain {domain}, run {target_run}, S{target_S})")
+    
+    # Adjust title based on show_annotations
+    if show_annotations:
+        plt.title(f"All Peak Positions vs Cumulative Time\n(domain {domain}, run {target_run}, S{target_S})")
+    else:
+        plt.title(f"Domain {domain} - Run {target_run} - S{target_S}")
+    
     plt.grid(True, alpha=0.3)
     
     legend_patches = [mpatches.Patch(color=color, label=f"{isotope} {energy} keV")
@@ -309,16 +333,19 @@ def _create_combined_plot(domain, domain_x, domain_y, domain_isotopes, domain_en
     plt.legend(handles=legend_patches, bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.tight_layout()
     
-    combined_filename = f"combined_plot_run_{target_run}_domain_{domain}_S{target_S}.png"
+    # Add suffix to filename if annotations are disabled
+    suffix = "_no_annotations" if not show_annotations else ""
+    combined_filename = f"combined_plot_run_{target_run}_domain_{domain}_S{target_S}{suffix}.png"
     combined_path = os.path.join(output_path, combined_filename)
     plt.savefig(combined_path, dpi=300, bbox_inches='tight')
     plt.close()
 
 def plot_peak_positions_vs_time(target_run, domain_start, domain_end, target_S, 
                                parent_dir=None, durations_file="run_durations.json", 
-                               verbose=True, create_plots=True):
+                               verbose=True, create_plots=True, show_annotations=True):
     """
     Main function to plot peak positions vs cumulative time for detector calibration data.
+    Also saves the extracted data to a JSON file for further analysis.
     
     Args:
         target_run (int): Target run number (e.g., 171)
@@ -329,9 +356,15 @@ def plot_peak_positions_vs_time(target_run, domain_start, domain_end, target_S,
         durations_file (str): Name of the durations JSON file
         verbose (bool): Whether to print progress information
         create_plots (bool): Whether to create and save plots
+        show_annotations (bool): Whether to show text annotations next to data points
     
     Returns:
-        dict: Dictionary containing extracted data and metadata
+        dict: Dictionary containing extracted data and metadata, including:
+            - 'x', 'y': lists of time and position data
+            - 'isotopes', 'energies', 'filenames', 'domains': corresponding metadata
+            - 'unique_isotopes': set of unique isotopes found
+            - 'output_path': path where plots/data are saved
+            - 'json_output_path': path to the saved JSON data file
     """
     if parent_dir is None:
         parent_dir = os.getcwd()
@@ -379,38 +412,93 @@ def plot_peak_positions_vs_time(target_run, domain_start, domain_end, target_S,
             print(f"No pos_ch values found for domains {domain_start}-{domain_end} in run {target_run} S{target_S}.")
         return data
     
+    # Create output folder (needed for both plots and JSON)
+    output_folder = f"compare_shift_run_{target_run}_domains_{domain_start}-{domain_end}_S{target_S}"
+    output_path = os.path.join(parent_dir, output_folder)
+    
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+        if verbose:
+            print(f"\nCreated output folder: {output_path}")
+    else:
+        if verbose:
+            print(f"\nUsing existing output folder: {output_path}")
+
+    plots_created = 0
     if create_plots:
-        # Create output folder
-        output_folder = f"compare_shift_run_{target_run}_domains_{domain_start}-{domain_end}_S{target_S}"
-        output_path = os.path.join(parent_dir, output_folder)
-        
-        if not os.path.exists(output_path):
-            os.makedirs(output_path)
-            if verbose:
-                print(f"\nCreated output folder: {output_path}")
-        else:
-            if verbose:
-                print(f"\nUsing existing output folder: {output_path}")
-        
         # Create plots for each domain
         unique_domains = sorted(set(data['domains']))
         if verbose:
             print(f"\nCreating separate plots for domains: {unique_domains}")
         
-        plots_created = 0
         for domain in unique_domains:
             if verbose:
                 print(f"\nProcessing plots for domain {domain}...")
             
-            if create_plots_for_domain(domain, data, target_run, target_S, output_path, verbose):
+            if create_plots_for_domain(domain, data, target_run, target_S, output_path, verbose, show_annotations):
                 plots_created += 1
         
         if verbose:
             print(f"\nAll plots saved in: {output_path}")
             print(f"Created plots for {plots_created} domains")
+    
+    data['output_path'] = output_path
+    data['plots_created'] = plots_created
+    
+    # Save extracted data to JSON file (always save, regardless of create_plots)
+    json_output_filename = f"energy_over_time_data_run_{target_run}_domains_{domain_start}-{domain_end}_S{target_S}.json"
+    json_output_path = os.path.join(output_path, json_output_filename)
+    
+    # Organize data by source and domain for better structure
+    organized_data = {}
+    for i in range(len(data['x'])):
+        isotope = data['isotopes'][i]
+        domain = data['domains'][i]
         
-        data['output_path'] = output_path
-        data['plots_created'] = plots_created
+        if isotope not in organized_data:
+            organized_data[isotope] = {}
+        if domain not in organized_data[isotope]:
+            organized_data[isotope][domain] = []
+        
+        organized_data[isotope][domain].append({
+            'time_seconds': data['x'][i] / 1e12,  # Convert picoseconds to seconds
+            'position': data['y'][i],
+            'energy_kev': data['energies'][i],
+            'filename': data['filenames'][i]
+        })
+    
+    # Prepare hierarchically organized JSON data
+    json_data = {
+        'metadata': {
+            'target_run': target_run,
+            'domain_start': domain_start,
+            'domain_end': domain_end,
+            'target_S': target_S,
+            'total_data_points': len(data['y']),
+            'unique_isotopes': sorted(list(data['unique_isotopes'])),
+            'unique_domains': sorted(list(set(data['domains']))),
+            'plots_created': plots_created,
+            'time_range_seconds': [min(data['x']) / 1e12, max(data['x']) / 1e12] if data['x'] else [0, 0],
+            'position_range': [min(data['y']), max(data['y'])] if data['y'] else [0, 0],
+            'time_unit': 'seconds',
+            'position_unit': 'channels'
+        },
+        'sources': organized_data
+    }
+    
+    try:
+        with open(json_output_path, 'w') as json_file:
+            json.dump(json_data, json_file, indent=4)
+        
+        if verbose:
+            print(f"Saved extracted data to: {json_output_path}")
+        
+        data['json_output_path'] = json_output_path
+        
+    except Exception as e:
+        if verbose:
+            print(f"Error saving JSON data: {e}")
+        data['json_output_path'] = None
     
     return data
 
@@ -423,6 +511,7 @@ def main():
     parser.add_argument('target_S', type=int, help='Target S number (e.g., 2)')
     parser.add_argument('--parent_dir', type=str, help='Parent directory path (default: current directory)')
     parser.add_argument('--no_plots', action='store_true', help='Skip creating plots')
+    parser.add_argument('--no_annotations', action='store_true', help='Disable text annotations on data points')
     parser.add_argument('--quiet', action='store_true', help='Suppress verbose output')
     
     args = parser.parse_args()
@@ -434,7 +523,8 @@ def main():
         target_S=args.target_S,
         parent_dir=args.parent_dir,
         verbose=not args.quiet,
-        create_plots=not args.no_plots
+        create_plots=not args.no_plots,
+        show_annotations=not args.no_annotations
     )
     
     if result is None:
