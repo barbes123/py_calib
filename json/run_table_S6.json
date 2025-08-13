@@ -1,8 +1,242 @@
 [
    {
+        "runNumber": 213,
+        "start": "2025-06-26 09:06:24",
+        "stop": "2025-06-26 14:27:05",
+        "expName": "ES6",
+        "comment": "",
+        "source": "54Mn",
+        "distance": "999"
+    },
+    {
+        "runNumber": 212,
+        "start": "2025-06-24 13:36:03",
+        "stop": "2025-06-26 08:47:14",
+        "expName": "ES6",
+        "comment": "",
+        "source": "137Cs",
+        "distance": "999"
+    },
+    {
+        "runNumber": 211,
+        "start": "2025-06-23 12:30:38",
+        "stop": "2025-06-24 13:26:16",
+        "expName": "ES6",
+        "comment": "",
+        "source": "BG",
+        "distance": "999"
+    },
+    {
+        "runNumber": 210,
+        "start": "2025-06-23 11:36:30",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES6",
+        "comment": "",
+        "source": "xxx",
+        "distance": "999"
+    },
+    {
+        "runNumber": 209,
+        "start": "2025-06-20 15:12:42",
+        "stop": "2025-06-21 14:24:09",
+        "expName": "ES6",
+        "comment": "",
+        "source": "BG",
+        "distance": "999"
+    },
+    {
+        "runNumber": 208,
+        "start": "2025-06-16 13:36:36",
+        "stop": "2025-06-20 15:05:36",
+        "expName": "ES6",
+        "comment": "",
+        "source": "60Co",
+        "distance": "999"
+    },
+    {
+        "runNumber": 207,
+        "start": "2025-06-13 10:40:36",
+        "stop": "2025-06-16 13:20:01",
+        "expName": "ES6",
+        "comment": "",
+        "source": "152Eu",
+        "distance": "999"
+    },
+    {
+        "runNumber": 206,
+        "start": "2025-06-12 16:05:15",
+        "stop": "2025-06-13 10:18:55",
+        "expName": "ES6",
+        "comment": "",
+        "source": "133Ba",
+        "distance": "999"
+    },
+    {
+        "runNumber": 205,
+        "start": "2025-06-12 16:04:02",
+        "stop": "2025-06-12 16:05:12",
+        "expName": "ES6",
+        "comment": "",
+        "source": "133Ba",
+        "distance": "999"
+    },
+    {
+        "runNumber": 204,
+        "start": "2025-06-12 16:00:20",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES6",
+        "comment": "",
+        "source": "133Ba",
+        "distance": "999"
+    },
+    {
+        "runNumber": 203,
+        "start": "2025-06-12 15:58:12",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES6",
+        "comment": "",
+        "source": "133Ba",
+        "distance": "999"
+    },
+    {
+        "runNumber": 202,
+        "start": "2025-06-12 15:56:42",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES6",
+        "comment": "",
+        "source": "133Ba",
+        "distance": "999"
+    },
+    {
+        "runNumber": 201,
+        "start": "2025-06-12 15:52:22",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES6",
+        "comment": "",
+        "source": "133Ba",
+        "distance": "999"
+    },
+    {
+        "runNumber": 200,
+        "start": "2025-06-12 15:49:20",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES6",
+        "comment": "",
+        "source": "133Ba",
+        "distance": "999"
+    },
+    {
+        "runNumber": 199,
+        "start": "2025-06-12 15:48:33",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES6",
+        "comment": "",
+        "source": "133Ba",
+        "distance": "999"
+    },
+    {
+        "runNumber": 198,
+        "start": "2025-06-12 15:46:46",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES6",
+        "comment": "",
+        "source": "133Ba",
+        "distance": "999"
+    },
+    {
+        "runNumber": 197,
+        "start": "2025-06-05 14:41:54",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES6",
+        "comment": "",
+        "source": "133Ba",
+        "distance": "999"
+    },
+    {
+        "runNumber": 196,
+        "start": "2025-06-05 14:40:53",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES6",
+        "comment": "",
+        "source": "133Ba",
+        "distance": "999"
+    },
+    {
+        "runNumber": 195,
+        "start": "2025-06-05 14:40:04",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES6",
+        "comment": "",
+        "source": "133Ba",
+        "distance": "999"
+    },
+    {
+        "runNumber": 194,
+        "start": "2025-06-05 14:39:11",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES6",
+        "comment": "",
+        "source": "133Ba",
+        "distance": "999"
+    },
+    {
+        "runNumber": 193,
+        "start": "2025-06-05 14:38:33",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES6",
+        "comment": "",
+        "source": "133Ba",
+        "distance": "999"
+    },
+    {
+        "runNumber": 192,
+        "start": "2025-06-05 14:37:48",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES6",
+        "comment": "",
+        "source": "133Ba",
+        "distance": "999"
+    },
+    {
+        "runNumber": 191,
+        "start": "2025-06-05 14:37:00",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES6",
+        "comment": "",
+        "source": "133Ba",
+        "distance": "999"
+    },
+    {
+        "runNumber": 190,
+        "start": "2025-06-05 14:36:09",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES6",
+        "comment": "",
+        "source": "133Ba",
+        "distance": "999"
+    },
+    {
+        "runNumber": 189,
+        "start": "2025-06-05 14:35:08",
+        "stop": "1970-01-01 02:00:00",
+        "expName": "ES6",
+        "comment": "Setting the program",
+        "source": "60Co",
+        "distance": "999"
+    },
+    {
+        "runNumber": 188,
+        "start": "2025-06-05 11:20:53",
+        "stop": "2025-06-05 14:34:38",
+        "expName": "ES6",
+        "comment": "Setting the program",
+        "source": "60Co",
+        "distance": "999"
+    },
+   {
         "runNumber": 187,
         "start": "2025-06-02 15:26:55",
-        "stop": "1970-01-01 02:00:00",
+        "stop": "2025-06-02 16:26:55",
         "expName": "ES6",
         "comment": "Setting the program",
         "source": "152Eu",
