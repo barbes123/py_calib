@@ -234,7 +234,7 @@ def _create_energy_subplots(domain, domain_x, domain_y, domain_isotopes, domain_
             ax.plot(energy_x_sorted, energy_y_sorted, 'o-', alpha=0.7, linewidth=2, markersize=8)
             ax.scatter(energy_x_sorted, energy_y_sorted, c=colors, alpha=0.7, s=50, zorder=5)
             ax.set_xlabel("Cumulative Time (s)")
-            ax.set_ylabel("pos_ch/kev")
+            ax.set_ylabel("kev")
             
             # Only show detailed titles if show_annotations is True
             if show_annotations:
@@ -318,7 +318,7 @@ def _create_combined_plot(domain, domain_x, domain_y, domain_isotopes, domain_en
                         fontsize=8, alpha=0.7)
     
     plt.xlabel("Cumulative Time (seconds)")
-    plt.ylabel("pos_ch/kev")
+    plt.ylabel("kev")
     
     # Adjust title based on show_annotations
     if show_annotations:
