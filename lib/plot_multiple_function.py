@@ -7,7 +7,15 @@ import numpy as np
 import argparse
 
 def find_dicts_with_domain(obj, target_domain):
-    """Find all dictionaries that contain the                          colors = [isotope_color_map[isotope] for isotope indef _create_volume_subplots(domain, domain_x, domain_y, domain_isotopes, domain_energies, 
+    """Find all dictionaries that contain the                          col            ax.scatter(energy_x_sorted, energy_y_sorted, c=colors, alpha=0.7, s=50, zorder=5)
+            ax.set_xlabel("Cumulative Time (s)")
+            ax.set_ylabel("pos_ch/kev")
+            
+            # Format x-axis with scientific notation and reduce tick density
+            ax.ticklabel_format(style='scientific', axis='x', scilimits=(0,0))
+            ax.locator_params(axis='x', nbins=5)  # Limit to 5 ticks on x-axis
+            
+            # Only show detailed titles if show_annotations is True [isotope_color_map[isotope] for isotope indef _create_volume_subplots(domain, domain_x, domain_y, domain_isotopes, domain_energies, 
                            domain_filenames, domain_unique_energies, target_run, target_S, output_path, show_annotations=False):nergy_isotopes_sorted]
             
             ax.scatter(energy_x_sorted, energy_y_sorted, c=colors, alpha=0.7, s=50, zorder=5)
@@ -260,7 +268,11 @@ def _create_energy_subplots(domain, domain_x, domain_y, domain_isotopes, domain_
             
             ax.scatter(energy_x_sorted, energy_y_sorted, c=colors, alpha=0.7, s=50, zorder=5)
             ax.set_xlabel("Cumulative Time (s)")
-            ax.set_ylabel("kev")
+            ax.set_ylabel("pos_ch/kev")
+            
+            # Format x-axis with scientific notation and reduce tick density
+            ax.ticklabel_format(style='scientific', axis='x', scilimits=(0,0))
+            ax.locator_params(axis='x', nbins=5)  # Limit to 5 ticks on x-axis
             
             # Only show detailed titles if show_annotations is True
             if show_annotations:
@@ -447,8 +459,9 @@ def _create_combined_plot(domain, domain_x, domain_y, domain_isotopes, domain_en
     plt.xlabel("Cumulative Time (seconds)")
     plt.ylabel("pos_ch/kev")
     
-    # Format x-axis with scientific notation for large numbers
+    # Format x-axis with scientific notation and reduce tick density
     plt.ticklabel_format(style='scientific', axis='x', scilimits=(0,0))
+    plt.locator_params(axis='x', nbins=5)  # Limit to 5 ticks on x-axis
     
     # Adjust title based on show_annotations
     if show_annotations:
