@@ -491,6 +491,8 @@ def main():
             domain_start=my_params.dom1,
             domain_end=my_params.dom2,
             target_S=my_params.server,
+            vol_start=my_params.vol0,
+            vol_end=my_params.vol1,
             verbose=True,    # Set to False to suppress output
             create_plots=True,  # Set to False to only extract data without creating plots
             show_annotations=config.annotations  # Enable annotations if --annotations is set

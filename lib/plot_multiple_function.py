@@ -82,8 +82,8 @@ def load_run_durations(parent_dir, durations_file):
 
 
 
-def find_matching_folders(parent_dir, target_run, target_S, run_durations):
-    """Find folders matching the pattern and with valid run durations"""
+def find_matching_folders(parent_dir, target_run, target_S, run_durations, vol_start=None, vol_end=None):
+    """Find folders matching the pattern and with valid run durations, optionally filtered by volume range"""
     folder_pattern = re.compile(rf"selected_run_{target_run}_(\d+)_eliadeS{target_S}_calib")
     subfolders = []
 
@@ -93,6 +93,13 @@ def find_matching_folders(parent_dir, target_run, target_S, run_durations):
             match = folder_pattern.fullmatch(d)
             if match:
                 index = int(match.group(1))
+                
+                # Apply volume range filter if specified
+                if vol_start is not None and index < vol_start:
+                    continue
+                if vol_end is not None and index > vol_end:
+                    continue
+                
                 run_key = f"run{target_run}_{index}_eliadeS{target_S}"
                 if run_key in run_durations:
                     subfolders.append((d, index))
@@ -485,6 +492,7 @@ def _create_combined_plot(domain, domain_x, domain_y, domain_isotopes, domain_en
 
 def plot_peak_positions_vs_time(target_run, domain_start, domain_end, target_S, 
                                parent_dir=None, durations_file="run_durations.json", 
+                               vol_start=None, vol_end=None,
                                verbose=True, create_plots=True, show_annotations=False):
     """
     Main function to plot peak positions vs cumulative time for detector calibration data.
@@ -497,6 +505,8 @@ def plot_peak_positions_vs_time(target_run, domain_start, domain_end, target_S,
         target_S (int): Target S number (e.g., 2)
         parent_dir (str, optional): Parent directory path. Defaults to current working directory.
         durations_file (str): Name of the durations JSON file
+        vol_start (int, optional): Starting volume number to filter data
+        vol_end (int, optional): Ending volume number to filter data
         verbose (bool): Whether to print progress information
         create_plots (bool): Whether to create and save plots
         show_annotations (bool): Whether to show text annotations next to data points
@@ -528,7 +538,7 @@ def plot_peak_positions_vs_time(target_run, domain_start, domain_end, target_S,
         return None
     
     # Find matching folders
-    subfolders = find_matching_folders(parent_dir, target_run, target_S, run_durations)
+    subfolders = find_matching_folders(parent_dir, target_run, target_S, run_durations, vol_start, vol_end)
     if verbose:
         print(f"Found {len(subfolders)} matching folders")
         for folder_name, index in subfolders:
@@ -665,6 +675,8 @@ def main():
     parser.add_argument('domain_end', type=int, help='Ending domain number (e.g., 115)')
     parser.add_argument('target_S', type=int, help='Target S number (e.g., 2)')
     parser.add_argument('--parent_dir', type=str, help='Parent directory path (default: current directory)')
+    parser.add_argument('--vol_start', type=int, help='Starting volume number to filter data')
+    parser.add_argument('--vol_end', type=int, help='Ending volume number to filter data')
     parser.add_argument('--no_plots', action='store_true', help='Skip creating plots')
     parser.add_argument('--annotations', action='store_true', help='Enable text annotations on data points')
     parser.add_argument('--quiet', action='store_true', help='Suppress verbose output')
@@ -677,6 +689,8 @@ def main():
         domain_end=args.domain_end,
         target_S=args.target_S,
         parent_dir=args.parent_dir,
+        vol_start=args.vol_start,
+        vol_end=args.vol_end,
         verbose=not args.quiet,
         create_plots=not args.no_plots,
         show_annotations=args.annotations
