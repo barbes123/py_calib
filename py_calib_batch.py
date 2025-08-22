@@ -441,7 +441,7 @@ def main():
                 f"{path}/gammaset -f selected_run_{my_params.runnbr}_{volnbr}_eliadeS{my_params.server}.root "
                 f"-rp {lut_recall_fname} -sc {my_params.dom1} -ec {my_params.dom2} -s {src} -pd {my_params.pd} -fd 3 "
                 f"-br {my_params.fitrange} -peakthresh {my_params.peakthresh} -rb 1 -hist {my_params.prefix} "
-                f"-guideSigma {my_params.guideSigma} -fgf {Tail} -hough 0 -exclude_energy 1085.79 1112.07"
+                f"-guideSigma {my_params.guideSigma} -fgf {Tail} -hough 0 -exclude_energy 1085.79,1112.07"
             )
             # fgf - tail 1 is off; 0 is on
             print("Command to run:")
