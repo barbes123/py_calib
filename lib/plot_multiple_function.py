@@ -87,22 +87,29 @@ def find_matching_folders(parent_dir, target_run, target_S, run_durations, vol_s
     folder_pattern = re.compile(rf"selected_run_{target_run}_(\d+)_eliadeS{target_S}_calib")
     subfolders = []
 
-    for d in sorted(os.listdir(parent_dir)):
+    # Get all directories and extract volume numbers for proper numeric sorting
+    all_folders = []
+    for d in os.listdir(parent_dir):
         full_path = os.path.join(parent_dir, d)
         if os.path.isdir(full_path):
             match = folder_pattern.fullmatch(d)
             if match:
                 index = int(match.group(1))
-                
-                # Apply volume range filter if specified
-                if vol_start is not None and index < vol_start:
-                    continue
-                if vol_end is not None and index > vol_end:
-                    continue
-                
-                run_key = f"run{target_run}_{index}_eliadeS{target_S}"
-                if run_key in run_durations:
-                    subfolders.append((d, index))
+                all_folders.append((d, index))
+    
+    # Sort by volume number (numeric sorting)
+    all_folders.sort(key=lambda x: x[1])
+    
+    for d, index in all_folders:
+        # Apply volume range filter if specified
+        if vol_start is not None and index < vol_start:
+            continue
+        if vol_end is not None and index > vol_end:
+            continue
+        
+        run_key = f"run{target_run}_{index}_eliadeS{target_S}"
+        if run_key in run_durations:
+            subfolders.append((d, index))
     
     return subfolders
 
@@ -212,7 +219,7 @@ def create_plots_for_domain(domain, data, target_run, target_S, output_path, ver
     domain_energies = [data['energies'][i] for i in domain_indices]
     domain_filenames = [data['filenames'][i] for i in domain_indices]
     
-    domain_unique_energies = sorted(set(domain_energies))
+    domain_unique_energies = sorted(set(domain_energies), key=lambda x: float(x) if str(x).replace('.', '', 1).replace('-', '', 1).isdigit() else float('inf'))
     if verbose:
         print(f"  Energies found for domain {domain}: {domain_unique_energies}")
     
