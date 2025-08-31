@@ -304,6 +304,31 @@ def read_gamma_sources():
         return gamma_sources_json
     return None
 
+def filter_zero_energy_peaks(js_tab):
+    """Filter out peaks with energy key "0" from all isotope data"""
+    filtered_data = []
+    
+    for entry in js_tab:
+        filtered_entry = entry.copy()
+        
+        # Check each isotope in the entry
+        for isotope_key in entry.keys():
+            if isinstance(entry[isotope_key], dict) and isotope_key not in ['domain', 'serial', 'detType', 'PT', 'pol_list', 'bg']:
+                # This is an isotope data section
+                filtered_peaks = {}
+                for energy_key, peak_data in entry[isotope_key].items():
+                    # Skip peaks with energy "0"
+                    if energy_key != "0":
+                        filtered_peaks[energy_key] = peak_data
+                    else:
+                        print(f"Filtering out peak with energy '0' in domain {entry.get('domain', 'unknown')}, isotope {isotope_key}")
+                
+                filtered_entry[isotope_key] = filtered_peaks
+        
+        filtered_data.append(filtered_entry)
+    
+    return filtered_data
+
 def get_serial_detType(domain, lut_data):
     for entry in lut_data:
         if entry.get("domain") == domain:
@@ -441,7 +466,7 @@ def main():
                 f"{path}/gammaset -f selected_run_{my_params.runnbr}_{volnbr}_eliadeS{my_params.server}.root "
                 f"-rp {lut_recall_fname} -sc {my_params.dom1} -ec {my_params.dom2} -s {src} -pd {my_params.pd} -fd 3 "
                 f"-br {my_params.fitrange} -peakthresh {my_params.peakthresh} -rb 1 -hist {my_params.prefix} "
-                f"-guideSigma {my_params.guideSigma} -fgf {Tail} -hough 0 -exclude_energy 1085.793,1112.070"
+                f"-guideSigma {my_params.guideSigma} -fgf {Tail} -hough 0  -exclude_energy 1085.793,1112.070"
             )
             # fgf - tail 1 is off; 0 is on
             print("Command to run:")
@@ -450,40 +475,41 @@ def main():
 
             result_scr = subprocess.run(['{}'.format(command_line)], shell=True)
 
-            # JSON post-processing (serial and energy calculation)
-            if config.processjson:
-                json_path = '{}selected_run_{}_{}_eliadeS{}_calib/selected_run_{}_{}_eliadeS{}.json'.format(
-                    datapath, my_params.runnbr, volnbr, my_params.server, my_params.runnbr, volnbr, my_params.server)
-                print(f'Processing JSON data for volume {volnbr}: {json_path}')
-                # Check if JSON file exists after C++ analysis
-                if os.path.exists(json_path):
-                    # Update domain and serial information
-                    update_domain_serial(json_path, j_lut)
-                    # Process efficiency data using IsotopeData
-                    with open(json_path, 'r') as exp_file:
-                        experimental_data = json.load(exp_file)
-                    print(f'Processing efficiency calculations for volume {volnbr}')
-                    isotope_data = IsotopeData(experimental_data, j_sources, my_source.name, n_decays_sum, n_decays_err)    
-                    # Set advanced parameters for efficiency calculation
-                    isotope_data.set_advanced_parameters(
-                        A0=newa0, sigma_A0=newa0 * 0.05, 
-                        lambd=newdeccst, sigma_lambd=0,
-                        T1=newt1, sigma_T1=0.5,          
-                        T2=newt2, sigma_T2=0.5
-                    )
-                    # Parse data and calculate efficiencies
-                    isotope_data.parse_experimental_data()
-                    isotope_data.add_probabilities_to_peaks(use_advanced_calculation=True)
-                    # Save updated data back to the JSON file
-                    isotope_data.save_experimental_data(json_path)
-                    print(f'Efficiency calculations completed for volume {volnbr}')
-                else:
-                    print(f'Warning: JSON file not found for volume {volnbr}: {json_path}')
-            else:
-                print("Skipping JSON post-processing because --processjson flag is not set.")
-
     else:
         print("Skipping calibration fittings because --calib flag is not set.")
+
+    # JSON post-processing (serial and energy calculation) - now independent of --calib
+    if config.processjson:
+        for volnbr in range(my_params.vol0, my_params.vol1 + 1):
+            json_path = '{}selected_run_{}_{}_eliadeS{}_calib/selected_run_{}_{}_eliadeS{}.json'.format(
+                datapath, my_params.runnbr, volnbr, my_params.server, my_params.runnbr, volnbr, my_params.server)
+            print(f'Processing JSON data for volume {volnbr}: {json_path}')
+            # Check if JSON file exists
+            if os.path.exists(json_path):
+                # Update domain and serial information
+                update_domain_serial(json_path, j_lut)
+                # Process efficiency data using IsotopeData
+                with open(json_path, 'r') as exp_file:
+                    experimental_data = json.load(exp_file)
+                print(f'Processing efficiency calculations for volume {volnbr}')
+                isotope_data = IsotopeData(experimental_data, j_sources, my_source.name, n_decays_sum, n_decays_err)    
+                # Set advanced parameters for efficiency calculation
+                isotope_data.set_advanced_parameters(
+                    A0=newa0, sigma_A0=newa0 * 0.05, 
+                    lambd=newdeccst, sigma_lambd=0,
+                    T1=newt1, sigma_T1=0.5,          
+                    T2=newt2, sigma_T2=0.5
+                )
+                # Parse data and calculate efficiencies
+                isotope_data.parse_experimental_data()
+                isotope_data.add_probabilities_to_peaks(use_advanced_calculation=True)
+                # Save updated data back to the JSON file
+                isotope_data.save_experimental_data(json_path)
+                print(f'Efficiency calculations completed for volume {volnbr}')
+            else:
+                print(f'Warning: JSON file not found for volume {volnbr}: {json_path}')
+    else:
+        print("Skipping JSON post-processing because --processjson flag is not set.")
 
     if config.enerplots:  # Only run the loop if --enerplots is set
         result = plot_peak_positions_vs_time(
@@ -540,7 +566,11 @@ def main():
                 print(f"Attempting to open file: {file_path}")
                 with open(file_path, 'r') as ifile:
                     js_tab = json.load(ifile)
-                    print(f"File opened successfully for volume {volnbr}!")
+                    
+                    # Filter out peaks with energy "0"
+                    js_tab = filter_zero_energy_peaks(js_tab)
+                    
+                    print(f"File opened and filtered successfully for volume {volnbr}!")
                     
                     # Validate JSON data
                     if not js_tab or len(js_tab) == 0:
