@@ -312,19 +312,43 @@ def filter_zero_energy_peaks(js_tab):
         filtered_entry = entry.copy()
         
         # Check each isotope in the entry
-        for isotope_key in entry.keys():
-            if isinstance(entry[isotope_key], dict) and isotope_key not in ['domain', 'serial', 'detType', 'PT', 'pol_list', 'bg']:
+        for isotope_key in list(entry.keys()):
+            if isinstance(entry[isotope_key], dict) and isotope_key not in ['domain', 'serial', 'detType', 'PT', 'pol_list', 'bg', 'err_PT']:
                 # This is an isotope data section
                 filtered_peaks = {}
-                for energy_key, peak_data in entry[isotope_key].items():
-                    # Skip peaks with energy "0"
-                    if energy_key != "0":
-                        filtered_peaks[energy_key] = peak_data
+                original_peaks = entry[isotope_key].copy()
+                print(f"Processing isotope {isotope_key} for domain {entry.get('domain', 'unknown')}")
+                print(f"  Original peaks: {list(original_peaks.keys())}")
+                
+                for energy_key, peak_data in original_peaks.items():
+                    # Always skip peaks with energy "0" or "0.0" - these are artifacts
+                    if str(energy_key) in ["0", "0.0"]:
+                        print(f"  Filtering out peak with energy '0' in domain {entry.get('domain', 'unknown')}, isotope {isotope_key}")
+                        continue
+                    
+                    # Check if peak data is valid
+                    if isinstance(peak_data, dict) and 'eff' in peak_data:
+                        eff_values = peak_data['eff']
+                        if isinstance(eff_values, list) and len(eff_values) > 0:
+                            eff_val = eff_values[0]
+                            if eff_val > 0:
+                                filtered_peaks[energy_key] = peak_data
+                                print(f"  Keeping peak energy '{energy_key}' with efficiency {eff_val}")
+                            else:
+                                print(f"  Filtering out peak with zero efficiency: energy '{energy_key}' (eff={eff_val}) in domain {entry.get('domain', 'unknown')}, isotope {isotope_key}")
+                        else:
+                            # Keep peaks without efficiency data (might be background peaks)
+                            filtered_peaks[energy_key] = peak_data
+                            print(f"  Keeping peak energy '{energy_key}' (no efficiency data)")
                     else:
-                        print(f"Filtering out peak with energy '0' in domain {entry.get('domain', 'unknown')}, isotope {isotope_key}")
+                        # Keep peaks without efficiency field (might be background peaks)
+                        filtered_peaks[energy_key] = peak_data
+                        print(f"  Keeping peak energy '{energy_key}' (no eff field)")
                 
                 filtered_entry[isotope_key] = filtered_peaks
+                print(f"  Final filtered peaks for {isotope_key}: {list(filtered_peaks.keys())}")
         
+        # Always include entries - they contain calibration and other data
         filtered_data.append(filtered_entry)
     
     return filtered_data
@@ -466,7 +490,7 @@ def main():
                 f"{path}/gammaset -f selected_run_{my_params.runnbr}_{volnbr}_eliadeS{my_params.server}.root "
                 f"-rp {lut_recall_fname} -sc {my_params.dom1} -ec {my_params.dom2} -s {src} -pd {my_params.pd} -fd 3 "
                 f"-br {my_params.fitrange} -peakthresh {my_params.peakthresh} -rb 1 -hist {my_params.prefix} "
-                f"-guideSigma {my_params.guideSigma} -fgf {Tail} -hough 0  -exclude_energy 1085.793,1112.070"
+                f"-guideSigma {my_params.guideSigma} -fgf {Tail} -hough 0"
             )
             # fgf - tail 1 is off; 0 is on
             print("Command to run:")
@@ -569,6 +593,26 @@ def main():
                     
                     # Filter out peaks with energy "0"
                     js_tab = filter_zero_energy_peaks(js_tab)
+                    
+                    # Debug: Check filtered data
+                    print(f"Debug: Checking filtered data for volume {volnbr}")
+                    print(f"Debug: Original data length: {len(js_tab)}")
+                    for i, entry in enumerate(js_tab):
+                        domain = entry.get('domain', 'unknown')
+                        print(f"  Entry {i}: Domain {domain}")
+                        for isotope_key in entry.keys():
+                            if isinstance(entry[isotope_key], dict) and isotope_key not in ['domain', 'serial', 'detType', 'PT', 'pol_list', 'bg', 'err_PT']:
+                                energies = list(entry[isotope_key].keys())
+                                print(f"    Isotope {isotope_key}: energies = {energies}")
+                                if "0" in energies:
+                                    print(f"      WARNING: Energy '0' still present!")
+                                # Check efficiency values
+                                for energy_key, peak_data in entry[isotope_key].items():
+                                    if isinstance(peak_data, dict) and 'eff' in peak_data:
+                                        eff_val = peak_data['eff'][0] if isinstance(peak_data['eff'], list) and len(peak_data['eff']) > 0 else peak_data['eff']
+                                        print(f"      Energy {energy_key}: eff = {eff_val}")
+                                        if eff_val <= 0:
+                                            print(f"        WARNING: Zero efficiency for energy {energy_key}!")
                     
                     print(f"File opened and filtered successfully for volume {volnbr}!")
                     
